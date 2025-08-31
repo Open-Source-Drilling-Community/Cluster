@@ -1,0 +1,1404 @@
+﻿@implements IUnitAwareComponent
+@inject ILogger<ClusterEdit> logger
+@inject ISnackbar Snackbar
+
+<MudText Class="mt-4 mb-4" Typo="Typo.h6">Edit Cluster</MudText>
+<MudContainer Class="d-flex flex-row mt-4 mb-4">
+    <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="Update">Update</MudButton>
+    <MudButton Class="me-1" Variant="Variant.Filled" OnClick="Cancel">Cancel</MudButton>
+</MudContainer>
+
+<MudExpansionPanels Class="mt-4 mb-4">
+    <MudExpansionPanel Text="Description" Expanded="true">
+        <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
+            <MudTextField @bind-Value="@_name" Label="Name" Variant="Variant.Filled"></MudTextField>
+            <MudTextField @bind-Value="@_descr" Label="Description" Variant="Variant.Filled"></MudTextField>
+        </MudContainer>
+        @if (Fields != null && Fields.Count > 0)
+        {
+            <MudSelect @bind-Value="@_field" Label="Field" Variant="Variant.Filled" ToStringFunc="@(s => s?.Name)">
+                @foreach (var f in Fields)
+                {
+                    <MudSelectItem Value="@f">@f.Name</MudSelectItem>
+                }
+            </MudSelect>
+        }
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Reference">
+        <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
+            <MudGrid>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputAngleWithUnitAdornment QuantityLabel="Ref. Latitude (WGS84)"
+                                                    SIValueNullable="referenceLatitudeWGS84"
+                                                    SIValueNullableChanged="@ChangeReferenceLatitudeWGS84" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
+                                               QuantityLabel="Ref. Latitude (WGS84)"
+                                               SIValueNullable="referenceLatitudeWGS84"
+                                               SIValueNullableChanged="@ChangeReferenceLatitudeWGS84" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputAngleWithUnitAdornment QuantityLabel="Ref. Latitude (Datum)"
+                                                    SIValueNullable="referenceLatitudeDatum"
+                                                    SIValueNullableChanged="@ChangeReferenceLatitudeDatum" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
+                                               QuantityLabel="Ref. Latitude (Datum)"
+                                               SIValueNullable="referenceLatitudeDatum"
+                                               SIValueNullableChanged="@ChangeReferenceLatitudeDatum" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputWithUnitAdornment QuantityName="PositionDrilling"
+                                               QuantityLabel="Ref. Northing"
+                                               SIValueNullable="referenceNorthing"
+                                               SIValueNullableChanged="@ChangeReferenceNorthing" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
+                                               QuantityLabel="Ref. Northing Accuracy"
+                                               SIValueNullable="referenceNorthingAccuracy"
+                                               SIValueNullableChanged="@(val => referenceNorthingAccuracy = val)" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputAngleWithUnitAdornment QuantityLabel="Ref. Longitude (WGS84)"
+                                                    SIValueNullable="referenceLongitudeWGS84"
+                                                    SIValueNullableChanged="@ChangeReferenceLongitudeWGS84" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
+                                               QuantityLabel="Ref. Longitude (WGS84)"
+                                               SIValueNullable="referenceLongitudeWGS84"
+                                               SIValueNullableChanged="@ChangeReferenceLongitudeWGS84" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputAngleWithUnitAdornment QuantityLabel="Ref. Longitude (Datum)"
+                                                    SIValueNullable="referenceLongitudeDatum"
+                                                    SIValueNullableChanged="@ChangeReferenceLongitudeDatum" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
+                                               QuantityLabel="Ref. Longitude (Datum)"
+                                               SIValueNullable="referenceLongitudeDatum"
+                                               SIValueNullableChanged="@ChangeReferenceLongitudeDatum" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputWithUnitAdornment QuantityName="PositionDrilling"
+                                               QuantityLabel="Ref. Easting"
+                                               SIValueNullable="referenceEasting"
+                                               SIValueNullableChanged="@ChangeReferenceEasting" />
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
+                                               QuantityLabel="Ref. Easting Accuracy"
+                                               SIValueNullable="referenceEastingAccuracy"
+                                               SIValueNullableChanged="@(val => referenceEastingAccuracy = val)" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                               QuantityLabel="Ref. Depth (WGS84)"
+                                               SIValueNullable="referenceDepthWGS84"
+                                               SIValueNullableChanged="@ChangeReferenceDepthWGS84" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                               QuantityLabel="Ref. Depth (Datum)"
+                                               SIValueNullable="referenceDepthDatum"
+                                               SIValueNullableChanged="@ChangeReferenceDepthDatum" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
+                                               QuantityLabel="Ref. Depth Accuracy"
+                                               SIValueNullable="referenceDepthAccuracy"
+                                               SIValueNullableChanged="@(val => referenceDepthAccuracy = val)" />
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Environment Description">
+        <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
+            <MudGrid>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                               QuantityLabel="Ground/Mud Line Depth (WGS84)"
+                                               SIValueNullable="groundMudLineDepthWGS84"
+                                               SIValueNullableChanged="@ChangeGroundMudLineDepthWGS84" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                               QuantityLabel="Ground/Mud Line Depth (Datum)"
+                                               SIValueNullable="groundMudLineDepthDatum"
+                                               SIValueNullableChanged="@ChangeGroundMudLineDepthDatum" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
+                                               QuantityLabel="Ground/Mud Line Accuracy"
+                                               SIValueNullable="groundMudLineDepthAccuracy"
+                                               SIValueNullableChanged="@(val => groundMudLineDepthAccuracy = val)" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                               QuantityLabel="Top Water Depth (WGS84)"
+                                               SIValueNullable="topWaterDepthWGS84"
+                                               SIValueNullableChanged="@ChangeTopWaterDepthWGS84" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                               QuantityLabel="Top Water Depth (Datum)"
+                                               SIValueNullable="topWaterDepthDatum"
+                                               SIValueNullableChanged="@ChangeTopWaterDepthDatum" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
+                                               QuantityLabel="Top Water Accuracy"
+                                               SIValueNullable="topWaterDepthAccuracy"
+                                               SIValueNullableChanged="@(val => topWaterDepthAccuracy = val)" />
+                </MudItem>
+
+            </MudGrid>
+        </MudContainer>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Slots">
+        <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
+            <MudGrid>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddSlot" Class="mt-2">
+                        Add Slot
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
+                                               QuantityLabel="Northing Accuracy"
+                                               SIValueNullable="slotNorthingAccuracy"
+                                               SIValueNullableChanged="@(val => slotNorthingAccuracy = val)" />
+                </MudItem>
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
+                                               QuantityLabel="Easting Accuracy"
+                                               SIValueNullable="slotEastingAccuracy"
+                                               SIValueNullableChanged="@(val => slotEastingAccuracy = val)" />
+                </MudItem>
+            </MudGrid>
+            <MudTable Items="_slots" Hover="true" Dense="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>
+                        <MudText>Latitude (WGS84)</MudText>
+                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
+                    </MudTh>
+                    <MudTh>
+                        <MudText>Longitude (WGS84)</MudText>
+                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
+                    </MudTh>
+                    <MudTh>
+                        <MudText>Latitude (Datum)</MudText>
+                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
+                    </MudTh>
+                    <MudTh>
+                        <MudText>Longitude (Datum)</MudText>
+                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
+                    </MudTh>
+                    <MudTh>
+                        <MudText>Northing</MudText>
+                        <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text" />
+                    </MudTh>
+                    <MudTh>
+                        <MudText>Easting</MudText>
+                        <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text" />
+                    </MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>
+                        <MudTextField @bind-Value="@context.Name"
+                                      Variant="Variant.Text"
+                                      Style="width:40px"
+                                      Immediate="true" />
+                    </MudTd>
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                          SIValueNullable="@context.LatitudeWGS84"
+                                          SIValueNullableChanged="@(val => UpdateSlotLatitudeWGS84(val, context))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                          SIValueNullable="@context.LongitudeWGS84"
+                                          SIValueNullableChanged="@(val => UpdateSlotLongitudeWGS84(val, context))" />
+
+                    </MudTd>
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                          SIValueNullable="@context.LatitudeDatum"
+                                          SIValueNullableChanged="@(val => UpdateSlotLatitudeDatum(val, context))" />
+
+                    </MudTd>
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                          SIValueNullable="@context.LongitudeDatum"
+                                          SIValueNullableChanged="@(val => UpdateSlotLongitudeDatum(val, context))" />
+
+                    </MudTd>
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PositionDrilling"
+                                          SIValueNullable="@context.Northing"
+                                          SIValueNullableChanged="@(val => UpdateSlotNorthing(val, context))" />
+
+                    </MudTd>
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PositionDrilling"
+                                          SIValueNullable="@context.Easting"
+                                          SIValueNullableChanged="@(val => UpdateSlotEasting(val, context))" />
+
+                    </MudTd>
+                    <MudTd>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       Style="width:25px"
+                                       OnClick="@(()=>RemoveSlot(context))" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudContainer>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Cluster Display">
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="6" lg="6">
+                <ScatterPlot NameList="@nameDepthList" ModeFlagList="@modeFlagDepthList" ColorList="@colorDepthList"
+                             XValuesList="@xValuesDepthList" YValuesList="@yValuesDepthList"
+                             YAxisReversed="@true" AspectRatio="-1" PlotHeight="500" PlotWidth="500"
+                             PlotTitle="Depth References" XAxisTitle="@DataUtils.DepthReferencesXValuesTitle" YAxisTitle="@DataUtils.DepthReferencesYValuesTitle"
+                             XUnit="@DataUtils.DepthReferencesXValuesQty" YUnit="@DataUtils.DepthReferencesYValuesQty"
+                             @ref="@depthPlot">
+                </ScatterPlot>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="6" lg="6">
+                <ScatterPlot NameList="@nameSlotList" ModeFlagList="@modeFlagSlotList" ColorList="@colorSlotList"
+                             XValuesList="@xValuesSlotList" YValuesList="@yValuesSlotList"
+                             YAxisReversed="@false" AspectRatio="1" PlotHeight="500" PlotWidth="500"
+                             PlotTitle="Slots" XAxisTitle="@DataUtils.SlotsXValuesTitle" YAxisTitle="@DataUtils.SlotsYValuesTitle"
+                             XUnit="@DataUtils.SlotsXValuesQty" YUnit="@DataUtils.SlotsYValuesQty"
+                             @ref="@clusterPlot">
+                </ScatterPlot>
+            </MudItem>
+        </MudGrid>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+@code {
+    [CascadingParameter]
+    private MudUnitAndReferenceChoiceTag? Parent { get; set; }
+
+    [Parameter]
+    public Cluster? CurrentCluster { get; set; }
+
+    [Parameter]
+    public List<Field>? Fields { get; set; }
+
+    [Parameter]
+    public List<Slot?>? AvailableSlotList { get; set; }
+
+    [Parameter]
+    public Action? OnUpdate { get; set; }
+
+    // Local variables used to retrieve user-defined parameters
+    private string? _name;
+    private string? _descr;
+    private Field? _field;
+    private double? referenceLatitudeWGS84 = null;
+    private double? referenceLongitudeWGS84 = null;
+    private double? referenceLatitudeDatum = null;
+    private double? referenceLongitudeDatum = null;
+    private double? referenceNorthing = null;
+    private double? referenceEasting = null;
+    private double? referenceNorthingAccuracy = null;
+    private double? referenceEastingAccuracy = null;
+    private double? referenceDepthWGS84 = null;
+    private double? referenceDepthDatum = null;
+    private double? referenceDepthAccuracy = null;
+    private double? groundMudLineDepthWGS84 = null;
+    private double? groundMudLineDepthDatum = null;
+    private double? groundMudLineDepthAccuracy = null;
+    private double? topWaterDepthWGS84 = null;
+    private double? topWaterDepthDatum = null;
+    private double? topWaterDepthAccuracy = null;
+    private double? slotNorthingAccuracy = null;
+    private double? slotEastingAccuracy = null;
+    private List<SlotTemplate> _slots = new List<SlotTemplate>();
+
+    // Plot variables
+    string[] colorScale = { "black", "blue", "grey", "red", "orange", "green", "yellow", "pink", "brown", "purple" };
+    ScatterPlot clusterPlot = new ScatterPlot();
+    List<string> nameSlotList = new List<string>(); //name of each curve in the list to plot
+    List<int> modeFlagSlotList = new List<int>(); //modeFlag of each curve in the list to plot (1 = lines; 2 = markers)
+    List<string> colorSlotList = new List<string>(); //color of each curve in the list of curves to plot
+    List<List<object>> xValuesSlotList = new List<List<object>>(); // list of x values for the list of curves to plot
+    List<List<object>> yValuesSlotList = new List<List<object>>(); // list of y values for the list of curves to plot
+
+    ScatterPlot depthPlot = new ScatterPlot();
+    List<string> nameDepthList = new List<string>(); //name of each curve in the list to plot
+    List<int> modeFlagDepthList = new List<int>(); //modeFlag of each curve in the list to plot (1 = lines; 2 = markers)
+    List<string> colorDepthList = new List<string>(); //color of each curve in the list of curves to plot
+    List<List<object>> xValuesDepthList = new List<List<object>>(); // list of x values for the list of curves to plot
+    List<List<object>> yValuesDepthList = new List<List<object>>(); // list of y values for the list of curves to plot
+
+    // Labels
+    private string? inputParamUnitLabel = null;
+
+    // UI related variables
+    private string? _slotSearchString;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (Parent == null)
+                throw new ArgumentNullException(nameof(Parent), "TargetEdit page must exist within a MudUnitAndReferenceChoiceTag");
+            Parent.Add(this);
+            ManageUnits();
+
+            if (CurrentCluster != null && CurrentCluster.MetaInfo != null)
+            {
+                _name = CurrentCluster.Name;
+                _descr = CurrentCluster.Description;
+                _field = Fields?.FirstOrDefault(f => f.MetaInfo != null && f.MetaInfo.ID == CurrentCluster.FieldID);
+                referenceLatitudeWGS84 = CurrentCluster.ReferenceLatitude?.GaussianValue?.Mean;
+                referenceLongitudeWGS84 = CurrentCluster.ReferenceLongitude?.GaussianValue?.Mean;
+                referenceDepthWGS84 = CurrentCluster.ReferenceDepth?.GaussianValue?.Mean;
+                referenceDepthAccuracy = CurrentCluster.ReferenceDepth?.GaussianValue?.StandardDeviation;
+                referenceNorthingAccuracy = CurrentCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
+                referenceEastingAccuracy = CurrentCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
+                groundMudLineDepthWGS84 = CurrentCluster.GroundMudLineDepth?.GaussianValue?.Mean;
+                groundMudLineDepthAccuracy = CurrentCluster.GroundMudLineDepth?.GaussianValue?.StandardDeviation;
+                topWaterDepthWGS84 = CurrentCluster.TopWaterDepth?.GaussianValue?.Mean;
+                topWaterDepthAccuracy = CurrentCluster.TopWaterDepth?.GaussianValue?.StandardDeviation;
+                if (CurrentCluster.Slots != null)
+                {
+                    _slots ??= new List<SlotTemplate>();
+                    _slots.Clear();
+                    double maxAccuracyNorthing = double.MinValue;
+                    double maxAccuracyEasting = double.MinValue;
+                    foreach (Slot slot in CurrentCluster.Slots.Values)
+                    {
+                        SlotTemplate slotTemplate = new SlotTemplate();
+                        slotTemplate.Name = slot.Name;
+                        slotTemplate.ID = slot.ID;
+                        if (slot.Latitude != null && slot.Latitude.GaussianValue != null)
+                        {
+                            slotTemplate.LatitudeWGS84 = slot.Latitude.GaussianValue.Mean;
+                            if (slot.Latitude.GaussianValue.StandardDeviation != null &&
+                            slot.Latitude.GaussianValue.StandardDeviation > maxAccuracyNorthing)
+                            {
+                                maxAccuracyNorthing = slot.Latitude.GaussianValue.StandardDeviation.Value;
+                            }
+
+                        }
+                        if (slot.Longitude != null && slot.Longitude.GaussianValue != null)
+                        {
+                            slotTemplate.LongitudeWGS84 = slot.Longitude.GaussianValue.Mean;
+                            if (slot.Longitude.GaussianValue.StandardDeviation != null &&
+                            slot.Longitude.GaussianValue.StandardDeviation > maxAccuracyEasting)
+                            {
+                                maxAccuracyEasting = slot.Longitude.GaussianValue.StandardDeviation.Value;
+                            }
+                        }
+                        _slots.Add(slotTemplate);
+                    }
+                    CalculateWGS84();
+                    if (maxAccuracyNorthing > double.MinValue)
+                    {
+                        slotNorthingAccuracy = maxAccuracyNorthing * APIUtils.EarthRadiusWGS84;
+                    }
+                    else
+                    {
+                        slotNorthingAccuracy = 0.01 * APIUtils.EarthRadiusWGS84;
+                    }
+                    if (maxAccuracyEasting > double.MinValue)
+                    {
+                        slotEastingAccuracy = maxAccuracyEasting * APIUtils.EarthRadiusWGS84;
+                    }
+                    else
+                    {
+                        slotEastingAccuracy = 0.01 * APIUtils.EarthRadiusWGS84;
+                    }
+                    UpdateSlotPlot();
+                    UpdateDepthPlot();
+                }
+            }
+            else
+            {
+                logger.LogError("Current Cluster is null or badly formed");
+                Snackbar.Add("Current Cluster is null or badly formed", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Problem on Cluster initialization");
+            Snackbar.Add("Problem on Cluster initialization", Severity.Error);
+        }
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    public void ManageUnits()
+    {
+
+    }
+
+    private async Task Update()
+    {
+        try
+        {
+            if (CurrentCluster != null && CurrentCluster.MetaInfo != null)
+            {
+                Cluster cluster = new()
+                {
+                    MetaInfo = CurrentCluster.MetaInfo,
+                    Name = _name,
+                    Description = _descr,
+                    CreationDate = CurrentCluster.CreationDate,
+                    LastModificationDate = DateTimeOffset.UtcNow,
+                    FieldID = (_field != null && _field.MetaInfo != null) ? _field.MetaInfo.ID : null,
+                    ReferenceDepth = (referenceDepthWGS84 != null) ? new GaussianDrillingProperty()
+                    {
+                        GaussianValue = new GaussianDistribution()
+                        {
+                            Mean = referenceDepthWGS84,
+                            StandardDeviation = (referenceDepthAccuracy == null) ? 0.01 : referenceDepthAccuracy
+                        },
+                    } : null,
+                    ReferenceLatitude = (referenceLatitudeWGS84 != null) ? new GaussianDrillingProperty()
+                    {
+                        GaussianValue = new GaussianDistribution()
+                        {
+                            Mean = referenceLatitudeWGS84,
+                            StandardDeviation = (referenceNorthingAccuracy == null) ? 0.01 / APIUtils.EarthRadiusWGS84 : referenceNorthingAccuracy / APIUtils.EarthRadiusWGS84
+                        },
+                    } : null,
+                    ReferenceLongitude = (referenceLongitudeWGS84 != null) ? new GaussianDrillingProperty()
+                    {
+                        GaussianValue = new GaussianDistribution()
+                        {
+                            Mean = referenceLongitudeWGS84,
+                            StandardDeviation = (referenceEastingAccuracy == null) ? 0.01 / APIUtils.EarthRadiusWGS84 : referenceEastingAccuracy / APIUtils.EarthRadiusWGS84
+                        },
+                    } : null,
+                    GroundMudLineDepth = (groundMudLineDepthWGS84 != null) ? new GaussianDrillingProperty()
+                    {
+                        GaussianValue = new GaussianDistribution()
+                        {
+                            Mean = groundMudLineDepthWGS84,
+                            StandardDeviation = (groundMudLineDepthAccuracy == null) ? 0.01 : groundMudLineDepthAccuracy
+                        },
+                    } : null,
+                    TopWaterDepth = (topWaterDepthWGS84 != null) ? new GaussianDrillingProperty()
+                    {
+                        GaussianValue = new GaussianDistribution()
+                        {
+                            Mean = topWaterDepthWGS84,
+                            StandardDeviation = (topWaterDepthAccuracy == null) ? 0.01 : topWaterDepthAccuracy
+                        },
+                    } : null,
+                };
+                if (_slots != null)
+                {
+                    if (cluster.Slots == null)
+                    {
+                        cluster.Slots = new Dictionary<string, Slot>();
+                    }
+                    cluster.Slots.Clear();
+                    double latitudeAccuracy = 0.01 / APIUtils.EarthRadiusWGS84;
+                    if (slotNorthingAccuracy != null)
+                    {
+                        latitudeAccuracy = slotNorthingAccuracy.Value / APIUtils.EarthRadiusWGS84;
+                    }
+                    double longitudeAccuracy = 0.01 / APIUtils.EarthRadiusWGS84;
+                    if (slotEastingAccuracy != null)
+                    {
+                        longitudeAccuracy = slotEastingAccuracy.Value / APIUtils.EarthRadiusWGS84;
+                    }
+                    foreach (SlotTemplate slotTemplate in _slots)
+                    {
+                        if (slotTemplate != null && slotTemplate.ID != Guid.Empty)
+                        {
+                            Slot slot = new Slot()
+                            {
+                                Name = slotTemplate.Name,
+                                ID = slotTemplate.ID,
+                                Latitude = (slotTemplate.LatitudeWGS84 != null) ? new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = slotTemplate.LatitudeWGS84, StandardDeviation = latitudeAccuracy } } : null,
+                                Longitude = (slotTemplate.LongitudeWGS84 != null) ? new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = slotTemplate.LongitudeWGS84, StandardDeviation = longitudeAccuracy } } : null
+                            };
+                            cluster.Slots.Add(slot.ID.ToString(), slot);
+                        }
+                    }
+                }
+                await APIUtils.ClientCluster.PutClusterByIdAsync(CurrentCluster.MetaInfo.ID, cluster);
+                logger.LogInformation("Updated the Cluster successfully");
+                Snackbar.Add("Updated the Cluster successfully", Severity.Success);
+            }
+            else
+            {
+                logger.LogWarning("Problem while updating the Cluster");
+                Snackbar.Add("Problem while updating the Cluster", Severity.Warning);
+            }
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError(ex, "Problem while updating the Cluster");
+            Snackbar.Add("Problem while updating the Cluster", Severity.Warning);
+        }
+        UpdateSlotPlot();
+    }
+
+    private void Cancel()
+    {
+        OnUpdate?.Invoke();
+    }
+
+    private void UpdateDepthPlot()
+    {
+        if (referenceDepthWGS84 != null || groundMudLineDepthWGS84 != null || topWaterDepthWGS84 != null)
+        {
+            //each list below is designed to contain N curves: in this case, we only plot 1 curve, corresponding to 1 trajectory
+            nameDepthList.Clear();
+            modeFlagDepthList.Clear();
+            colorDepthList.Clear();
+            xValuesDepthList.Clear();
+            yValuesDepthList.Clear();
+
+            int count = 32;
+            double step = 100 / count;
+            List<object> xValues = new List<object>();
+            List<object> yValues = new List<object>();
+
+            for (int i = 0; i < count; i++)
+            {
+                xValues.Add(0 + i * step);
+                yValues.Add(0);
+            }
+            xValuesDepthList.Add(xValues);
+            yValuesDepthList.Add(yValues);
+            nameDepthList.Add("WGS84 Datum");
+            modeFlagDepthList.Add(1); //1 to 3
+            colorDepthList.Add(colorScale[3]);
+            if (referenceDepthWGS84 != null)
+            {
+                xValues = new List<object>();
+                yValues = new List<object>();
+
+                for (int i = 0; i < count; i++)
+                {
+                    xValues.Add(0 + i * step);
+                    yValues.Add(referenceDepthWGS84.Value);
+                }
+                xValuesDepthList.Add(xValues);
+                yValuesDepthList.Add(yValues);
+                nameDepthList.Add("Cluster Depth Reference");
+                modeFlagDepthList.Add(1); //1 to 3
+                colorDepthList.Add(colorScale[0]);
+            }
+            if (groundMudLineDepthWGS84 != null)
+            {
+                xValues = new List<object>();
+                yValues = new List<object>();
+
+                for (int i = 0; i < count; i++)
+                {
+                    xValues.Add(0 + i * step);
+                    yValues.Add(groundMudLineDepthWGS84.Value);
+                }
+                xValuesDepthList.Add(xValues);
+                yValuesDepthList.Add(yValues);
+                nameDepthList.Add("Ground or Mud Level");
+                modeFlagDepthList.Add(1); //1 to 3
+                colorDepthList.Add(colorScale[1]);
+            }
+            if (topWaterDepthWGS84 != null)
+            {
+                xValues = new List<object>();
+                yValues = new List<object>();
+
+                for (int i = 0; i < count; i++)
+                {
+                    xValues.Add(0 + i * step);
+                    yValues.Add(topWaterDepthWGS84.Value);
+                }
+                xValuesDepthList.Add(xValues);
+                yValuesDepthList.Add(yValues);
+                nameDepthList.Add("Top Water Level");
+                modeFlagDepthList.Add(1); //1 to 3
+                colorDepthList.Add(colorScale[2]);
+            }
+
+            //plot curves
+            depthPlot.Plot();
+        }
+    }
+    private void UpdateSlotPlot()
+    {
+        if (_slots != null)
+        {
+            //each list below is designed to contain N curves: in this case, we only plot 1 curve, corresponding to 1 trajectory
+            nameSlotList.Clear();
+            modeFlagSlotList.Clear();
+            colorSlotList.Clear();
+            xValuesSlotList.Clear();
+            yValuesSlotList.Clear();
+
+            int count = 32;
+            double angle = 2.0 * Math.PI / count;
+            double radius = 0.5; // typical radius of a slot
+            foreach (SlotTemplate slotTemplate in _slots)
+            {
+                if (slotTemplate.Northing != null && slotTemplate.Easting != null)
+                {
+                    List<object> xValues = new List<object>();
+                    List<object> yValues = new List<object>();
+
+                    for (int i = 0; i <= count; i++)
+                    {
+                        xValues.Add(slotTemplate.Easting.Value + radius * Math.Cos(i * angle));
+                        yValues.Add(slotTemplate.Northing.Value + radius * Math.Sin(i * angle));
+                    }
+                    xValuesSlotList.Add(xValues);
+                    yValuesSlotList.Add(yValues);
+                    nameSlotList.Add((slotTemplate.Name == null) ? string.Empty : slotTemplate.Name);
+                    modeFlagSlotList.Add(1); //1 to 3
+                    colorSlotList.Add(colorScale[0]);
+                }
+            }
+            //plot curves
+            clusterPlot.Plot();
+        }
+    }
+
+    //Quick filter - filter gobally across multiple columns with the same input
+    private Func<Slot, bool> _slotFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_slotSearchString))
+            return true;
+        if ($"{x.Name}".Contains(_slotSearchString))
+            return true;
+
+        return false;
+    };
+    private void ChangeReferenceLatitudeWGS84(double? val)
+    {
+        referenceLatitudeWGS84 = val;
+        if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
+        {
+            CalculateReferenceWGS84();
+        }
+    }
+    private void ChangeReferenceLongitudeWGS84(double? val)
+    {
+        referenceLongitudeWGS84 = val;
+        if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
+        {
+            CalculateReferenceWGS84();
+        }
+    }
+    private void ChangeReferenceLatitudeDatum(double? val)
+    {
+        referenceLatitudeDatum = val;
+        if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && referenceDepthDatum != null)
+        {
+            CalculateReferenceDatum();
+        }
+    }
+    private void ChangeReferenceLongitudeDatum(double? val)
+    {
+        referenceLongitudeDatum = val;
+        if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && referenceDepthDatum != null)
+        {
+            CalculateReferenceDatum();
+        }
+    }
+    private void ChangeReferenceNorthing(double? val)
+    {
+        referenceNorthing = val;
+        if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null)
+        {
+            CalculateReferenceCartography();
+        }
+    }
+    private void ChangeReferenceEasting(double? val)
+    {
+        referenceEasting = val;
+        if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null)
+        {
+            CalculateReferenceCartography();
+        }
+    }
+    private void ChangeReferenceDepthWGS84(double? val)
+    {
+        referenceDepthWGS84 = val;
+        if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
+        {
+            CalculateReferenceWGS84();
+            UpdateDepthPlot();
+        }
+    }
+    private void ChangeReferenceDepthDatum(double? val)
+    {
+        referenceDepthDatum = val;
+        if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && referenceDepthDatum != null)
+        {
+            CalculateReferenceDatum();
+            UpdateDepthPlot();
+        }
+        else if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null)
+        {
+            CalculateReferenceCartography();
+            UpdateDepthPlot();
+        }
+    }
+
+    private void CalculateReferenceWGS84()
+    {
+        if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        {
+            try
+            {
+                if (APIUtils.ClientField != null)
+                {
+                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                    {
+                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
+                        Name = "Calculate Cluster Reference",
+                        Description = "Calculate Cluster Reference",
+                        FieldID = _field.MetaInfo.ID,
+                        CartographicCoordinateList = new List<CartographicCoordinate>() {
+                            new CartographicCoordinate() {
+                                GeodeticCoordinate = new GeodeticCoordinate() {
+                                    LatitudeWGS84 = referenceLatitudeWGS84 ,
+                                    LongitudeWGS84 = referenceLongitudeWGS84,
+                                    VerticalDepthWGS84 = referenceDepthWGS84
+                                }
+                            }
+                        }
+                    };
+                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
+                        calculatedConversionSet.CartographicCoordinateList != null &&
+                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
+                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
+                    {
+                        referenceLatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
+                        referenceLongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
+                        referenceDepthDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthDatum;
+                        referenceNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
+                        referenceEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
+                    }
+                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+    }
+    private void CalculateReferenceDatum()
+    {
+        if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && referenceDepthDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        {
+            try
+            {
+                if (APIUtils.ClientField != null)
+                {
+                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                    {
+                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
+                        Name = "Calculate Cluster Reference",
+                        Description = "Calculate Cluster Reference",
+                        FieldID = _field.MetaInfo.ID,
+                        CartographicCoordinateList = new List<CartographicCoordinate>() {
+                            new CartographicCoordinate() {
+                                GeodeticCoordinate = new GeodeticCoordinate() {
+                                    LatitudeDatum = referenceLatitudeDatum,
+                                    LongitudeDatum = referenceLongitudeDatum,
+                                    VerticalDepthDatum = referenceDepthDatum
+                                }
+                            }
+                        }
+                    };
+                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
+                        calculatedConversionSet.CartographicCoordinateList != null &&
+                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
+                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
+                    {
+                        referenceLatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
+                        referenceLongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
+                        referenceDepthWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
+                        referenceNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
+                        referenceEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
+                    }
+                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+    }
+    private void CalculateReferenceCartography()
+    {
+        if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        {
+            try
+            {
+                if (APIUtils.ClientField != null)
+                {
+                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                    {
+                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
+                        Name = "Calculate Cluster Reference",
+                        Description = "Calculate Cluster Reference",
+                        FieldID = _field.MetaInfo.ID,
+                        CartographicCoordinateList = new List<CartographicCoordinate>() {
+                            new CartographicCoordinate() {
+                                Northing = referenceNorthing,
+                                Easting = referenceEasting,
+                                VerticalDepth = referenceDepthDatum,
+                            }
+                        }
+                    };
+                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
+                        calculatedConversionSet.CartographicCoordinateList != null &&
+                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
+                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
+                    {
+                        referenceLatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
+                        referenceLongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
+                        referenceDepthWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
+                        referenceLatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
+                        referenceLongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
+                    }
+                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+    }
+    private void ChangeGroundMudLineDepthWGS84(double? val)
+    {
+        groundMudLineDepthWGS84 = val;
+        if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && groundMudLineDepthWGS84 != null)
+        {
+            CalculateDepthWGS84(groundMudLineDepthWGS84, out groundMudLineDepthDatum);
+            UpdateDepthPlot();
+        }
+    }
+    private void ChangeGroundMudLineDepthDatum(double? val)
+    {
+        groundMudLineDepthDatum = val;
+        if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && groundMudLineDepthDatum != null)
+        {
+            CalculateDepthDatum(groundMudLineDepthDatum, out groundMudLineDepthWGS84);
+            UpdateDepthPlot();
+        }
+    }
+    private void ChangeTopWaterDepthWGS84(double? val)
+    {
+        topWaterDepthWGS84 = val;
+        if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && topWaterDepthWGS84 != null)
+        {
+            CalculateDepthWGS84(topWaterDepthWGS84, out topWaterDepthDatum);
+            UpdateDepthPlot();
+        }
+    }
+    private void ChangeTopWaterDepthDatum(double? val)
+    {
+        topWaterDepthDatum = val;
+        if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && topWaterDepthDatum != null)
+        {
+            CalculateDepthDatum(topWaterDepthDatum, out topWaterDepthWGS84);
+            UpdateDepthPlot();
+        }
+    }
+    private void CalculateDepthWGS84(double? depthInput, out double? depthOutput)
+    {
+        depthOutput = null;
+        if (depthInput != null && referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        {
+            try
+            {
+                if (APIUtils.ClientField != null)
+                {
+                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                    {
+                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
+                        Name = "Calculate Depth",
+                        Description = "Calculate Depth",
+                        FieldID = _field.MetaInfo.ID,
+                        CartographicCoordinateList = new List<CartographicCoordinate>() {
+                            new CartographicCoordinate() {
+                                GeodeticCoordinate = new GeodeticCoordinate() {
+                                    LatitudeWGS84 = referenceLatitudeWGS84 ,
+                                    LongitudeWGS84 = referenceLongitudeWGS84,
+                                    VerticalDepthWGS84 = depthInput
+                                }
+                            }
+                        }
+                    };
+                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
+                        calculatedConversionSet.CartographicCoordinateList != null &&
+                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
+                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
+                    {
+                        depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthDatum;
+                    }
+                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+    }
+    private void CalculateDepthDatum(double? depthInput, out double? depthOutput)
+    {
+        depthOutput = null;
+        if (depthInput != null && referenceLatitudeDatum != null && referenceLongitudeDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        {
+            try
+            {
+                if (APIUtils.ClientField != null)
+                {
+                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                    {
+                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
+                        Name = "Calculate Depth",
+                        Description = "Calculate Depth",
+                        FieldID = _field.MetaInfo.ID,
+                        CartographicCoordinateList = new List<CartographicCoordinate>() {
+                            new CartographicCoordinate() {
+                                GeodeticCoordinate = new GeodeticCoordinate() {
+                                    LatitudeDatum = referenceLatitudeDatum ,
+                                    LongitudeDatum = referenceLongitudeDatum,
+                                    VerticalDepthDatum = depthInput
+                                }
+                            }
+                        }
+                    };
+                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
+                        calculatedConversionSet.CartographicCoordinateList != null &&
+                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
+                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
+                    {
+                        depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
+                    }
+                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+    }
+    private void AddSlot()
+    {
+        _slots.Add(new SlotTemplate() { ID = Guid.NewGuid() });
+    }
+
+    private void RemoveSlot(SlotTemplate slot)
+    {
+        _slots.Remove(slot);
+        UpdateSlotPlot();
+    }
+    private void UpdateSlotLatitudeWGS84(double? val, SlotTemplate context)
+    {
+        context.LatitudeWGS84 = val;
+        if (context.LatitudeWGS84 != null && context.LongitudeWGS84 != null && referenceDepthWGS84 != null)
+        {
+            CalculateSlotWGS84(context);
+            UpdateSlotPlot();
+        }
+    }
+    private void UpdateSlotLongitudeWGS84(double? val, SlotTemplate context)
+    {
+        context.LongitudeWGS84 = val;
+        if (context.LatitudeWGS84 != null && context.LongitudeWGS84 != null && referenceDepthWGS84 != null)
+        {
+            CalculateSlotWGS84(context);
+            UpdateSlotPlot();
+        }
+    }
+    private void UpdateSlotLatitudeDatum(double? val, SlotTemplate context)
+    {
+        context.LatitudeDatum = val;
+        if (context.LatitudeDatum != null && context.LongitudeDatum != null && referenceDepthDatum != null)
+        {
+            CalculateDatum(context);
+            UpdateSlotPlot();
+        }
+    }
+    private void UpdateSlotLongitudeDatum(double? val, SlotTemplate context)
+    {
+        context.LongitudeDatum = val;
+        if (context.LatitudeDatum != null && context.LongitudeDatum != null && referenceDepthDatum != null)
+        {
+            CalculateDatum(context);
+            UpdateSlotPlot();
+        }
+    }
+    private void UpdateSlotNorthing(double? val, SlotTemplate context)
+    {
+        context.Northing = val;
+        if (context.Northing != null && context.Easting != null && referenceDepthDatum != null)
+        {
+            CalculateCartographic(context);
+            UpdateSlotPlot();
+        }
+    }
+    private void UpdateSlotEasting(double? val, SlotTemplate context)
+    {
+        context.Easting = val;
+        if (context.Northing != null && context.Easting != null && referenceDepthDatum != null)
+        {
+            CalculateCartographic(context);
+            UpdateSlotPlot();
+        }
+    }
+    private void CalculateSlotWGS84(SlotTemplate slot)
+    {
+        if (slot.LatitudeWGS84 != null && slot.LongitudeWGS84 != null && referenceDepthWGS84 != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        {
+            try
+            {
+                if (APIUtils.ClientField != null)
+                {
+                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                    {
+                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
+                        Name = "Calculate Slot Position",
+                        Description = "Calculate Slot Position",
+                        FieldID = _field.MetaInfo.ID,
+                        CartographicCoordinateList = new List<CartographicCoordinate>() {
+                            new CartographicCoordinate() {
+                                GeodeticCoordinate = new GeodeticCoordinate() {
+                                    LatitudeWGS84 = slot.LatitudeWGS84 ,
+                                    LongitudeWGS84 = slot.LongitudeWGS84,
+                                    VerticalDepthWGS84 = referenceDepthWGS84
+                                }
+                            }
+                        }
+                    };
+                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
+                        calculatedConversionSet.CartographicCoordinateList != null &&
+                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
+                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
+                    {
+                        slot.LatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
+                        slot.LongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
+                        slot.Northing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
+                        slot.Easting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
+                    }
+                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+    }
+    private void CalculateDatum(SlotTemplate slot)
+    {
+        if (slot.LatitudeDatum != null && slot.LongitudeDatum != null && referenceDepthDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        {
+            try
+            {
+                if (APIUtils.ClientField != null)
+                {
+                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                    {
+                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
+                        Name = "Calculate Slot Position",
+                        Description = "Calculate Slot Position",
+                        FieldID = _field.MetaInfo.ID,
+                        CartographicCoordinateList = new List<CartographicCoordinate>() {
+                            new CartographicCoordinate() {
+                                GeodeticCoordinate = new GeodeticCoordinate() {
+                                    LatitudeDatum = slot.LatitudeDatum ,
+                                    LongitudeDatum = slot.LongitudeDatum,
+                                    VerticalDepthDatum = referenceDepthDatum
+                                }
+                            }
+                        }
+                    };
+                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
+                        calculatedConversionSet.CartographicCoordinateList != null &&
+                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
+                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
+                    {
+                        slot.LatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
+                        slot.LongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
+                        slot.Northing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
+                        slot.Easting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
+                    }
+                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+    }
+    private void CalculateCartographic(SlotTemplate slot)
+    {
+        if (slot.Northing != null && slot.Easting != null && referenceDepthDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        {
+            try
+            {
+                if (APIUtils.ClientField != null)
+                {
+                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                    {
+                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
+                        Name = "Calculate Slot Position",
+                        Description = "Calculate Slot Position",
+                        FieldID = _field.MetaInfo.ID,
+                        CartographicCoordinateList = new List<CartographicCoordinate>() {
+                            new CartographicCoordinate() {
+                                Northing = slot.Northing,
+                                Easting = slot.Easting,
+                                VerticalDepth = referenceDepthDatum,
+                            }
+                        }
+                    };
+                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
+                        calculatedConversionSet.CartographicCoordinateList != null &&
+                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
+                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
+                    {
+                        slot.LatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
+                        slot.LongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
+                        slot.LatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
+                        slot.LongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
+                    }
+                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+    }
+
+    private void CalculateWGS84()
+    {
+        try
+        {
+            if (APIUtils.ClientField != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+            {
+                FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                {
+                    MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
+                    Name = "Calculate Slot Position",
+                    Description = "Calculate Slot Position",
+                    FieldID = _field.MetaInfo.ID
+                };
+                conversionSet.CartographicCoordinateList ??= new List<CartographicCoordinate>();
+                conversionSet.CartographicCoordinateList.Clear();
+                double defaultLatitudeWGS84 = 0;
+                double defaultLongitudeWGS84 = 0;
+                if (referenceLatitudeWGS84 != null)
+                {
+                    defaultLatitudeWGS84 = referenceLatitudeWGS84.Value;
+                }
+                if (referenceLongitudeWGS84 != null)
+                {
+                    defaultLongitudeWGS84 = referenceLongitudeWGS84.Value;
+                }
+                List<bool> toBeProcessed = new List<bool>();
+                CartographicCoordinate coordinate;
+                if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
+                {
+                    coordinate = new CartographicCoordinate()
+                    {
+                        GeodeticCoordinate = new GeodeticCoordinate()
+                        {
+                            LatitudeWGS84 = referenceLatitudeWGS84,
+                            LongitudeWGS84 = referenceLongitudeWGS84,
+                            VerticalDepthWGS84 = referenceDepthWGS84
+                        }
+                    };
+                    toBeProcessed.Add(true);
+                }
+                else
+                {
+                    coordinate = new CartographicCoordinate()
+                    {
+                        GeodeticCoordinate = new GeodeticCoordinate()
+                        {
+                            LatitudeWGS84 = defaultLatitudeWGS84,
+                            LongitudeWGS84 = defaultLongitudeWGS84,
+                            VerticalDepthWGS84 = 0
+                        }
+                    };
+                    toBeProcessed.Add(false);
+                }
+                conversionSet.CartographicCoordinateList.Add(coordinate);
+                if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && groundMudLineDepthWGS84 != null)
+                {
+                    coordinate = new CartographicCoordinate()
+                    {
+                        GeodeticCoordinate = new GeodeticCoordinate()
+                        {
+                            LatitudeWGS84 = referenceLatitudeWGS84,
+                            LongitudeWGS84 = referenceLongitudeWGS84,
+                            VerticalDepthWGS84 = groundMudLineDepthWGS84
+                        }
+                    };
+                    toBeProcessed.Add(true);
+                }
+                else
+                {
+                    coordinate = new CartographicCoordinate()
+                    {
+                        GeodeticCoordinate = new GeodeticCoordinate()
+                        {
+                            LatitudeWGS84 = defaultLatitudeWGS84,
+                            LongitudeWGS84 = defaultLongitudeWGS84,
+                            VerticalDepthWGS84 = 0
+                        }
+                    };
+                    toBeProcessed.Add(false);
+                }
+                conversionSet.CartographicCoordinateList.Add(coordinate);
+                if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && topWaterDepthWGS84 != null)
+                {
+                    coordinate = new CartographicCoordinate()
+                    {
+                        GeodeticCoordinate = new GeodeticCoordinate()
+                        {
+                            LatitudeWGS84 = referenceLatitudeWGS84,
+                            LongitudeWGS84 = referenceLongitudeWGS84,
+                            VerticalDepthWGS84 = topWaterDepthWGS84
+                        }
+                    };
+                    toBeProcessed.Add(true);
+                }
+                else
+                {
+                    coordinate = new CartographicCoordinate()
+                    {
+                        GeodeticCoordinate = new GeodeticCoordinate()
+                        {
+                            LatitudeWGS84 = defaultLatitudeWGS84,
+                            LongitudeWGS84 = defaultLongitudeWGS84,
+                            VerticalDepthWGS84 = 0
+                        }
+                    };
+                    toBeProcessed.Add(false);
+                }
+                conversionSet.CartographicCoordinateList.Add(coordinate);
+                if (_slots != null)
+                {
+                    foreach (SlotTemplate slotTemplate in _slots)
+                    {
+                        if (slotTemplate != null && slotTemplate.LatitudeWGS84 != null && slotTemplate.LongitudeWGS84 != null && referenceDepthWGS84 != null)
+                        {
+                            coordinate = new CartographicCoordinate()
+                            {
+                                GeodeticCoordinate = new GeodeticCoordinate()
+                                {
+                                    LatitudeWGS84 = slotTemplate.LatitudeWGS84,
+                                    LongitudeWGS84 = slotTemplate.LongitudeWGS84,
+                                    VerticalDepthWGS84 = referenceDepthWGS84
+                                }
+                            };
+                            toBeProcessed.Add(true);
+                        }
+                        else
+                        {
+                            coordinate = new CartographicCoordinate()
+                            {
+                                GeodeticCoordinate = new GeodeticCoordinate()
+                                {
+                                    LatitudeWGS84 = defaultLatitudeWGS84,
+                                    LongitudeWGS84 = defaultLongitudeWGS84,
+                                    VerticalDepthWGS84 = 0
+                                }
+                            };
+                            toBeProcessed.Add(false);
+                        }
+                        conversionSet.CartographicCoordinateList.Add(coordinate);
+                    }
+                }
+                APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
+                    calculatedConversionSet.CartographicCoordinateList != null &&
+                    calculatedConversionSet.CartographicCoordinateList.Count == toBeProcessed.Count &&
+                    calculatedConversionSet.CartographicCoordinateList.Count >= 3)
+                {
+                    CartographicCoordinate calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(0);
+                    if (calculatedCoordinate != null && toBeProcessed[0])
+                    {
+                        if (calculatedCoordinate.GeodeticCoordinate != null)
+                        {
+                            referenceDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
+                            referenceLatitudeDatum = calculatedCoordinate.GeodeticCoordinate.LatitudeDatum;
+                            referenceLongitudeDatum = calculatedCoordinate.GeodeticCoordinate.LongitudeDatum;
+                        }
+                        referenceNorthing = calculatedCoordinate.Northing;
+                        referenceEasting = calculatedCoordinate.Easting;
+                    }
+                    calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(1);
+                    if (calculatedCoordinate != null && toBeProcessed[1])
+                    {
+                        groundMudLineDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
+                    }
+                    calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(2);
+                    if (calculatedCoordinate != null && toBeProcessed[2] && calculatedCoordinate.GeodeticCoordinate != null)
+                    {
+                        topWaterDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
+                    }
+                    if (_slots != null)
+                    {
+                        for (int i = 3; i < calculatedConversionSet.CartographicCoordinateList.Count; i++)
+                        {
+                            calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(i);
+                            if (calculatedCoordinate != null && toBeProcessed[i])
+                            {
+                                if (calculatedCoordinate.GeodeticCoordinate != null)
+                                {
+                                    _slots[i - 3].LatitudeDatum = calculatedCoordinate.GeodeticCoordinate.LatitudeDatum;
+                                    _slots[i - 3].LongitudeDatum = calculatedCoordinate.GeodeticCoordinate.LongitudeDatum;
+                                }
+                                _slots[i - 3].Northing = calculatedCoordinate.Northing;
+                                _slots[i - 3].Easting = calculatedCoordinate.Easting;
+                            }
+                        }
+                    }
+                }
+                APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
+}
+

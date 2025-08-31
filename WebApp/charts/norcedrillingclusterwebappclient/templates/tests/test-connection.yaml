@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "norcedrillingclusterwebappclient.fullname" . }}-test-connection"
+  labels:
+    {{- include "norcedrillingclusterwebappclient.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "norcedrillingclusterwebappclient.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
