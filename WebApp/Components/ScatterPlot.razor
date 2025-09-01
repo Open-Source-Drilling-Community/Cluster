@@ -25,6 +25,12 @@
     public List<string>? ColorList { get; set; }
 
     [Parameter]
+    public List<bool>? ShowLegends { get; set; }
+
+    [Parameter]
+    public List<bool>? ShowMarkers { get; set; }
+
+    [Parameter]
     public List<List<object>>? XValuesList { get; set; }
 
     [Parameter]
@@ -103,18 +109,15 @@
 
     public void ManageUnits()
     {
-        if (chart != null && layout != null)
-            Plot();
+        Plot();
     }
 
     public void Plot()
     {
-        if (chart != null)
+        if (chart != null && layout != null)
         {
-            //Update layout, including axis ranges due to unit choice set changes
-            ManageLayout();
-            //Update traces
             ManageTraces();
+            ManageLayout();
         }
     }
 
@@ -208,15 +211,35 @@
                         {
                             marker = new Marker { AutoColorScale = true };
                         }
+                        bool showLegend = (ShowLegends != null && i < ShowLegends.Count) ? ShowLegends[i] : true;
+                        bool showMarker = (ShowMarkers != null && i < ShowMarkers.Count) ? ShowMarkers[i] : false;
                         //adding trace with attributes
-                        await InvokeAsync(async () => await chart.AddTrace(new Scatter
+                        if (showMarker)
+                        {
+                            await InvokeAsync(async () => await chart.AddTrace(new Scatter
+                            {
+                                Name = name,
+                                Mode = ModeFlag.Text,
+                                Marker = marker,
+                                ShowLegend = showLegend,
+                                Text = name,
+                                TextPosition = TextPositionEnum.TopCenter,
+                                X = XValuesInUserUnit,
+                                Y = YValuesInUserUnit
+                            }));
+                        }
+                        else
+                        {
+                            await InvokeAsync(async () => await chart.AddTrace(new Scatter
                             {
                                 Name = name,
                                 Mode = modeFlag,
                                 Marker = marker,
+                                ShowLegend = showLegend,
                                 X = XValuesInUserUnit,
                                 Y = YValuesInUserUnit
                             }));
+                        }
                         // Add the delay to keep the UI responsive
                         await Task.Delay(10);
                     }

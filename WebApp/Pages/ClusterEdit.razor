@@ -372,6 +372,7 @@
             <MudItem xs="12" sm="6" md="6" lg="6">
                 <ScatterPlot NameList="@nameSlotList" ModeFlagList="@modeFlagSlotList" ColorList="@colorSlotList"
                              XValuesList="@xValuesSlotList" YValuesList="@yValuesSlotList"
+                             ShowLegends="@showSlotLegends" ShowMarkers="@showSlotMarkers"
                              YAxisReversed="@false" AspectRatio="1" PlotHeight="500" PlotWidth="500"
                              PlotTitle="Slots" XAxisTitle="@DataUtils.SlotsXValuesTitle" YAxisTitle="@DataUtils.SlotsYValuesTitle"
                              XUnit="@DataUtils.SlotsXValuesQty" YUnit="@DataUtils.SlotsYValuesQty"
@@ -515,6 +516,8 @@
     List<string> colorSlotList = new List<string>(); //color of each curve in the list of curves to plot
     List<List<object>> xValuesSlotList = new List<List<object>>(); // list of x values for the list of curves to plot
     List<List<object>> yValuesSlotList = new List<List<object>>(); // list of y values for the list of curves to plot
+    List<bool> showSlotLegends = new List<bool>(); // list of booleans to indicate if the legend must be shown for each curve
+    List<bool> showSlotMarkers = new List<bool>(); // list of booleans to indicate if the marker must be shown or not
 
     ScatterPlot depthPlot = new ScatterPlot();
     List<string> nameDepthList = new List<string>(); //name of each curve in the list to plot
@@ -824,10 +827,30 @@
             colorSlotList.Clear();
             xValuesSlotList.Clear();
             yValuesSlotList.Clear();
+            showSlotLegends.Clear();
+            showSlotMarkers.Clear();
 
             int count = 32;
             double angle = 2.0 * Math.PI / count;
             double radius = 0.5; // typical radius of a slot
+            foreach (SlotTemplate slotTemplate in _slots)
+            {
+                if (slotTemplate.Northing != null && slotTemplate.Easting != null)
+                {
+                    List<object> xValues = new List<object>();
+                    List<object> yValues = new List<object>();
+
+                    xValues.Add(slotTemplate.Easting.Value);
+                    yValues.Add(slotTemplate.Northing.Value);
+                    xValuesSlotList.Add(xValues);
+                    yValuesSlotList.Add(yValues);
+                    nameSlotList.Add((slotTemplate.Name == null) ? string.Empty : slotTemplate.Name);
+                    modeFlagSlotList.Add(2); //1 to 3
+                    showSlotLegends.Add(false);
+                    showSlotMarkers.Add(true);
+                    colorSlotList.Add(colorScale[0]);
+                }
+            }
             foreach (SlotTemplate slotTemplate in _slots)
             {
                 if (slotTemplate.Northing != null && slotTemplate.Easting != null)
@@ -843,6 +866,8 @@
                     xValuesSlotList.Add(xValues);
                     yValuesSlotList.Add(yValues);
                     nameSlotList.Add((slotTemplate.Name == null) ? string.Empty : slotTemplate.Name);
+                    showSlotLegends.Add(false);
+                    showSlotMarkers.Add(false);
                     modeFlagSlotList.Add(1); //1 to 3
                     colorSlotList.Add(colorScale[0]);
                 }
