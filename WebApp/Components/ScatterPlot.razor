@@ -1,10 +1,13 @@
 ﻿@implements IUnitAwareComponent
 
-<PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart" />
+<PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart" Id="@GetID()"/>
 
 @code {
     [CascadingParameter]
     private MudUnitAndReferenceChoiceTag? Parent { get; set; }
+
+    [Parameter]
+    public string ID { get; set; } = "default";
 
     [Parameter]
     public String? XUnit { get; set; }
@@ -50,6 +53,20 @@
 
     [Parameter]
     public decimal? AspectRatio { get; set; } = null;
+
+    [Parameter]
+    public DrillingSignalReferenceType DrillingSignalReference { get; set; } = DrillingSignalReferenceType.Independent;
+
+    [Parameter]
+    public PositionDirectionType PositionDirectionX { get; set; } = PositionDirectionType.Independent;
+
+    [Parameter]
+    public PositionDirectionType PositionDirectionY { get; set; } = PositionDirectionType.Independent;
+
+    private string GetID()
+    {
+        return ID;
+    }
 
     private PlotlyChart? chart;
     private Config config = new Config() { Responsive = true };
@@ -120,7 +137,26 @@
                     {
                         double? X = null;
                         if (x is double?)
-                            X = Parent.FromSI((double?)x, XUnit);
+                        {
+                            switch (DrillingSignalReference)
+                            {
+                                case DrillingSignalReferenceType.Pressure:
+                                    X = Parent.FromAbsolutePressureSI((double?)x, XUnit!);
+                                    break;
+                                case DrillingSignalReferenceType.Azimuth:
+                                    X = Parent.FromTrueNorthAzimuthSI((double?)x, XUnit!);
+                                    break;
+                                case DrillingSignalReferenceType.Depth:
+                                    X = Parent.FromWGS84DepthSI((double?)x, XUnit!);
+                                    break;
+                                case DrillingSignalReferenceType.Position:
+                                    X = Parent.FromWGS84PositionSI((double?)x, XUnit!, PositionDirectionX);
+                                    break;
+                                default:
+                                    X = Parent.FromSI((double?)x, XUnit);
+                                    break;
+                            }
+                        }
                         if (x is int?)
                             X = Parent.FromSI((int?)x, XUnit);
                         if (X != null)
@@ -130,7 +166,26 @@
                     {
                         double? Y = null;
                         if (y is double?)
-                            Y = Parent.FromSI((double?)y, YUnit);
+                        {
+                            switch (DrillingSignalReference)
+                            {
+                                case DrillingSignalReferenceType.Pressure:
+                                    Y = Parent.FromAbsolutePressureSI((double?)y, YUnit!);
+                                    break;
+                                case DrillingSignalReferenceType.Azimuth:
+                                    Y = Parent.FromTrueNorthAzimuthSI((double?)y, YUnit!);
+                                    break;
+                                case DrillingSignalReferenceType.Depth:
+                                    Y = Parent.FromWGS84DepthSI((double?)y, YUnit!);
+                                    break;
+                                case DrillingSignalReferenceType.Position:
+                                    Y = Parent.FromWGS84PositionSI((double?)y, YUnit!, PositionDirectionY);
+                                    break;
+                                default:
+                                    Y = Parent.FromSI((double?)y, YUnit);
+                                    break;
+                            }
+                        }
                         if (y is int?)
                             Y = Parent.FromSI((int?)y, YUnit);
                         if (Y != null)

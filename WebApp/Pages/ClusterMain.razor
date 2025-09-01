@@ -7,7 +7,7 @@
                               HttpController="UnitSystem/"
                               UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
                               UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
-                              PositionReferenceName=""
+                              PositionReferenceName="WGS84"
                               CartographicGridPositionReferenceSource="_cartographicReference"
                               ClusterPositionReferenceSource="_clusterReference"
                               >
@@ -148,6 +148,10 @@
             logger.LogError(ex, "Problem Cluster initialization");
         }
         await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    private void UpdatePositionReference(string newPositionReference)
+    {
     }
 
     private async Task AddCluster()

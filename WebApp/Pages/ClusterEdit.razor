@@ -249,11 +249,13 @@
                     {
                         <MudTh>
                             <MudText>Northing</MudText>
-                            <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text" />
+                            <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text"
+                                              DrillingSignalReference="@DrillingSignalReferenceType.Position" />
                         </MudTh>
                         <MudTh>
                             <MudText>Easting</MudText>
-                            <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text" />
+                            <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text"
+                                              DrillingSignalReference="@DrillingSignalReferenceType.Position" />
                         </MudTh>
                     }
                     <MudTh></MudTh>
@@ -355,6 +357,7 @@
         </MudContainer>
     </MudExpansionPanel>
     <MudExpansionPanel Text="Cluster Display">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RefreshPlots" Class="mt-2">Refresh Plots</MudButton>
         <MudGrid>
             <MudItem xs="12" sm="6" md="6" lg="6">
                 <ScatterPlot NameList="@nameDepthList" ModeFlagList="@modeFlagDepthList" ColorList="@colorDepthList"
@@ -362,7 +365,8 @@
                              YAxisReversed="@true" AspectRatio="-1" PlotHeight="500" PlotWidth="500"
                              PlotTitle="Depth References" XAxisTitle="@DataUtils.DepthReferencesXValuesTitle" YAxisTitle="@DataUtils.DepthReferencesYValuesTitle"
                              XUnit="@DataUtils.DepthReferencesXValuesQty" YUnit="@DataUtils.DepthReferencesYValuesQty"
-                             @ref="@depthPlot">
+                             @ref="@depthPlot"
+                             ID="DepthPlot">
                 </ScatterPlot>
             </MudItem>
             <MudItem xs="12" sm="6" md="6" lg="6">
@@ -371,7 +375,11 @@
                              YAxisReversed="@false" AspectRatio="1" PlotHeight="500" PlotWidth="500"
                              PlotTitle="Slots" XAxisTitle="@DataUtils.SlotsXValuesTitle" YAxisTitle="@DataUtils.SlotsYValuesTitle"
                              XUnit="@DataUtils.SlotsXValuesQty" YUnit="@DataUtils.SlotsYValuesQty"
-                             @ref="@clusterPlot">
+                             @ref="@clusterPlot"
+                             DrillingSignalReference="@DrillingSignalReferenceType.Position"
+                             PositionDirectionX="@PositionDirectionType.East"
+                             PositionDirectionY="@PositionDirectionType.North"
+                             ID="SlotPlot">
                 </ScatterPlot>
             </MudItem>
         </MudGrid>
@@ -1573,6 +1581,12 @@
         catch (Exception e)
         {
         }
+    }
+    private void RefreshPlots()
+    {
+        UpdateDepthPlot();
+        UpdateSlotPlot();
+        InvokeAsync(() => { StateHasChanged(); }).Wait();
     }
 }
 
