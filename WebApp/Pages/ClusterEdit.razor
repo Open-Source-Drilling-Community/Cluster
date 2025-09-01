@@ -51,7 +51,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="2" md="2" lg="2">
                     <MudInputWithUnitAdornment QuantityName="PositionDrilling"
-                                               QuantityLabel="Ref. Northing"
+                                               QuantityLabel="Ref. Northing (Carto)"
                                                SIValueNullable="referenceNorthing"
                                                SIValueNullableChanged="@ChangeReferenceNorthing" />
                 </MudItem>
@@ -85,7 +85,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="2" md="2" lg="2">
                     <MudInputWithUnitAdornment QuantityName="PositionDrilling"
-                                               QuantityLabel="Ref. Easting"
+                                               QuantityLabel="Ref. Easting (Carto)"
                                                SIValueNullable="referenceEasting"
                                                SIValueNullableChanged="@ChangeReferenceEasting" />
                 </MudItem>
@@ -162,18 +162,34 @@
     <MudExpansionPanel Text="Slots">
         <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
             <MudGrid>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="1" md="1" lg="1">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddSlot" Class="mt-2">
                         Add Slot
                     </MudButton>
                 </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
+                    <MudRadioGroup T="string" @bind-Value="SlotTableColumnChoice" Class="mt-2">
+                        <MudRadio Value="@_geodeticWGS84">@_geodeticWGS84</MudRadio>
+                        <MudRadio Value="@_geodeticDatum">@_geodeticDatum</MudRadio>
+                        <MudRadio Value="@_cartographic">@_cartographic</MudRadio>
+                    </MudRadioGroup>
+                </MudItem>
+                <MudItem xs="12" sm="2" md="2" lg="2">
+                    @if (_slotTableColumnChoice == _geodeticWGS84 || _slotTableColumnChoice == _geodeticDatum)
+                    {
+                        <MudRadioGroup T="string" @bind-Value="SlotTableAngleChoice" Class="mt-2">
+                            <MudRadio Value="@_decimal">@_decimal</MudRadio>
+                            <MudRadio Value="@_sexagesimal">@_sexagesimal</MudRadio>
+                        </MudRadioGroup>
+                    }
+                </MudItem>
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="LengthSmall"
                                                QuantityLabel="Northing Accuracy"
                                                SIValueNullable="slotNorthingAccuracy"
                                                SIValueNullableChanged="@(val => slotNorthingAccuracy = val)" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="LengthSmall"
                                                QuantityLabel="Easting Accuracy"
                                                SIValueNullable="slotEastingAccuracy"
@@ -183,30 +199,63 @@
             <MudTable Items="_slots" Hover="true" Dense="true" Bordered="true">
                 <HeaderContent>
                     <MudTh>Name</MudTh>
-                    <MudTh>
-                        <MudText>Latitude (WGS84)</MudText>
-                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
-                    </MudTh>
-                    <MudTh>
-                        <MudText>Longitude (WGS84)</MudText>
-                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
-                    </MudTh>
-                    <MudTh>
-                        <MudText>Latitude (Datum)</MudText>
-                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
-                    </MudTh>
-                    <MudTh>
-                        <MudText>Longitude (Datum)</MudText>
-                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
-                    </MudTh>
-                    <MudTh>
-                        <MudText>Northing</MudText>
-                        <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text" />
-                    </MudTh>
-                    <MudTh>
-                        <MudText>Easting</MudText>
-                        <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text" />
-                    </MudTh>
+                    @if (_geodeticWGS84ColumnVisible)
+                    {
+                        if (_decimalAngleVisible)
+                        {
+                            <MudTh>
+                                <MudText>Latitude (WGS84)</MudText>
+                                <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
+                            </MudTh>
+                            <MudTh>
+                                <MudText>Longitude (WGS84)</MudText>
+                                <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
+                            </MudTh>
+                        }
+                        else
+                        {
+                            <MudTh>
+                                <MudText>Latitude (WGS84)</MudText>
+                            </MudTh>
+                            <MudTh>
+                                <MudText>Longitude (WGS84)</MudText>
+                            </MudTh>
+                        }
+                    }
+                    @if (_geodeticDatumColumnVisible)
+                    {
+                        if (_decimalAngleVisible)
+                        {
+                            <MudTh>
+                                <MudText>Latitude (Datum)</MudText>
+                                <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
+                            </MudTh>
+                            <MudTh>
+                                <MudText>Longitude (Datum)</MudText>
+                                <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
+                            </MudTh>
+                        }
+                        else
+                        {
+                            <MudTh>
+                                <MudText>Latitude (Datum)</MudText>
+                            </MudTh>
+                            <MudTh>
+                                <MudText>Longitude (Datum)</MudText>
+                            </MudTh>
+                        }
+                    }
+                    @if (_cartographicColumnVisible)
+                    {
+                        <MudTh>
+                            <MudText>Northing</MudText>
+                            <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text" />
+                        </MudTh>
+                        <MudTh>
+                            <MudText>Easting</MudText>
+                            <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text" />
+                        </MudTh>
+                    }
                     <MudTh></MudTh>
                 </HeaderContent>
                 <RowTemplate>
@@ -216,41 +265,85 @@
                                       Style="width:40px"
                                       Immediate="true" />
                     </MudTd>
-                    <MudTd>
-                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
-                                          SIValueNullable="@context.LatitudeWGS84"
-                                          SIValueNullableChanged="@(val => UpdateSlotLatitudeWGS84(val, context))" />
-                    </MudTd>
-                    <MudTd>
-                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
-                                          SIValueNullable="@context.LongitudeWGS84"
-                                          SIValueNullableChanged="@(val => UpdateSlotLongitudeWGS84(val, context))" />
+                    @if (_geodeticWGS84ColumnVisible)
+                    {
+                        if (_decimalAngleVisible)
+                        {
+                            <MudTd>
+                                <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                                  SIValueNullable="@context.LatitudeWGS84"
+                                                  SIValueNullableChanged="@(val => UpdateSlotLatitudeWGS84(val, context))" />
+                            </MudTd>
+                            <MudTd>
+                                <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                                  SIValueNullable="@context.LongitudeWGS84"
+                                                  SIValueNullableChanged="@(val => UpdateSlotLongitudeWGS84(val, context))" />
 
-                    </MudTd>
-                    <MudTd>
-                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
-                                          SIValueNullable="@context.LatitudeDatum"
-                                          SIValueNullableChanged="@(val => UpdateSlotLatitudeDatum(val, context))" />
+                            </MudTd>
+                        }
+                        else
+                        {
+                            <MudTd>
+                                <MudInputAngleWithUnit SIValueNullable="@context.LatitudeWGS84"
+                                                       SIValueNullableChanged="@(val => UpdateSlotLatitudeWGS84(val, context))" />
+                            </MudTd>
+                            <MudTd>
+                                <MudInputAngleWithUnit SIValueNullable="@context.LongitudeWGS84"
+                                                       SIValueNullableChanged="@(val => UpdateSlotLongitudeWGS84(val, context))" />
 
-                    </MudTd>
-                    <MudTd>
-                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
-                                          SIValueNullable="@context.LongitudeDatum"
-                                          SIValueNullableChanged="@(val => UpdateSlotLongitudeDatum(val, context))" />
+                            </MudTd>
+                        }
+                    }
+                    @if (_geodeticDatumColumnVisible)
+                    {
+                        if (_decimalAngleVisible)
+                        {
+                            <MudTd>
+                                <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                                  SIValueNullable="@context.LatitudeDatum"
+                                                  SIValueNullableChanged="@(val => UpdateSlotLatitudeDatum(val, context))" />
 
-                    </MudTd>
-                    <MudTd>
-                        <MudInputWithUnit QuantityName="PositionDrilling"
-                                          SIValueNullable="@context.Northing"
-                                          SIValueNullableChanged="@(val => UpdateSlotNorthing(val, context))" />
+                            </MudTd>
+                            <MudTd>
+                                <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                                  SIValueNullable="@context.LongitudeDatum"
+                                                  SIValueNullableChanged="@(val => UpdateSlotLongitudeDatum(val, context))" />
 
-                    </MudTd>
-                    <MudTd>
-                        <MudInputWithUnit QuantityName="PositionDrilling"
-                                          SIValueNullable="@context.Easting"
-                                          SIValueNullableChanged="@(val => UpdateSlotEasting(val, context))" />
+                            </MudTd>
+                        }
+                        else
+                        {
+                            <MudTd>
+                                <MudInputAngleWithUnit SIValueNullable="@context.LatitudeDatum"
+                                                       SIValueNullableChanged="@(val => UpdateSlotLatitudeDatum(val, context))" />
 
-                    </MudTd>
+                            </MudTd>
+                            <MudTd>
+                                <MudInputAngleWithUnit SIValueNullable="@context.LongitudeDatum"
+                                                       SIValueNullableChanged="@(val => UpdateSlotLongitudeDatum(val, context))" />
+
+                            </MudTd>
+                        }
+                    }
+                    @if (_cartographicColumnVisible)
+                    {
+                        <MudTd>
+                            <MudInputWithUnit QuantityName="PositionDrilling"
+                                              DrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                              PositionDirection="@PositionDirectionType.North"
+                                              SIValueNullable="@context.Northing"
+                                              SIValueNullableChanged="@(val => UpdateSlotNorthing(val, context))" />
+
+                        </MudTd>
+                        <MudTd>
+                            <MudInputWithUnit QuantityName="PositionDrilling"
+                                              DrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                              PositionDirection="@PositionDirectionType.East"
+                                              SIValueNullable="@context.Easting"
+                                              SIValueNullableChanged="@(val => UpdateSlotEasting(val, context))" />
+
+                        </MudTd>
+                    }
                     <MudTd>
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                        Color="Color.Error"
@@ -300,6 +393,12 @@
     [Parameter]
     public Action? OnUpdate { get; set; }
 
+    [Parameter]
+    public CartographicReference? CartographicReference { get; set; }
+
+    [Parameter]
+    public ClusterReference? ClusterReference { get; set; }
+
     // Local variables used to retrieve user-defined parameters
     private string? _name;
     private string? _descr;
@@ -308,8 +407,10 @@
     private double? referenceLongitudeWGS84 = null;
     private double? referenceLatitudeDatum = null;
     private double? referenceLongitudeDatum = null;
-    private double? referenceNorthing = null;
-    private double? referenceEasting = null;
+    private double? _referenceNorthing = null;
+    private double? _referenceEasting = null;
+    private double? referenceNorthing { get { return _referenceNorthing; } set { _referenceNorthing = value; ManageReferenceNorthinEasting(); } }
+    private double? referenceEasting { get { return _referenceEasting; } set { _referenceEasting = value; ManageReferenceNorthinEasting(); } }
     private double? referenceNorthingAccuracy = null;
     private double? referenceEastingAccuracy = null;
     private double? referenceDepthWGS84 = null;
@@ -324,6 +425,79 @@
     private double? slotNorthingAccuracy = null;
     private double? slotEastingAccuracy = null;
     private List<SlotTemplate> _slots = new List<SlotTemplate>();
+    private bool _geodeticWGS84ColumnVisible = true;
+    private bool _geodeticDatumColumnVisible = false;
+    private bool _cartographicColumnVisible = false;
+    private bool _decimalAngleVisible = true;
+    private bool _sexagesimalAngleVisible = false;
+    private static readonly string _geodeticWGS84 = "Geodetic (WGS84)";
+    private static readonly string _geodeticDatum = "Geodetic (Datum)";
+    private static readonly string _cartographic = "Cartographic";
+    private static readonly string _decimal = "decimal";
+    private static readonly string _sexagesimal = "sexagesimal";
+    private string _slotTableColumnChoice = _geodeticWGS84;
+    private string _slotTableAngleChoice = _decimal;
+    private string SlotTableColumnChoice
+    {
+        get { return _slotTableColumnChoice; }
+        set
+        {
+            _slotTableColumnChoice = value;
+            ManageSlotTableColumnChoice();
+        }
+    }
+    private string SlotTableAngleChoice
+    {
+        get { return _slotTableAngleChoice; }
+        set
+        {
+            _slotTableAngleChoice = value;
+            ManageSlotTableAngleChoice();
+        }
+    }
+
+    private void ManageSlotTableColumnChoice()
+    {
+        _geodeticWGS84ColumnVisible = false;
+        _geodeticDatumColumnVisible = false;
+        _cartographicColumnVisible = false;
+        if (_geodeticWGS84.Equals(_slotTableColumnChoice))
+        {
+            _geodeticWGS84ColumnVisible = true;
+        }
+        else if (_geodeticDatum.Equals(_slotTableColumnChoice))
+        {
+            _geodeticDatumColumnVisible = true;
+        }
+        else
+        {
+            _cartographicColumnVisible = true;
+        }
+        InvokeAsync(() => { StateHasChanged(); }).Wait();
+    }
+    private void ManageSlotTableAngleChoice()
+    {
+        _decimalAngleVisible = false;
+        _sexagesimalAngleVisible = false;
+        if (_decimal.Equals(_slotTableAngleChoice))
+        {
+            _decimalAngleVisible = true;
+        }
+        else
+        {
+            _sexagesimalAngleVisible = true;
+        }
+        InvokeAsync(() => { StateHasChanged(); }).Wait();
+    }
+
+    private void ManageReferenceNorthinEasting()
+    {
+        if (ClusterReference != null && referenceNorthing != null && referenceEasting != null)
+        {
+            ClusterReference.ClusterNorthPositionReference = -referenceNorthing;
+            ClusterReference.ClusterEastPositionReference = -referenceEasting;
+        }
+    }
 
     // Plot variables
     string[] colorScale = { "black", "blue", "grey", "red", "orange", "green", "yellow", "pink", "brown", "purple" };

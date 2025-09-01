@@ -1,0 +1,139 @@
+﻿@page "/Statistics"
+@inject ILogger<StatisticsMain> logger
+@inject ISnackbar Snackbar
+
+@if (statistics_ == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div hidden="@isHiddenMainPanel">
+        <MudText Class="mt-4 mb-4" Typo="Typo.h5"><strong>Usage Statistics</strong></MudText>
+        <div style="width: 90%; margin: auto">
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.h6">Total count:</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.body1">@totalCount_</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.h6">Cluster Count:</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.body1">@clusterCount_</MudText>
+                </MudItem>
+            </MudGrid>
+        </div>
+    </div>
+}
+
+@code {
+    private UsageStatisticsCluster statistics_ = null!;
+    private long totalCount_ = 0;
+    private long clusterCount_ = 0;
+    private long clusterConversionSetCount_ = 0;
+
+    private bool isHiddenMainPanel = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            statistics_ = await APIUtils.ClientCluster.GetClusterUsageStatisticsAsync();
+            if (statistics_ != null)
+            {
+                totalCount_ = 0;
+                clusterCount_ = 0;
+                clusterConversionSetCount_ = 0;
+
+                if (statistics_.GetAllClusterIdPerDay != null && statistics_.GetAllClusterIdPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.GetAllClusterIdPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            clusterCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.GetAllClusterMetaInfoPerDay != null && statistics_.GetAllClusterMetaInfoPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.GetAllClusterMetaInfoPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            clusterCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.GetClusterByIdPerDay != null && statistics_.GetClusterByIdPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.GetClusterByIdPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            clusterCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.GetAllClusterPerDay != null && statistics_.GetAllClusterPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.GetAllClusterPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            clusterCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.PostClusterPerDay != null && statistics_.PostClusterPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.PostClusterPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            clusterCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.PutClusterByIdPerDay != null && statistics_.PutClusterByIdPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.PutClusterByIdPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            clusterCount_ += count.Count;
+                        }
+                    }
+                }
+                if (statistics_.DeleteClusterByIdPerDay != null && statistics_.DeleteClusterByIdPerDay.Data != null)
+                {
+                    foreach (CountPerDay count in statistics_.DeleteClusterByIdPerDay.Data)
+                    {
+                        if (count != null)
+                        {
+                            totalCount_ += count.Count;
+                            clusterCount_ += count.Count;
+                        }
+                    }
+                }
+            }
+            // Show main panel
+            isHiddenMainPanel = false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Problem UsageStatistics initialization");
+        }
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+}

@@ -1,4 +1,6 @@
-﻿public static class APIUtils
+﻿using OSDC.UnitConversion.DrillingRazorMudComponents;
+
+public static class APIUtils
 {
     // API parameters
     public static readonly string HostNameCluster = NORCE.Drilling.Cluster.WebApp.Configuration.ClusterHostURL!;
@@ -29,4 +31,17 @@
         httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         return httpClient;
     }
+}
+
+public class CartographicReference : ICartographicGridPositionReferenceSource
+{
+    public double? CartographicGridNorthPositionReference { get; set; }
+    public double? CartographicGridEastPositionReference { get; set; }
+
+}
+
+public class ClusterReference : IClusterPositionReferenceSource
+{
+    public double? ClusterNorthPositionReference { get; set; }
+    public double? ClusterEastPositionReference { get; set; }
 }

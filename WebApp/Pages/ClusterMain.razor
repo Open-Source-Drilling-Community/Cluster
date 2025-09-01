@@ -6,7 +6,11 @@
                               HttpBasePath=@APIUtils.HostBasePathUnitConversion
                               HttpController="UnitSystem/"
                               UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
-                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName">
+                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
+                              PositionReferenceName=""
+                              CartographicGridPositionReferenceSource="_cartographicReference"
+                              ClusterPositionReferenceSource="_clusterReference"
+                              >
     @if (clusterList == null)
     {
         <p><em>Loading...</em></p>
@@ -45,7 +49,7 @@
     }
     @if (isHiddenMainPanel && currentCluster != null)
     {
-        <ClusterEdit CurrentCluster="@currentCluster" Fields="@fieldList" OnUpdate="@ShowMainPanel" />
+        <ClusterEdit CurrentCluster="@currentCluster" Fields="@fieldList" OnUpdate="@ShowMainPanel" CartographicReference="@_cartographicReference" ClusterReference="@_clusterReference" />
     }
 </MudUnitAndReferenceChoiceTag>
 
@@ -62,6 +66,9 @@
     public bool isHiddenMainPanel;
     public bool isHiddenEditPanel;
     private string? _searchString;
+
+    private CartographicReference _cartographicReference = new CartographicReference() { CartographicGridNorthPositionReference = 0, CartographicGridEastPositionReference = 0 };
+    private ClusterReference _clusterReference = new ClusterReference() { ClusterNorthPositionReference = 0, ClusterEastPositionReference = 0 };
 
     protected override async Task OnInitializedAsync()
     {
