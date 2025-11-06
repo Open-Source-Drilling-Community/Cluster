@@ -418,8 +418,8 @@
     private double? referenceLongitudeDatum = null;
     private double? _referenceNorthing = null;
     private double? _referenceEasting = null;
-    private double? referenceNorthing { get { return _referenceNorthing; } set { _referenceNorthing = value; ManageReferenceNorthinEasting(); } }
-    private double? referenceEasting { get { return _referenceEasting; } set { _referenceEasting = value; ManageReferenceNorthinEasting(); } }
+    private double? referenceNorthing { get { return _referenceNorthing; } set { _referenceNorthing = value; ManageReferenceNorthingEasting(); } }
+    private double? referenceEasting { get { return _referenceEasting; } set { _referenceEasting = value; ManageReferenceNorthingEasting(); } }
     private double? referenceNorthingAccuracy = null;
     private double? referenceEastingAccuracy = null;
     private double? referenceDepthWGS84 = null;
@@ -499,7 +499,7 @@
         InvokeAsync(() => { StateHasChanged(); }).Wait();
     }
 
-    private void ManageReferenceNorthinEasting()
+    private void ManageReferenceNorthingEasting()
     {
         if (ClusterReference != null && referenceNorthing != null && referenceEasting != null)
         {
