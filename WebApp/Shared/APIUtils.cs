@@ -13,6 +13,12 @@ public static class APIUtils
     public static readonly HttpClient HttpClientField = APIUtils.SetHttpClient(HostNameField, HostBasePathField);
     public static readonly NORCE.Drilling.Cluster.ModelShared.Client ClientField = new NORCE.Drilling.Cluster.ModelShared.Client(APIUtils.HttpClientField.BaseAddress!.ToString(), APIUtils.HttpClientField);
 
+    // If RigHostURL is not configured, default to the Cluster host (common setup in some deployments)
+    public static readonly string HostNameRig = NORCE.Drilling.Cluster.WebApp.Configuration.RigHostURL ?? NORCE.Drilling.Cluster.WebApp.Configuration.ClusterHostURL!;
+    public static readonly string HostBasePathRig = "Rig/api/";
+    public static readonly HttpClient HttpClientRig = APIUtils.SetHttpClient(HostNameRig, HostBasePathRig);
+    public static readonly NORCE.Drilling.Cluster.ModelShared.Client ClientRig = new NORCE.Drilling.Cluster.ModelShared.Client(APIUtils.HttpClientRig.BaseAddress!.ToString(), APIUtils.HttpClientRig);
+
     public static readonly string HostNameUnitConversion = NORCE.Drilling.Cluster.WebApp.Configuration.UnitConversionHostURL!;
     public static readonly string HostBasePathUnitConversion = "UnitConversion/api/";
 

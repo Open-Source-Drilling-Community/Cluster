@@ -23,6 +23,29 @@
                 }
             </MudSelect>
         }
+        <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
+            <MudSwitch T="bool" @bind-Value="IsFixedPlatform" Label="Fixed Platform" Color="Color.Primary" />
+            @if (IsFixedPlatform)
+            {
+                @if (_rigs == null || !_rigs.Any())
+                {
+                    <MudText Color="Color.Warning">No rigs loaded. Check configuration or click Reload.</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadRigs">Reload rigs</MudButton>
+                }
+                else
+                {
+                    <MudSelect T="RigLight" @bind-Value="_rig" Label="Rig" Variant="Variant.Filled" ToStringFunc="@(r => GetRigName(r))">
+                        @foreach (var rig in _rigs)
+                        {
+                            @if (rig is not null && rig.MetaInfo is not null && !string.IsNullOrEmpty(rig.Name))
+                            {
+                                <MudSelectItem Value="rig">@rig.Name</MudSelectItem>
+                            }
+                        }
+                    </MudSelect>
+                }
+            }
+        </MudContainer>
     </MudExpansionPanel>
     <MudExpansionPanel Text="Reference">
         <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
@@ -434,6 +457,31 @@
     private double? slotNorthingAccuracy = null;
     private double? slotEastingAccuracy = null;
     private List<SlotTemplate> _slots = new List<SlotTemplate>();
+
+    private bool _isFixedPlatform = false;
+    private bool _shouldLoadRigsAfterRender = false;
+    private bool _disposed = false;
+
+    private bool IsFixedPlatform
+    {
+        get
+        {
+            return _isFixedPlatform;
+        }
+        set
+        {
+            _isFixedPlatform = value;
+        }
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+    }
+
+    private RigLight? _rig = null;
+    private List<RigLight> _rigs = new List<RigLight>();
+
     private bool _geodeticWGS84ColumnVisible = true;
     private bool _geodeticDatumColumnVisible = false;
     private bool _cartographicColumnVisible = false;
@@ -541,11 +589,27 @@
             Parent.Add(this);
             ManageUnits();
 
+            // Load available rigs for fixed platform assignment
+            await LoadRigs();
+
             if (CurrentCluster != null && CurrentCluster.MetaInfo != null)
             {
                 _name = CurrentCluster.Name;
                 _descr = CurrentCluster.Description;
                 _field = Fields?.FirstOrDefault(f => f.MetaInfo != null && f.MetaInfo.ID == CurrentCluster.FieldID);
+                IsFixedPlatform = CurrentCluster.IsFixedPlatform;
+                _rig = null;
+                if (CurrentCluster.RigID is not null && _rigs is not null)
+                {
+                    foreach (var rig in _rigs)
+                    {
+                        if (rig is not null && rig.MetaInfo is not null && rig.MetaInfo.ID == CurrentCluster.RigID)
+                        {
+                            _rig = rig;
+                            break;
+                        }
+                    }
+                }
                 referenceLatitudeWGS84 = CurrentCluster.ReferenceLatitude?.GaussianValue?.Mean;
                 referenceLongitudeWGS84 = CurrentCluster.ReferenceLongitude?.GaussianValue?.Mean;
                 referenceDepthWGS84 = CurrentCluster.ReferenceDepth?.GaussianValue?.Mean;
@@ -620,12 +684,72 @@
             logger.LogError(ex, "Problem on Cluster initialization");
             Snackbar.Add("Problem on Cluster initialization", Severity.Error);
         }
-        await InvokeAsync(() => { StateHasChanged(); });
+        if (!_disposed)
+        {
+            try
+            {
+                await InvokeAsync(() => { StateHasChanged(); });
+            }
+            catch (ObjectDisposedException)
+            {
+                // Component was disposed before render could complete.
+            }
+        }
     }
 
     public void ManageUnits()
     {
 
+    }
+
+    private async Task LoadRigs()
+    {
+        try
+        {
+            var rigs = await APIUtils.ClientRig.GetAllRigLightAsync();
+            // Only fixed platform rigs are relevant when selecting a fixed platform cluster
+            _rigs = rigs?.Where(r => r.IsFixedPlatform).OrderBy(r => r.Name).ToList() ?? new List<RigLight>();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to load list of rigs");
+            Snackbar.Add("Unable to load list of rigs", Severity.Warning);
+        }
+        if (!_disposed)
+        {
+            try
+            {
+                await InvokeAsync(() => { StateHasChanged(); });
+            }
+            catch (ObjectDisposedException)
+            {
+                // Component was disposed before render could complete.
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_disposed && _shouldLoadRigsAfterRender)
+        {
+            _shouldLoadRigsAfterRender = false;
+            await LoadRigs();
+        }
+    }
+
+    private string GetRigName(RigLight? rig)
+    {
+        return rig?.Name ?? string.Empty;
+    }
+
+    private Task OnFixedPlatformChanged(bool value)
+    {
+        _isFixedPlatform = value;
+        if (value && (_rigs == null || !_rigs.Any()))
+        {
+            _shouldLoadRigsAfterRender = true;
+        }
+        return Task.CompletedTask;
     }
 
     private async Task Update()
@@ -682,6 +806,8 @@
                             StandardDeviation = (topWaterDepthAccuracy == null) ? 0.01 : topWaterDepthAccuracy
                         },
                     } : null,
+                    IsFixedPlatform = _isFixedPlatform,
+                    RigID = _isFixedPlatform ? ((_rig != null && _rig.MetaInfo != null) ? _rig.MetaInfo.ID : null) : null
                 };
                 if (_slots != null)
                 {

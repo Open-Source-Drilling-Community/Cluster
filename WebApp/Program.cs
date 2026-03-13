@@ -30,6 +30,10 @@ if (!String.IsNullOrEmpty(builder.Configuration["FieldHostURL"]))
     NORCE.Drilling.Cluster.WebApp.Configuration.FieldHostURL = builder.Configuration["FieldHostURL"];
 if (!String.IsNullOrEmpty(builder.Configuration["UnitConversionHostURL"]))
     NORCE.Drilling.Cluster.WebApp.Configuration.UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"];
+if (!String.IsNullOrEmpty(builder.Configuration["RigHostURL"]))
+    NORCE.Drilling.Cluster.WebApp.Configuration.RigHostURL = builder.Configuration["RigHostURL"];
+else
+    NORCE.Drilling.Cluster.WebApp.Configuration.RigHostURL = builder.Configuration["ClusterHostURL"];
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -1,1834 +1,10 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.0.4",
   "info": {
-    "title": "ModelShared (Service)",
-    "description": "Data model containing model dependencies of the clients of the current microservice (WebApp, ServiceTest)",
+    "title": "Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
     "version": "1.0"
   },
   "paths": {
-    "/Cluster": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllClusterId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "PostCluster",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Cluster/MetaInfo": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllClusterMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Cluster/{id}": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cluster"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "PutClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Cluster"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "DeleteClusterById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Cluster/HeavyData": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllCluster",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Cluster"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ClusterUsageStatistics": {
-      "get": {
-        "tags": [
-          "ClusterUsageStatistics"
-        ],
-        "operationId": "GetClusterUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsCluster"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "PostCartographicConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "PutCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "DeleteCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "PostCartographicProjection",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicProjection/MetaInfo": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection/{id}": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicProjection"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "PutCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "DeleteCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicProjection/LightData": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjectionLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjection",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjection"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetAllCartographicProjectionTypeId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType/{id}": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetCartographicProjectionTypeById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicProjectionType"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetAllCartographicProjectionType",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjectionType"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionUsageStatistics": {
-      "get": {
-        "tags": [
-          "CartographicProjectionUsageStatistics"
-        ],
-        "operationId": "GetCartographicProjectionUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsCartographicProjection"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "PostGeodeticConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeodeticConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "PutGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "DeleteGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "PostGeodeticDatum",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/MetaInfo": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/{id}": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeodeticDatum"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "PutGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "DeleteGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/LightData": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticDatumLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/HeavyData": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatum",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatumUsageStatistics": {
-      "get": {
-        "tags": [
-          "GeodeticDatumUsageStatistics"
-        ],
-        "operationId": "GetGeodeticDatumUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsGeodeticDatum"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Spheroid": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroidId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "PostSpheroid",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Spheroid/MetaInfo": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroidMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Spheroid/{id}": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Spheroid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "PutSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "DeleteSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Spheroid/HeavyData": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroid",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Spheroid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Field": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetAllFieldId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "PostField",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Field/MetaInfo": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetAllFieldMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Field/{id}": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Field"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "PutFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Field"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "DeleteFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Field/HeavyData": {
-      "get": {
-        "tags": [
-          "Field"
-        ],
-        "operationId": "GetAllField",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Field"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "PostFieldCartographicConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FieldCartographicConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "PutFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "DeleteFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/FieldUsageStatistics": {
-      "get": {
-        "tags": [
-          "FieldUsageStatistics"
-        ],
-        "operationId": "GetFieldUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsField"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Rig": {
       "get": {
         "tags": [
@@ -1861,17 +37,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Rig"
+                "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Rig"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Rig"
+                "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Rig"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Rig"
+                "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Rig"
               }
             }
           }
@@ -1897,7 +73,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
                   }
                 }
               }
@@ -1929,7 +105,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Rig"
+                  "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Rig"
                 }
               }
             }
@@ -1956,17 +132,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Rig"
+                "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Rig"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Rig"
+                "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Rig"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Rig"
+                "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Rig"
               }
             }
           }
@@ -2014,7 +190,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RigLight"
+                    "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RigLight"
                   }
                 }
               }
@@ -2037,7 +213,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Rig"
+                    "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Rig"
                   }
                 }
               }
@@ -2058,7 +234,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsRig"
+                  "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.UsageStatisticsRig"
                 }
               }
             }
@@ -2069,1434 +245,7 @@
   },
   "components": {
     "schemas": {
-      "Cluster": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "IsSingleWell": {
-            "type": "boolean"
-          },
-          "RigID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "IsFixedPlatform": {
-            "type": "boolean"
-          },
-          "ReferenceLatitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "ReferenceLongitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "ReferenceDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "GroundMudLineDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "TopWaterDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "Slots": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/Slot"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "CountPerDay": {
-        "type": "object",
-        "properties": {
-          "Date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "Count": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "History": {
-        "type": "object",
-        "properties": {
-          "Data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CountPerDay"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "Slot": {
-        "type": "object",
-        "properties": {
-          "ID": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "Latitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "Longitude": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          }
-        }
-      },
-      "UsageStatisticsCluster": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllClusterIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllClusterMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetClusterByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllClusterPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostClusterPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutClusterByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteClusterByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "GaussianDrillingProperty": {
-        "type": "object",
-        "properties": {
-          "GaussianValue": {
-            "$ref": "#/components/schemas/GaussianDistribution"
-          }
-        }
-      },
-      "MetaInfo": {
-        "type": "object",
-        "properties": {
-          "ID": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "HttpHostName": {
-            "type": "string",
-            "nullable": true
-          },
-          "HttpHostBasePath": {
-            "type": "string",
-            "nullable": true
-          },
-          "HttpEndPoint": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "GaussianDistribution": {
-        "type": "object",
-        "properties": {
-          "MinValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "MaxValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "Mean": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "StandardDeviation": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "UsageStatisticsCartographicProjection": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllCartographicProjectionTypeIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicProjectionTypeByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionTypePerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostCartographicProjectionPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "AreaNormalizationTransformType": {
-        "enum": [
-          "None",
-          "Linear",
-          "Quadratic",
-          "Tangent"
-        ],
-        "type": "string"
-      },
-      "AxisType": {
-        "enum": [
-          "None",
-          "x",
-          "y"
-        ],
-        "type": "string"
-      },
-      "CartographicConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "CartographicCoordinateList": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CartographicCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "CartographicConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionName": {
-            "type": "string",
-            "nullable": true
-          },
-          "CartographicProjectionDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "CartographicCoordinate": {
-        "type": "object",
-        "properties": {
-          "Northing": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Easting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GeodeticCoordinate": {
-            "$ref": "#/components/schemas/GeodeticCoordinate"
-          },
-          "GridConvergenceDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        },
-        "additionalProperties": { }
-      },
-      "CartographicProjection": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "ProjectionType": {
-            "$ref": "#/components/schemas/ProjectionType"
-          },
-          "GeodeticDatumID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "LatitudeOrigin": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude1": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude2": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LatitudeTrueScale": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeOrigin": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Scaling": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "FalseEasting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "FalseNorthing": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Zone": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "IsSouth": {
-            "type": "boolean"
-          },
-          "IsHyperbolic": {
-            "type": "boolean"
-          },
-          "ProjectionHeight": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "HeightViewPoint": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Sweep": {
-            "$ref": "#/components/schemas/AxisType"
-          },
-          "AzimuthCentralLine": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Weight": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Landsat": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "Path": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "Alpha": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Gamma": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude1": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude2": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeCentralPoint": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "NoOffset": {
-            "type": "boolean"
-          },
-          "NoRotation": {
-            "type": "boolean"
-          },
-          "AreaNormalizationTransform": {
-            "$ref": "#/components/schemas/AreaNormalizationTransformType"
-          },
-          "PegLatitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "PegLongitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "PegHeading": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "N": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Q": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "CartographicProjectionLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          }
-        }
-      },
-      "CartographicProjectionType": {
-        "type": "object",
-        "properties": {
-          "Projection": {
-            "$ref": "#/components/schemas/ProjectionType"
-          },
-          "UseLatitudeOrigin": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitude1": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitude2": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitudeTrueScale": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitudeOrigin": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseScaling": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseFalseEastingNorthing": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseZone": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseSouth": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseHyperbolic": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseProjectionHeight": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseHeightViewPoint": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseSweep": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAzimuthCentralLine": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseWeight": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLandsat": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePath": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAlpha": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseGamma": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitude1": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitude2": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitudeCentralPoint": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseNoOffset": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseNoRotation": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAreaNormalizationTransform": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegLatitude": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegLongitude": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegHeading": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseN": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseQ": {
-            "type": "boolean",
-            "readOnly": true
-          }
-        }
-      },
-      "ProjectionType": {
-        "enum": [
-          "Unknown",
-          "UTM",
-          "LambertConformalConic",
-          "LambertConformalConicAlternative",
-          "LambertEqualAreaConic",
-          "TransverseMercator",
-          "Mercator",
-          "Polyconic",
-          "ModifiedStereographicAlaska",
-          "AlbersEqualArea",
-          "AzimuthalEquidistant",
-          "Aitoff",
-          "Bonne",
-          "CalCoopOceanFish",
-          "Cassini",
-          "CentralCylinder",
-          "EqualAreaCylindrical",
-          "EquidistantCylindrical",
-          "EquidistantConic",
-          "GeostationarySatelliteView",
-          "GeneralSinusoidalSeries",
-          "ModifiedStereographic48US",
-          "ModifiedStereographic50US",
-          "InternationalMapWorldPolyconic",
-          "Laborde",
-          "LambertAzimuthalEqualArea",
-          "Lagrange",
-          "LeeOblatedStereographic",
-          "SpaceObliqueLandsat",
-          "McBrydeThomasFlatPolarSinusoidal",
-          "MillerOblatedStereographic",
-          "SpaceObliqueMISR",
-          "NewZealandMapGrid",
-          "ObliqueMercator",
-          "Orthographic",
-          "QuadrilateralizedSphericalCube",
-          "RoussilheStereographic",
-          "S2",
-          "SphericalCrossTrackHeight",
-          "Sinusoidal",
-          "SwissObliqueMercator",
-          "Stereographic",
-          "ObliqueStereographicAlternative",
-          "UniversalPolarStereographic",
-          "UrmaevV",
-          "WebMercator"
-        ],
-        "type": "string"
-      },
-      "GeodeticCoordinate": {
-        "type": "object",
-        "properties": {
-          "LatitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LatitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "OctreeDepth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "OctreeCode": {
-            "$ref": "#/components/schemas/OctreeCodeLong"
-          }
-        },
-        "additionalProperties": { }
-      },
-      "OctreeCodeLong": {
-        "type": "object",
-        "properties": {
-          "Depth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "CodeHigh": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "CodeLow": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": { }
-      },
-      "UsageStatisticsGeodeticDatum": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllSpheroidIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSpheroidMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSpheroidPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostSpheroidPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostGeodeticDatumPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostGeodeticConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "GeodeticConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "GeodeticDatum": {
-            "$ref": "#/components/schemas/GeodeticDatum"
-          },
-          "OctreeBounds": {
-            "$ref": "#/components/schemas/Bounds"
-          },
-          "GeodeticCoordinates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GeodeticCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "GeodeticConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "GeodeticDatumName": {
-            "type": "string",
-            "nullable": true
-          },
-          "GeodeticDatumDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "GeodeticDatum": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          },
-          "Spheroid": {
-            "$ref": "#/components/schemas/Spheroid"
-          },
-          "DeltaX": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "DeltaY": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "DeltaZ": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationX": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationY": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationZ": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "ScaleFactor": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          }
-        }
-      },
-      "GeodeticDatumLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          }
-        }
-      },
-      "Spheroid": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          },
-          "SemiMajorAxis": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSemiMajorAxisSet": {
-            "type": "boolean"
-          },
-          "SemiMinorAxis": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSemiMinorAxisSet": {
-            "type": "boolean"
-          },
-          "Eccentricity": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsEccentricitySet": {
-            "type": "boolean"
-          },
-          "SquaredEccentricity": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSquaredEccentricitySet": {
-            "type": "boolean"
-          },
-          "Flattening": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsFlatteningSet": {
-            "type": "boolean"
-          },
-          "InverseFlattening": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsInverseFlatteningSet": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ScalarDrillingProperty": {
-        "type": "object",
-        "properties": {
-          "DiracDistributionValue": {
-            "$ref": "#/components/schemas/DiracDistribution"
-          }
-        }
-      },
-      "Point3D": {
-        "type": "object",
-        "properties": {
-          "X": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Y": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Z": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "Bounds": {
-        "type": "object",
-        "properties": {
-          "MinX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MinY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MinZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MiddleX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "MiddleY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "MiddleZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "Center": {
-            "$ref": "#/components/schemas/Point3D"
-          }
-        }
-      },
-      "DiracDistribution": {
-        "type": "object",
-        "properties": {
-          "MinValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "MaxValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "Value": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "Field": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        }
-      },
-      "FieldCartographicConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "CartographicCoordinateList": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CartographicCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "FieldCartographicConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldName": {
-            "type": "string",
-            "nullable": true
-          },
-          "FieldDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "UsageStatisticsField": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllFieldIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostFieldPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "Accumulator": {
+      "NORCE.Drilling.Rig.Model.Accumulator": {
         "type": "object",
         "properties": {
           "Name": {
@@ -3524,7 +273,7 @@
             "nullable": true
           },
           "AccumulatorClass": {
-            "$ref": "#/components/schemas/AccumulatorClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.AccumulatorClass"
           },
           "Capacity": {
             "type": "number",
@@ -3541,9 +290,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "AccumulatorClass": {
+      "NORCE.Drilling.Rig.Model.AccumulatorClass": {
         "enum": [
           "Bladder",
           "Diaphragm",
@@ -3553,7 +303,7 @@
         ],
         "type": "string"
       },
-      "AutoDriller": {
+      "NORCE.Drilling.Rig.Model.AutoDriller": {
         "type": "object",
         "properties": {
           "Name": {
@@ -3581,7 +331,7 @@
             "nullable": true
           },
           "ControlMode": {
-            "$ref": "#/components/schemas/AutodrillerControlMode"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.AutodrillerControlMode"
           },
           "MaxLimitRop": {
             "type": "number",
@@ -3643,9 +393,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "AutodrillerControlMode": {
+      "NORCE.Drilling.Rig.Model.AutodrillerControlMode": {
         "enum": [
           "Rop",
           "Diffp",
@@ -3655,7 +406,7 @@
         ],
         "type": "string"
       },
-      "AuxSolidsControl": {
+      "NORCE.Drilling.Rig.Model.AuxSolidsControl": {
         "type": "object",
         "properties": {
           "Name": {
@@ -3683,7 +434,7 @@
             "nullable": true
           },
           "SolidsControlClass": {
-            "$ref": "#/components/schemas/SolidsControlClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.SolidsControlClass"
           },
           "DesanderOn": {
             "type": "boolean",
@@ -3701,9 +452,10 @@
             "type": "boolean",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "BopComponentClass": {
+      "NORCE.Drilling.Rig.Model.BopComponentClass": {
         "enum": [
           "AnnularPreventer",
           "BlindRam",
@@ -3716,7 +468,7 @@
         ],
         "type": "string"
       },
-      "BopLineClass": {
+      "NORCE.Drilling.Rig.Model.BopLineClass": {
         "enum": [
           "ChokeLine",
           "KillLine",
@@ -3726,11 +478,11 @@
         ],
         "type": "string"
       },
-      "BopLineDefinition": {
+      "NORCE.Drilling.Rig.Model.BopLineDefinition": {
         "type": "object",
         "properties": {
           "BopLinesClass": {
-            "$ref": "#/components/schemas/BopLineClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.BopLineClass"
           },
           "LineOd": {
             "type": "number",
@@ -3747,9 +499,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "BopStack": {
+      "NORCE.Drilling.Rig.Model.BopStack": {
         "type": "object",
         "properties": {
           "Name": {
@@ -3777,14 +530,14 @@
             "nullable": true
           },
           "BopStackClass": {
-            "$ref": "#/components/schemas/BopStackClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.BopStackClass"
           },
           "UnitReferenceList": {
             "type": "string",
             "nullable": true
           },
           "BopControlType": {
-            "$ref": "#/components/schemas/ControllerType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ControllerType"
           },
           "BoreDiameter": {
             "type": "number",
@@ -3804,14 +557,14 @@
           "BopComponents": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BopStackComponentDefinition"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.BopStackComponentDefinition"
             },
             "nullable": true
           },
           "BopLines": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BopLineDefinition"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.BopLineDefinition"
             },
             "nullable": true
           },
@@ -3860,9 +613,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "BopStackClass": {
+      "NORCE.Drilling.Rig.Model.BopStackClass": {
         "enum": [
           "LandBop",
           "MarineSurfaceBop",
@@ -3871,11 +625,11 @@
         ],
         "type": "string"
       },
-      "BopStackComponentDefinition": {
+      "NORCE.Drilling.Rig.Model.BopStackComponentDefinition": {
         "type": "object",
         "properties": {
           "BopStackComponentClass": {
-            "$ref": "#/components/schemas/BopComponentClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.BopComponentClass"
           },
           "BoreDiameter": {
             "type": "number",
@@ -3887,9 +641,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CasingDriveClass": {
+      "NORCE.Drilling.Rig.Model.CasingDriveClass": {
         "enum": [
           "Internal",
           "External",
@@ -3897,7 +652,7 @@
         ],
         "type": "string"
       },
-      "CasingDriveSystem": {
+      "NORCE.Drilling.Rig.Model.CasingDriveSystem": {
         "type": "object",
         "properties": {
           "Name": {
@@ -3925,7 +680,7 @@
             "nullable": true
           },
           "CsgDrvClass": {
-            "$ref": "#/components/schemas/CasingDriveClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CasingDriveClass"
           },
           "HoistingCapacity": {
             "type": "number",
@@ -3972,9 +727,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CasingRunningTool": {
+      "NORCE.Drilling.Rig.Model.CasingRunningTool": {
         "type": "object",
         "properties": {
           "Name": {
@@ -3985,9 +741,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CasingTongs": {
+      "NORCE.Drilling.Rig.Model.CasingTongs": {
         "type": "object",
         "properties": {
           "Name": {
@@ -3998,9 +755,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CatWalk": {
+      "NORCE.Drilling.Rig.Model.CatWalk": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4011,9 +769,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CementPump": {
+      "NORCE.Drilling.Rig.Model.CementPump": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4041,7 +800,7 @@
             "nullable": true
           },
           "PumpClass": {
-            "$ref": "#/components/schemas/PumpClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.PumpClass"
           },
           "PlungerDiameter": {
             "type": "number",
@@ -4056,7 +815,7 @@
           "CementPumpDisplacement": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CementPumpDisplacementPoint"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CementPumpDisplacementPoint"
             },
             "nullable": true
           },
@@ -4070,9 +829,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CementPumpDisplacementPoint": {
+      "NORCE.Drilling.Rig.Model.CementPumpDisplacementPoint": {
         "type": "object",
         "properties": {
           "StrokeRate": {
@@ -4090,9 +850,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CementUnit": {
+      "NORCE.Drilling.Rig.Model.CementUnit": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4120,7 +881,7 @@
             "nullable": true
           },
           "Mounting": {
-            "$ref": "#/components/schemas/MountingType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MountingType"
           },
           "Features": {
             "type": "string",
@@ -4131,9 +892,10 @@
             "format": "int32",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Centrifuge": {
+      "NORCE.Drilling.Rig.Model.Centrifuge": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4144,9 +906,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ChokeCvCurvePoint": {
+      "NORCE.Drilling.Rig.Model.ChokeCvCurvePoint": {
         "type": "object",
         "properties": {
           "Pressure": {
@@ -4159,16 +922,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ChokeFunction": {
+      "NORCE.Drilling.Rig.Model.ChokeFunction": {
         "enum": [
           "PressureControl",
           "Safety"
         ],
         "type": "string"
       },
-      "ChokeManifold": {
+      "NORCE.Drilling.Rig.Model.ChokeManifold": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4196,7 +960,7 @@
             "nullable": true
           },
           "ChokeControlClass": {
-            "$ref": "#/components/schemas/ControlClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ControlClass"
           },
           "MaxLimitDesignPressure": {
             "type": "number",
@@ -4228,9 +992,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ChokeNumber": {
+      "NORCE.Drilling.Rig.Model.ChokeNumber": {
         "enum": [
           "Single",
           "Dual",
@@ -4238,7 +1003,7 @@
         ],
         "type": "string"
       },
-      "CoilDriveSystem": {
+      "NORCE.Drilling.Rig.Model.CoilDriveSystem": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4266,7 +1031,7 @@
             "nullable": true
           },
           "CoilDrvClass": {
-            "$ref": "#/components/schemas/MountingType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MountingType"
           },
           "ReelPayloadCapacity": {
             "type": "number",
@@ -4363,16 +1128,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CompensatorStatus": {
+      "NORCE.Drilling.Rig.Model.CompensatorStatus": {
         "enum": [
           "Active",
           "Inactive"
         ],
         "type": "string"
       },
-      "ContinuousCirculationDevice": {
+      "NORCE.Drilling.Rig.Model.ContinuousCirculationDevice": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4400,7 +1166,7 @@
             "nullable": true
           },
           "CcdControlClass": {
-            "$ref": "#/components/schemas/ControlClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ControlClass"
           },
           "WorkingPumpPressure": {
             "type": "number",
@@ -4447,9 +1213,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ControlClass": {
+      "NORCE.Drilling.Rig.Model.ControlClass": {
         "enum": [
           "Manual",
           "Automatic",
@@ -4457,7 +1224,7 @@
         ],
         "type": "string"
       },
-      "ControllerType": {
+      "NORCE.Drilling.Rig.Model.ControllerType": {
         "enum": [
           "Hydraulic",
           "Electrical",
@@ -4467,7 +1234,21 @@
         ],
         "type": "string"
       },
-      "CrownBlock": {
+      "NORCE.Drilling.Rig.Model.CountPerDay": {
+        "type": "object",
+        "properties": {
+          "Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NORCE.Drilling.Rig.Model.CrownBlock": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4529,9 +1310,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CuttingsDryer": {
+      "NORCE.Drilling.Rig.Model.CuttingsDryer": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4542,9 +1324,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "CuttingsTransportSystem": {
+      "NORCE.Drilling.Rig.Model.CuttingsTransportSystem": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4555,9 +1338,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Degasser": {
+      "NORCE.Drilling.Rig.Model.Degasser": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4568,9 +1352,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Derrick": {
+      "NORCE.Drilling.Rig.Model.Derrick": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4598,7 +1383,7 @@
             "nullable": true
           },
           "DerrickClass": {
-            "$ref": "#/components/schemas/DerrickClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DerrickClass"
           },
           "Height": {
             "type": "number",
@@ -4625,9 +1410,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DerrickClass": {
+      "NORCE.Drilling.Rig.Model.DerrickClass": {
         "enum": [
           "Conventional",
           "Slant",
@@ -4635,7 +1421,7 @@
         ],
         "type": "string"
       },
-      "Desander": {
+      "NORCE.Drilling.Rig.Model.Desander": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4646,9 +1432,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Desilter": {
+      "NORCE.Drilling.Rig.Model.Desilter": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4659,9 +1446,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Drawworks": {
+      "NORCE.Drilling.Rig.Model.Drawworks": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4689,7 +1477,7 @@
             "nullable": true
           },
           "DrawworksClass": {
-            "$ref": "#/components/schemas/DrawworksClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DrawworksClass"
           },
           "MaxLimitDesignLoad": {
             "type": "number",
@@ -4711,9 +1499,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrawworksClass": {
+      "NORCE.Drilling.Rig.Model.DrawworksClass": {
         "enum": [
           "DirectDrive",
           "SingleSpeedGearDriven",
@@ -4724,7 +1513,7 @@
         ],
         "type": "string"
       },
-      "DrillLine": {
+      "NORCE.Drilling.Rig.Model.DrillLine": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4781,9 +1570,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrillingChokeManifold": {
+      "NORCE.Drilling.Rig.Model.DrillingChokeManifold": {
         "type": "object",
         "properties": {
           "Name": {
@@ -4811,7 +1601,7 @@
             "nullable": true
           },
           "ManifoldType": {
-            "$ref": "#/components/schemas/ManifoldClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ManifoldClass"
           },
           "TrimSize": {
             "type": "number",
@@ -4849,15 +1639,15 @@
             "nullable": true
           },
           "ChokeNumber": {
-            "$ref": "#/components/schemas/ChokeNumber"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ChokeNumber"
           },
           "ChokeFunction": {
-            "$ref": "#/components/schemas/ChokeFunction"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ChokeFunction"
           },
           "ChokeCvCurves": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ChokeCvCurvePoint"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ChokeCvCurvePoint"
             },
             "nullable": true
           },
@@ -4976,9 +1766,10 @@
             "format": "int32",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrillingFluidClass": {
+      "NORCE.Drilling.Rig.Model.DrillingFluidClass": {
         "enum": [
           "OilBased",
           "WaterBased",
@@ -4986,7 +1777,7 @@
         ],
         "type": "string"
       },
-      "DrillingFluidType": {
+      "NORCE.Drilling.Rig.Model.DrillingFluidType": {
         "enum": [
           "AeratedMud",
           "Air",
@@ -5031,7 +1822,7 @@
         ],
         "type": "string"
       },
-      "DrillingFluidTypeDescriptor": {
+      "NORCE.Drilling.Rig.Model.DrillingFluidTypeDescriptor": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5043,14 +1834,15 @@
             "nullable": true
           },
           "DrillingFluidClass": {
-            "$ref": "#/components/schemas/DrillingFluidClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DrillingFluidClass"
           },
           "DrillingFluidType": {
-            "$ref": "#/components/schemas/DrillingFluidType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DrillingFluidType"
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrillingMarineRiser": {
+      "NORCE.Drilling.Rig.Model.DrillingMarineRiser": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5078,7 +1870,7 @@
             "nullable": true
           },
           "RiserClass": {
-            "$ref": "#/components/schemas/RiserClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RiserClass"
           },
           "JointWeight": {
             "type": "number",
@@ -5150,9 +1942,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DrillstringHeaveCompensator": {
+      "NORCE.Drilling.Rig.Model.DrillstringHeaveCompensator": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5180,7 +1973,7 @@
             "nullable": true
           },
           "HeaveCompClass": {
-            "$ref": "#/components/schemas/HeaveCompensatorClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.HeaveCompensatorClass"
           },
           "CompensatorCapacity": {
             "type": "number",
@@ -5188,16 +1981,17 @@
             "nullable": true
           },
           "CompensatorStatus": {
-            "$ref": "#/components/schemas/CompensatorStatus"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CompensatorStatus"
           },
           "MaxLimitCompensatorStroke": {
             "type": "number",
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DriveMode": {
+      "NORCE.Drilling.Rig.Model.DriveMode": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5225,11 +2019,12 @@
             "nullable": true
           },
           "DriveModeClass": {
-            "$ref": "#/components/schemas/DriveModeClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DriveModeClass"
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DriveModeClass": {
+      "NORCE.Drilling.Rig.Model.DriveModeClass": {
         "enum": [
           "Mechanical",
           "ElectricalDcScr",
@@ -5239,14 +2034,14 @@
         ],
         "type": "string"
       },
-      "EngineModelType": {
+      "NORCE.Drilling.Rig.Model.EngineModelType": {
         "enum": [
           "Reciprocating",
           "Turbine"
         ],
         "type": "string"
       },
-      "FloatValve": {
+      "NORCE.Drilling.Rig.Model.FloatValve": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5274,7 +2069,7 @@
             "nullable": true
           },
           "FloatValveClass": {
-            "$ref": "#/components/schemas/FloatValveClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.FloatValveClass"
           },
           "Diameter": {
             "type": "number",
@@ -5296,9 +2091,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "FloatValveClass": {
+      "NORCE.Drilling.Rig.Model.FloatValveClass": {
         "enum": [
           "PlungerFloatValve",
           "PortedPlungerValve",
@@ -5307,7 +2103,7 @@
         ],
         "type": "string"
       },
-      "FlowRoutingManifold": {
+      "NORCE.Drilling.Rig.Model.FlowRoutingManifold": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5335,7 +2131,7 @@
             "nullable": true
           },
           "ManifoldType": {
-            "$ref": "#/components/schemas/ManifoldClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ManifoldClass"
           },
           "FlangeSize": {
             "type": "number",
@@ -5358,12 +2154,12 @@
             "nullable": true
           },
           "ManifoldFlowPath": {
-            "$ref": "#/components/schemas/ManifoldFlowPath"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ManifoldFlowPath"
           },
           "ManifoldFlowcurves": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RoutingManifoldCurvePoint"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RoutingManifoldCurvePoint"
             },
             "nullable": true
           },
@@ -5422,9 +2218,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "FlowSensor": {
+      "NORCE.Drilling.Rig.Model.FlowSensor": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5452,7 +2249,7 @@
             "nullable": true
           },
           "FlowTransducer": {
-            "$ref": "#/components/schemas/FlowSensorType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.FlowSensorType"
           },
           "FlowOutOfBorehole": {
             "type": "boolean",
@@ -5468,9 +2265,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "FlowSensorType": {
+      "NORCE.Drilling.Rig.Model.FlowSensorType": {
         "enum": [
           "Coriollis",
           "Paddle",
@@ -5478,7 +2276,7 @@
         ],
         "type": "string"
       },
-      "Generator": {
+      "NORCE.Drilling.Rig.Model.Generator": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5506,7 +2304,7 @@
             "nullable": true
           },
           "GeneratorClass": {
-            "$ref": "#/components/schemas/GeneratorClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.GeneratorClass"
           },
           "Speed": {
             "type": "number",
@@ -5529,10 +2327,10 @@
             "nullable": true
           },
           "SpeedMode": {
-            "$ref": "#/components/schemas/SpeedMode"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.SpeedMode"
           },
           "EngineModel": {
-            "$ref": "#/components/schemas/EngineModelType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.EngineModelType"
           },
           "PowerplantGeneratorNumber": {
             "type": "integer",
@@ -5555,10 +2353,10 @@
             "nullable": true
           },
           "CoolingMedium": {
-            "$ref": "#/components/schemas/GeneratorCooling"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.GeneratorCooling"
           },
           "Phases": {
-            "$ref": "#/components/schemas/GeneratorPhases"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.GeneratorPhases"
           },
           "MaxLimitPower": {
             "type": "number",
@@ -5655,9 +2453,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "GeneratorClass": {
+      "NORCE.Drilling.Rig.Model.GeneratorClass": {
         "enum": [
           "Diesel",
           "Gas",
@@ -5671,7 +2470,7 @@
         ],
         "type": "string"
       },
-      "GeneratorCooling": {
+      "NORCE.Drilling.Rig.Model.GeneratorCooling": {
         "enum": [
           "Air",
           "Water",
@@ -5679,7 +2478,7 @@
         ],
         "type": "string"
       },
-      "GeneratorPhases": {
+      "NORCE.Drilling.Rig.Model.GeneratorPhases": {
         "enum": [
           "SinglePhase",
           "TwoPhase",
@@ -5687,7 +2486,7 @@
         ],
         "type": "string"
       },
-      "HeaveCompensatorClass": {
+      "NORCE.Drilling.Rig.Model.HeaveCompensatorClass": {
         "enum": [
           "PassiveCrownMounted",
           "ActiveCrownMounted",
@@ -5698,7 +2497,20 @@
         ],
         "type": "string"
       },
-      "HoistingSystem": {
+      "NORCE.Drilling.Rig.Model.History": {
+        "type": "object",
+        "properties": {
+          "Data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CountPerDay"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NORCE.Drilling.Rig.Model.HoistingSystem": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5710,23 +2522,24 @@
             "nullable": true
           },
           "HoistingSystemType": {
-            "$ref": "#/components/schemas/HoistingSystemType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.HoistingSystemType"
           },
           "Drawworks": {
-            "$ref": "#/components/schemas/Drawworks"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Drawworks"
           },
           "CrownBlock": {
-            "$ref": "#/components/schemas/CrownBlock"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CrownBlock"
           },
           "TravellingBlock": {
-            "$ref": "#/components/schemas/TravellingBlock"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.TravellingBlock"
           },
           "DrillLine": {
-            "$ref": "#/components/schemas/DrillLine"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DrillLine"
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "HoistingSystemType": {
+      "NORCE.Drilling.Rig.Model.HoistingSystemType": {
         "enum": [
           "Drawworks",
           "RamRig",
@@ -5734,7 +2547,7 @@
         ],
         "type": "string"
       },
-      "IronRoughneck": {
+      "NORCE.Drilling.Rig.Model.IronRoughneck": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5745,9 +2558,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Kelly": {
+      "NORCE.Drilling.Rig.Model.Kelly": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5775,7 +2589,7 @@
             "nullable": true
           },
           "KellyClass": {
-            "$ref": "#/components/schemas/KellyClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.KellyClass"
           },
           "KellyJointLength": {
             "type": "number",
@@ -5822,9 +2636,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "KellyClass": {
+      "NORCE.Drilling.Rig.Model.KellyClass": {
         "enum": [
           "Hexagonal",
           "Square",
@@ -5832,14 +2647,14 @@
         ],
         "type": "string"
       },
-      "ManifoldClass": {
+      "NORCE.Drilling.Rig.Model.ManifoldClass": {
         "enum": [
           "Standalone",
           "Integrated"
         ],
         "type": "string"
       },
-      "ManifoldFlowPath": {
+      "NORCE.Drilling.Rig.Model.ManifoldFlowPath": {
         "enum": [
           "One",
           "Two",
@@ -5847,7 +2662,7 @@
         ],
         "type": "string"
       },
-      "MarineMpdClass": {
+      "NORCE.Drilling.Rig.Model.MarineMpdClass": {
         "enum": [
           "RiserGasHandlingSystem",
           "IntegratedRiserJoint",
@@ -5855,7 +2670,7 @@
         ],
         "type": "string"
       },
-      "MarineMpdEquipment": {
+      "NORCE.Drilling.Rig.Model.MarineMpdEquipment": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5883,7 +2698,7 @@
             "nullable": true
           },
           "MarineMpdClass": {
-            "$ref": "#/components/schemas/MarineMpdClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MarineMpdClass"
           },
           "Length": {
             "type": "number",
@@ -5901,7 +2716,7 @@
             "nullable": true
           },
           "ControlMeans": {
-            "$ref": "#/components/schemas/ControllerType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ControllerType"
           },
           "ContainsFlowSpool": {
             "type": "boolean",
@@ -5930,9 +2745,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MeasurementAfm": {
+      "NORCE.Drilling.Rig.Model.MeasurementAfm": {
         "type": "object",
         "properties": {
           "Name": {
@@ -5991,7 +2807,7 @@
           "AfmRheometerMeasurements": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RheometerAfmMeasurement"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RheometerAfmMeasurement"
             },
             "nullable": true
           },
@@ -6005,9 +2821,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MountingType": {
+      "NORCE.Drilling.Rig.Model.MountingType": {
         "enum": [
           "TruckMounted",
           "SkidMounted",
@@ -6017,7 +2834,7 @@
         ],
         "type": "string"
       },
-      "MpdControlDevice": {
+      "NORCE.Drilling.Rig.Model.MpdControlDevice": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6045,7 +2862,7 @@
             "nullable": true
           },
           "MpdControlDeviceClass": {
-            "$ref": "#/components/schemas/MpdControlDeviceClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MpdControlDeviceClass"
           },
           "NominalSize": {
             "type": "number",
@@ -6086,16 +2903,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MpdControlDeviceClass": {
+      "NORCE.Drilling.Rig.Model.MpdControlDeviceClass": {
         "enum": [
           "Rotating",
           "NonRotating"
         ],
         "type": "string"
       },
-      "MpdController": {
+      "NORCE.Drilling.Rig.Model.MpdController": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6123,7 +2941,7 @@
             "nullable": true
           },
           "MpdGradientMode": {
-            "$ref": "#/components/schemas/MpdGradientMode"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MpdGradientMode"
           },
           "PrimaryChokeTrim": {
             "type": "number",
@@ -6170,9 +2988,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MpdGradientMode": {
+      "NORCE.Drilling.Rig.Model.MpdGradientMode": {
         "enum": [
           "Single",
           "Dual",
@@ -6181,7 +3000,7 @@
         ],
         "type": "string"
       },
-      "MudGasSeparator": {
+      "NORCE.Drilling.Rig.Model.MudGasSeparator": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6192,9 +3011,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MudPump": {
+      "NORCE.Drilling.Rig.Model.MudPump": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6222,10 +3042,10 @@
             "nullable": true
           },
           "Type": {
-            "$ref": "#/components/schemas/MudPumpType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MudPumpType"
           },
           "PumpClass": {
-            "$ref": "#/components/schemas/PumpClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.PumpClass"
           },
           "PumpAction": {
             "type": "integer",
@@ -6297,16 +3117,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MudPumpType": {
+      "NORCE.Drilling.Rig.Model.MudPumpType": {
         "enum": [
           "Variant1",
           "Variant2"
         ],
         "type": "string"
       },
-      "MudTank": {
+      "NORCE.Drilling.Rig.Model.MudTank": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6334,19 +3155,20 @@
             "nullable": true
           },
           "TankClass": {
-            "$ref": "#/components/schemas/TankClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.TankClass"
           },
           "TankFluidType": {
-            "$ref": "#/components/schemas/TankFluidType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.TankFluidType"
           },
           "MaxLimitOperatingVolume": {
             "type": "number",
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "MultiPhaseSeparator": {
+      "NORCE.Drilling.Rig.Model.MultiPhaseSeparator": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6374,7 +3196,7 @@
             "nullable": true
           },
           "SeparatorClass": {
-            "$ref": "#/components/schemas/SeparatorPhaseClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.SeparatorPhaseClass"
           },
           "MaximumOperatingPressure": {
             "type": "number",
@@ -6392,7 +3214,7 @@
             "nullable": true
           },
           "SeparatorMedium": {
-            "$ref": "#/components/schemas/SeparatorMedium"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.SeparatorMedium"
           },
           "MaxLimitDesignPressure": {
             "type": "number",
@@ -6429,9 +3251,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "PipeDeck": {
+      "NORCE.Drilling.Rig.Model.PipeDeck": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6442,9 +3265,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "PipeRack": {
+      "NORCE.Drilling.Rig.Model.PipeRack": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6455,9 +3279,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "PumpClass": {
+      "NORCE.Drilling.Rig.Model.PumpClass": {
         "enum": [
           "DuplexPump",
           "TriplexPump",
@@ -6467,7 +3292,7 @@
         ],
         "type": "string"
       },
-      "ReturnFlowLine": {
+      "NORCE.Drilling.Rig.Model.ReturnFlowLine": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6478,9 +3303,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RheometerAfmMeasurement": {
+      "NORCE.Drilling.Rig.Model.RheometerAfmMeasurement": {
         "type": "object",
         "properties": {
           "AfmViscShearRate": {
@@ -6493,13 +3319,14 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Rig": {
+      "NORCE.Drilling.Rig.Model.Rig": {
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
           },
           "Name": {
             "type": "string",
@@ -6522,157 +3349,157 @@
           "MudPumpList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudPump"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MudPump"
             },
             "nullable": true
           },
           "CementPumpList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CementPump"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CementPump"
             },
             "nullable": true
           },
           "CementUnit": {
-            "$ref": "#/components/schemas/CementUnit"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CementUnit"
           },
           "DriveMode": {
-            "$ref": "#/components/schemas/DriveMode"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DriveMode"
           },
           "MainRigMast": {
-            "$ref": "#/components/schemas/RigMast"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RigMast"
           },
           "AuxiliaryRigMast": {
-            "$ref": "#/components/schemas/RigMast"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RigMast"
           },
           "MudTankList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudTank"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MudTank"
             },
             "nullable": true
           },
           "GeneratorList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Generator"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Generator"
             },
             "nullable": true
           },
           "ShaleShakerList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ShaleShaker"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ShaleShaker"
             },
             "nullable": true
           },
           "AuxSolidsControl": {
-            "$ref": "#/components/schemas/AuxSolidsControl"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.AuxSolidsControl"
           },
           "DrillingFluidType": {
-            "$ref": "#/components/schemas/DrillingFluidTypeDescriptor"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DrillingFluidTypeDescriptor"
           },
           "FlowSensor": {
-            "$ref": "#/components/schemas/FlowSensor"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.FlowSensor"
           },
           "MeasurementAfm": {
-            "$ref": "#/components/schemas/MeasurementAfm"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MeasurementAfm"
           },
           "ReturnFlowLine": {
-            "$ref": "#/components/schemas/ReturnFlowLine"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ReturnFlowLine"
           },
           "MudGasSeparatorList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MudGasSeparator"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MudGasSeparator"
             },
             "nullable": true
           },
           "DesanderList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Desander"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Desander"
             },
             "nullable": true
           },
           "DesilterList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Desilter"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Desilter"
             },
             "nullable": true
           },
           "CentrifugeList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Centrifuge"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Centrifuge"
             },
             "nullable": true
           },
           "DegasserList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Degasser"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Degasser"
             },
             "nullable": true
           },
           "CuttingsTransportSystem": {
-            "$ref": "#/components/schemas/CuttingsTransportSystem"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CuttingsTransportSystem"
           },
           "CuttingsDryerList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CuttingsDryer"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CuttingsDryer"
             },
             "nullable": true
           },
           "PipeDeck": {
-            "$ref": "#/components/schemas/PipeDeck"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.PipeDeck"
           },
           "Accumulator": {
-            "$ref": "#/components/schemas/Accumulator"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Accumulator"
           },
           "BopStack": {
-            "$ref": "#/components/schemas/BopStack"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.BopStack"
           },
           "FloatValve": {
-            "$ref": "#/components/schemas/FloatValve"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.FloatValve"
           },
           "AutoDriller": {
-            "$ref": "#/components/schemas/AutoDriller"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.AutoDriller"
           },
           "MpdController": {
-            "$ref": "#/components/schemas/MpdController"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MpdController"
           },
           "MpdControlDevice": {
-            "$ref": "#/components/schemas/MpdControlDevice"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MpdControlDevice"
           },
           "ContinuousCirculationDevice": {
-            "$ref": "#/components/schemas/ContinuousCirculationDevice"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ContinuousCirculationDevice"
           },
           "DrillingChokeManifold": {
-            "$ref": "#/components/schemas/DrillingChokeManifold"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DrillingChokeManifold"
           },
           "SurfaceMpdEquipment": {
-            "$ref": "#/components/schemas/SurfaceMpdEquipment"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.SurfaceMpdEquipment"
           },
           "MarineMpdEquipment": {
-            "$ref": "#/components/schemas/MarineMpdEquipment"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MarineMpdEquipment"
           },
           "MultiPhaseSeparator": {
-            "$ref": "#/components/schemas/MultiPhaseSeparator"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.MultiPhaseSeparator"
           },
           "FlowRoutingManifold": {
-            "$ref": "#/components/schemas/FlowRoutingManifold"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.FlowRoutingManifold"
           },
           "DrillstringHeaveCompensator": {
-            "$ref": "#/components/schemas/DrillstringHeaveCompensator"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DrillstringHeaveCompensator"
           },
           "DrillingMarineRiser": {
-            "$ref": "#/components/schemas/DrillingMarineRiser"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.DrillingMarineRiser"
           },
           "RiserHeaveCompensator": {
-            "$ref": "#/components/schemas/RiserHeaveCompensator"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RiserHeaveCompensator"
           },
           "DrillFloorElevation": {
             "type": "number",
@@ -6687,9 +3514,10 @@
             "format": "uuid",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigChoke": {
+      "NORCE.Drilling.Rig.Model.RigChoke": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6700,13 +3528,14 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigLight": {
+      "NORCE.Drilling.Rig.Model.RigLight": {
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
           },
           "Name": {
             "type": "string",
@@ -6734,9 +3563,10 @@
             "format": "uuid",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RigMast": {
+      "NORCE.Drilling.Rig.Model.RigMast": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6748,69 +3578,70 @@
             "nullable": true
           },
           "HoistingSystem": {
-            "$ref": "#/components/schemas/HoistingSystem"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.HoistingSystem"
           },
           "CatWalk": {
-            "$ref": "#/components/schemas/CatWalk"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CatWalk"
           },
           "PipeRack": {
-            "$ref": "#/components/schemas/PipeRack"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.PipeRack"
           },
           "CasingDriveSystem": {
-            "$ref": "#/components/schemas/CasingDriveSystem"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CasingDriveSystem"
           },
           "CoilDriveSystem": {
-            "$ref": "#/components/schemas/CoilDriveSystem"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CoilDriveSystem"
           },
           "Derrick": {
-            "$ref": "#/components/schemas/Derrick"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Derrick"
           },
           "TorqueTurnSub": {
-            "$ref": "#/components/schemas/TorqueTurnSub"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.TorqueTurnSub"
           },
           "RotaryTable": {
-            "$ref": "#/components/schemas/RotaryTable"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RotaryTable"
           },
           "TopDrive": {
-            "$ref": "#/components/schemas/TopDrive"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.TopDrive"
           },
           "Kelly": {
-            "$ref": "#/components/schemas/Kelly"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Kelly"
           },
           "IronRoughneck": {
-            "$ref": "#/components/schemas/IronRoughneck"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.IronRoughneck"
           },
           "CasingTongs": {
-            "$ref": "#/components/schemas/CasingTongs"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CasingTongs"
           },
           "CasingRunningTool": {
-            "$ref": "#/components/schemas/CasingRunningTool"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CasingRunningTool"
           },
           "StandPipe": {
-            "$ref": "#/components/schemas/StandPipe"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.StandPipe"
           },
           "StandPipeManifold": {
-            "$ref": "#/components/schemas/StandPipeManifold"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.StandPipeManifold"
           },
           "RotaryHose": {
-            "$ref": "#/components/schemas/RotaryHose"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RotaryHose"
           },
           "ChokeManifold": {
-            "$ref": "#/components/schemas/ChokeManifold"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ChokeManifold"
           },
           "RigChokeList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RigChoke"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RigChoke"
             },
             "nullable": true
           },
           "Slips": {
-            "$ref": "#/components/schemas/Slips"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.Slips"
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RiserClass": {
+      "NORCE.Drilling.Rig.Model.RiserClass": {
         "enum": [
           "MarineDrillingRiser",
           "TieBackDrillingRiser",
@@ -6819,14 +3650,14 @@
         ],
         "type": "string"
       },
-      "RiserCompensatorClass": {
+      "NORCE.Drilling.Rig.Model.RiserCompensatorClass": {
         "enum": [
           "PassiveRiserTensioner",
           "Other"
         ],
         "type": "string"
       },
-      "RiserHeaveCompensator": {
+      "NORCE.Drilling.Rig.Model.RiserHeaveCompensator": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6854,7 +3685,7 @@
             "nullable": true
           },
           "RiserCompensatorClass": {
-            "$ref": "#/components/schemas/RiserCompensatorClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RiserCompensatorClass"
           },
           "CompensatorCapacity": {
             "type": "number",
@@ -6862,16 +3693,17 @@
             "nullable": true
           },
           "CompensatorStatus": {
-            "$ref": "#/components/schemas/CompensatorStatus"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.CompensatorStatus"
           },
           "MaxLimitCompensatorStroke": {
             "type": "number",
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RotaryHose": {
+      "NORCE.Drilling.Rig.Model.RotaryHose": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6882,9 +3714,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RotaryTable": {
+      "NORCE.Drilling.Rig.Model.RotaryTable": {
         "type": "object",
         "properties": {
           "Name": {
@@ -6912,7 +3745,7 @@
             "nullable": true
           },
           "RotaryTableType": {
-            "$ref": "#/components/schemas/RotaryTableType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RotaryTableType"
           },
           "TableOpeningDiameter": {
             "type": "number",
@@ -6920,7 +3753,7 @@
             "nullable": true
           },
           "BushingType": {
-            "$ref": "#/components/schemas/RotaryTableBushingType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.RotaryTableBushingType"
           },
           "BushingSize": {
             "type": "number",
@@ -6977,9 +3810,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "RotaryTableBushingType": {
+      "NORCE.Drilling.Rig.Model.RotaryTableBushingType": {
         "enum": [
           "Master",
           "Kelly",
@@ -6987,7 +3821,7 @@
         ],
         "type": "string"
       },
-      "RotaryTableType": {
+      "NORCE.Drilling.Rig.Model.RotaryTableType": {
         "enum": [
           "DcDrive",
           "AcDrive",
@@ -6996,7 +3830,7 @@
         ],
         "type": "string"
       },
-      "RoutingManifoldCurvePoint": {
+      "NORCE.Drilling.Rig.Model.RoutingManifoldCurvePoint": {
         "type": "object",
         "properties": {
           "Pressure": {
@@ -7009,16 +3843,17 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "SeparatorMedium": {
+      "NORCE.Drilling.Rig.Model.SeparatorMedium": {
         "enum": [
           "Mud",
           "WellboreFluid"
         ],
         "type": "string"
       },
-      "SeparatorPhaseClass": {
+      "NORCE.Drilling.Rig.Model.SeparatorPhaseClass": {
         "enum": [
           "TwoPhases",
           "ThreePhases",
@@ -7026,7 +3861,7 @@
         ],
         "type": "string"
       },
-      "ShakerClass": {
+      "NORCE.Drilling.Rig.Model.ShakerClass": {
         "enum": [
           "Linear",
           "Elliptical",
@@ -7035,7 +3870,7 @@
         ],
         "type": "string"
       },
-      "ShakerScreenDefinition": {
+      "NORCE.Drilling.Rig.Model.ShakerScreenDefinition": {
         "type": "object",
         "properties": {
           "ScreenDeck": {
@@ -7047,9 +3882,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "ShaleShaker": {
+      "NORCE.Drilling.Rig.Model.ShaleShaker": {
         "type": "object",
         "properties": {
           "Name": {
@@ -7077,7 +3913,7 @@
             "nullable": true
           },
           "ShakerClass": {
-            "$ref": "#/components/schemas/ShakerClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ShakerClass"
           },
           "ActiveShakers": {
             "type": "string",
@@ -7086,7 +3922,7 @@
           "ShakerScreens": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ShakerScreenDefinition"
+              "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.ShakerScreenDefinition"
             },
             "nullable": true
           },
@@ -7095,9 +3931,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Slips": {
+      "NORCE.Drilling.Rig.Model.Slips": {
         "type": "object",
         "properties": {
           "Name": {
@@ -7108,9 +3945,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "SolidsControlClass": {
+      "NORCE.Drilling.Rig.Model.SolidsControlClass": {
         "enum": [
           "Desander",
           "Desilter",
@@ -7120,14 +3958,14 @@
         ],
         "type": "string"
       },
-      "SpeedMode": {
+      "NORCE.Drilling.Rig.Model.SpeedMode": {
         "enum": [
           "ConstantSpeed",
           "VariableSpeed"
         ],
         "type": "string"
       },
-      "StandPipe": {
+      "NORCE.Drilling.Rig.Model.StandPipe": {
         "type": "object",
         "properties": {
           "Name": {
@@ -7148,9 +3986,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "StandPipeManifold": {
+      "NORCE.Drilling.Rig.Model.StandPipeManifold": {
         "type": "object",
         "properties": {
           "Name": {
@@ -7183,7 +4022,7 @@
             "nullable": true
           },
           "StandpipeSpecLevel": {
-            "$ref": "#/components/schemas/StandpipeSpecLevel"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.StandpipeSpecLevel"
           },
           "MaxLimitDesignPressure": {
             "type": "number",
@@ -7205,9 +4044,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "StandpipeSpecLevel": {
+      "NORCE.Drilling.Rig.Model.StandpipeSpecLevel": {
         "enum": [
           "Psl1LowPressureRating",
           "Psl2ModeratePressureRating",
@@ -7215,14 +4055,14 @@
         ],
         "type": "string"
       },
-      "SurfaceMpdClass": {
+      "NORCE.Drilling.Rig.Model.SurfaceMpdClass": {
         "enum": [
           "BackPressurePump",
           "Other"
         ],
         "type": "string"
       },
-      "SurfaceMpdEquipment": {
+      "NORCE.Drilling.Rig.Model.SurfaceMpdEquipment": {
         "type": "object",
         "properties": {
           "Name": {
@@ -7250,7 +4090,7 @@
             "nullable": true
           },
           "SurfaceMpdClass": {
-            "$ref": "#/components/schemas/SurfaceMpdClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.SurfaceMpdClass"
           },
           "MinimumBoreholeSize": {
             "type": "number",
@@ -7327,9 +4167,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "TankClass": {
+      "NORCE.Drilling.Rig.Model.TankClass": {
         "enum": [
           "Active",
           "Reserve",
@@ -7340,7 +4181,7 @@
         ],
         "type": "string"
       },
-      "TankFluidType": {
+      "NORCE.Drilling.Rig.Model.TankFluidType": {
         "enum": [
           "DrillingMud",
           "Brine",
@@ -7349,7 +4190,7 @@
         ],
         "type": "string"
       },
-      "TopDrive": {
+      "NORCE.Drilling.Rig.Model.TopDrive": {
         "type": "object",
         "properties": {
           "Name": {
@@ -7377,10 +4218,10 @@
             "nullable": true
           },
           "TopDriveClass": {
-            "$ref": "#/components/schemas/TopDriveClass"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.TopDriveClass"
           },
           "TopDriveControllerType": {
-            "$ref": "#/components/schemas/TopDriveControllerType"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.TopDriveControllerType"
           },
           "Orientable": {
             "type": "boolean",
@@ -7486,9 +4327,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "TopDriveClass": {
+      "NORCE.Drilling.Rig.Model.TopDriveClass": {
         "enum": [
           "AcTopDrive",
           "HydraulicTopDrive",
@@ -7496,7 +4338,7 @@
         ],
         "type": "string"
       },
-      "TopDriveControllerType": {
+      "NORCE.Drilling.Rig.Model.TopDriveControllerType": {
         "enum": [
           "Unknown",
           "StiffPIController",
@@ -7505,7 +4347,7 @@
         ],
         "type": "string"
       },
-      "TorqueTurnSub": {
+      "NORCE.Drilling.Rig.Model.TorqueTurnSub": {
         "type": "object",
         "properties": {
           "Name": {
@@ -7642,9 +4484,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "TravellingBlock": {
+      "NORCE.Drilling.Rig.Model.TravellingBlock": {
         "type": "object",
         "properties": {
           "Name": {
@@ -7711,9 +4554,10 @@
             "format": "double",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "UsageStatisticsRig": {
+      "NORCE.Drilling.Rig.Model.UsageStatisticsRig": {
         "type": "object",
         "properties": {
           "LastSaved": {
@@ -7725,30 +4569,53 @@
             "format": "date-span"
           },
           "GetAllRigIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.History"
           },
           "GetAllRigMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.History"
           },
           "GetRigByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.History"
           },
           "GetAllRigLightPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.History"
           },
           "GetAllRigPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.History"
           },
           "PostRigPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.History"
           },
           "PutRigByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.History"
           },
           "DeleteRigByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/NORCE.Drilling.Rig.Model.History"
           }
-        }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.DotnetLibraries.General.DataManagement.MetaInfo": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "HttpHostName": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpHostBasePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpEndPoint": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       }
     }
   }
