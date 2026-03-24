@@ -10,7 +10,10 @@
                               PositionReferenceName="WGS84"
                               CartographicGridPositionReferenceSource="_cartographicReference"
                               ClusterPositionReferenceSource="_clusterReference"
-                              >
+                              DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
+                              DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
+                              GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
+                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource">
     @if (clusterList == null)
     {
         <p><em>Loading...</em></p>
@@ -169,6 +172,7 @@
                 LastModificationDate = creationDate,
 
             };
+            UpdateSelectedClusterDepthReferenceSource();
             await APIUtils.ClientCluster.PostClusterAsync(currentCluster);
             await OnInitializedAsync();
             // Find the newly created datum in the refreshed list
@@ -203,6 +207,7 @@
         try
         {
             currentCluster = await APIUtils.ClientCluster.GetClusterByIdAsync(id);
+            UpdateSelectedClusterDepthReferenceSource();
             if (currentCluster != null)
             {
                 isHiddenMainPanel = true;
@@ -232,6 +237,7 @@
         {
             logger.LogError(ex, "Impossible to delete Cluster");
         }
+        UpdateSelectedClusterDepthReferenceSource();
     }
 
     private async Task DeleteSelectedCluster()
@@ -248,7 +254,7 @@
         {
             logger.LogError(ex, "Impossible to delete all Cluster");
         }
-
+        UpdateSelectedClusterDepthReferenceSource();
     }
 
     //Quick filter - filter gobally across multiple columns with the same input
@@ -292,4 +298,6 @@
         isHiddenEditPanel = true;
         await OnInitializedAsync();
     }
+
+    private void UpdateSelectedClusterDepthReferenceSource() =>  DataUtils.ApplyClusterReferenceValues(currentCluster);
 }

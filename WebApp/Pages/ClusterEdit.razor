@@ -142,37 +142,27 @@
     <MudExpansionPanel Text="Environment Description">
         <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
             <MudGrid>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Ground/Mud Line Depth (WGS84)"
+                                               QuantityLabel="Ground/Mud Line Depth"
+                                               DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                SIValueNullable="groundMudLineDepthWGS84"
                                                SIValueNullableChanged="@ChangeGroundMudLineDepthWGS84" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
-                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Ground/Mud Line Depth (Datum)"
-                                               SIValueNullable="groundMudLineDepthDatum"
-                                               SIValueNullableChanged="@ChangeGroundMudLineDepthDatum" />
-                </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="LengthSmall"
                                                QuantityLabel="Ground/Mud Line Accuracy"
                                                SIValueNullable="groundMudLineDepthAccuracy"
                                                SIValueNullableChanged="@(val => groundMudLineDepthAccuracy = val)" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Top Water Depth (WGS84)"
+                                               QuantityLabel="Top Water Depth"
+                                               DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                SIValueNullable="topWaterDepthWGS84"
                                                SIValueNullableChanged="@ChangeTopWaterDepthWGS84" />
                 </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
-                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Top Water Depth (Datum)"
-                                               SIValueNullable="topWaterDepthDatum"
-                                               SIValueNullableChanged="@ChangeTopWaterDepthDatum" />
-                </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="LengthSmall"
                                                QuantityLabel="Top Water Accuracy"
                                                SIValueNullable="topWaterDepthAccuracy"
@@ -449,10 +439,8 @@
     private double? referenceDepthDatum = null;
     private double? referenceDepthAccuracy = null;
     private double? groundMudLineDepthWGS84 = null;
-    private double? groundMudLineDepthDatum = null;
     private double? groundMudLineDepthAccuracy = null;
     private double? topWaterDepthWGS84 = null;
-    private double? topWaterDepthDatum = null;
     private double? topWaterDepthAccuracy = null;
     private double? slotNorthingAccuracy = null;
     private double? slotEastingAccuracy = null;
@@ -1226,36 +1214,18 @@
     private void ChangeGroundMudLineDepthWGS84(double? val)
     {
         groundMudLineDepthWGS84 = val;
+        DataUtils.ApplyGroundMudLineDepthWGS84(groundMudLineDepthWGS84);
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && groundMudLineDepthWGS84 != null)
         {
-            CalculateDepthWGS84(groundMudLineDepthWGS84, out groundMudLineDepthDatum);
-            UpdateDepthPlot();
-        }
-    }
-    private void ChangeGroundMudLineDepthDatum(double? val)
-    {
-        groundMudLineDepthDatum = val;
-        if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && groundMudLineDepthDatum != null)
-        {
-            CalculateDepthDatum(groundMudLineDepthDatum, out groundMudLineDepthWGS84);
             UpdateDepthPlot();
         }
     }
     private void ChangeTopWaterDepthWGS84(double? val)
     {
         topWaterDepthWGS84 = val;
+        DataUtils.ApplyTopWaterDepthWGS84(topWaterDepthWGS84);
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && topWaterDepthWGS84 != null)
         {
-            CalculateDepthWGS84(topWaterDepthWGS84, out topWaterDepthDatum);
-            UpdateDepthPlot();
-        }
-    }
-    private void ChangeTopWaterDepthDatum(double? val)
-    {
-        topWaterDepthDatum = val;
-        if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && topWaterDepthDatum != null)
-        {
-            CalculateDepthDatum(topWaterDepthDatum, out topWaterDepthWGS84);
             UpdateDepthPlot();
         }
     }
@@ -1701,12 +1671,12 @@
                     calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(1);
                     if (calculatedCoordinate != null && toBeProcessed[1])
                     {
-                        groundMudLineDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
+                        //groundMudLineDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
                     }
                     calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(2);
                     if (calculatedCoordinate != null && toBeProcessed[2] && calculatedCoordinate.GeodeticCoordinate != null)
                     {
-                        topWaterDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
+                        //topWaterDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
                     }
                     if (_slots != null)
                     {
