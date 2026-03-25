@@ -144,6 +144,7 @@
             <MudGrid>
                 <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                               @key="@($"ground-mud-depth-{_depthReferenceInputVersion}")"
                                                QuantityLabel="Ground/Mud Line Depth"
                                                DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                SIValueNullable="groundMudLineDepthWGS84"
@@ -157,6 +158,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="3" md="3" lg="3">
                     <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                               @key="@($"top-water-depth-{_depthReferenceInputVersion}")"
                                                QuantityLabel="Top Water Depth"
                                                DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                                SIValueNullable="topWaterDepthWGS84"
@@ -378,6 +380,7 @@
                              YAxisReversed="@true" AspectRatio="-1" PlotHeight="500" PlotWidth="500"
                              PlotTitle="Depth References" XAxisTitle="@DataUtils.DepthReferencesXValuesTitle" YAxisTitle="@DataUtils.DepthReferencesYValuesTitle"
                              XUnit="@DataUtils.DepthReferencesXValuesQty" YUnit="@DataUtils.DepthReferencesYValuesQty"
+                             YDrillingSignalReference="@DrillingSignalReferenceType.Depth"
                              @ref="@depthPlot"
                              ID="DepthPlot">
                 </ScatterPlot>
@@ -442,6 +445,7 @@
     private double? groundMudLineDepthAccuracy = null;
     private double? topWaterDepthWGS84 = null;
     private double? topWaterDepthAccuracy = null;
+    private int _depthReferenceInputVersion = 0;
     private double? slotNorthingAccuracy = null;
     private double? slotEastingAccuracy = null;
     private List<SlotTemplate> _slots = new List<SlotTemplate>();
@@ -864,14 +868,14 @@
             yValuesDepthList.Clear();
 
             int count = 32;
-            double step = 100 / count;
+            double step = 100.0 / count;
             List<object> xValues = new List<object>();
             List<object> yValues = new List<object>();
 
             for (int i = 0; i < count; i++)
             {
-                xValues.Add(0 + i * step);
-                yValues.Add(0);
+                xValues.Add(0.0 + i * step);
+                yValues.Add(0.0);
             }
             xValuesDepthList.Add(xValues);
             yValuesDepthList.Add(yValues);
@@ -885,7 +889,7 @@
 
                 for (int i = 0; i < count; i++)
                 {
-                    xValues.Add(0 + i * step);
+                    xValues.Add(0.0 + i * step);
                     yValues.Add(referenceDepthWGS84.Value);
                 }
                 xValuesDepthList.Add(xValues);
@@ -901,7 +905,7 @@
 
                 for (int i = 0; i < count; i++)
                 {
-                    xValues.Add(0 + i * step);
+                    xValues.Add(0.0 + i * step);
                     yValues.Add(groundMudLineDepthWGS84.Value);
                 }
                 xValuesDepthList.Add(xValues);
@@ -917,7 +921,7 @@
 
                 for (int i = 0; i < count; i++)
                 {
-                    xValues.Add(0 + i * step);
+                    xValues.Add(0.0 + i * step);
                     yValues.Add(topWaterDepthWGS84.Value);
                 }
                 xValuesDepthList.Add(xValues);
@@ -1215,19 +1219,23 @@
     {
         groundMudLineDepthWGS84 = val;
         DataUtils.ApplyGroundMudLineDepthWGS84(groundMudLineDepthWGS84);
+        _depthReferenceInputVersion++;
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && groundMudLineDepthWGS84 != null)
         {
             UpdateDepthPlot();
         }
+        InvokeAsync(StateHasChanged);
     }
     private void ChangeTopWaterDepthWGS84(double? val)
     {
         topWaterDepthWGS84 = val;
         DataUtils.ApplyTopWaterDepthWGS84(topWaterDepthWGS84);
+        _depthReferenceInputVersion++;
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && topWaterDepthWGS84 != null)
         {
             UpdateDepthPlot();
         }
+        InvokeAsync(StateHasChanged);
     }
     private void CalculateDepthWGS84(double? depthInput, out double? depthOutput)
     {

@@ -231,13 +231,13 @@
         try
         {
             await APIUtils.ClientCluster.DeleteClusterByIdAsync(id);
+            UpdateSelectedClusterDepthReferenceSource();
             await OnInitializedAsync();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Impossible to delete Cluster");
         }
-        UpdateSelectedClusterDepthReferenceSource();
     }
 
     private async Task DeleteSelectedCluster()
@@ -248,13 +248,13 @@
             {
                 await APIUtils.ClientCluster.DeleteClusterByIdAsync(cluster.MetaInfo.ID);
             }
+            UpdateSelectedClusterDepthReferenceSource();
             await OnInitializedAsync();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Impossible to delete all Cluster");
         }
-        UpdateSelectedClusterDepthReferenceSource();
     }
 
     //Quick filter - filter gobally across multiple columns with the same input
