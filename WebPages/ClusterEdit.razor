@@ -1,6 +1,7 @@
-﻿@implements IUnitAwareComponent
+@implements IUnitAwareComponent
 @inject ILogger<ClusterEdit> logger
 @inject ISnackbar Snackbar
+@inject IClusterAPIUtils Api
 
 <MudText Class="mt-4 mb-4" Typo="Typo.h6">Edit Cluster</MudText>
 <MudContainer Class="d-flex flex-row mt-4 mb-4">
@@ -606,8 +607,8 @@
                 referenceLongitudeWGS84 = CurrentCluster.ReferenceLongitude?.GaussianValue?.Mean;
                 referenceDepthWGS84 = CurrentCluster.ReferenceDepth?.GaussianValue?.Mean;
                 referenceDepthAccuracy = CurrentCluster.ReferenceDepth?.GaussianValue?.StandardDeviation;
-                referenceNorthingAccuracy = CurrentCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
-                referenceEastingAccuracy = CurrentCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * APIUtils.EarthRadiusWGS84;
+                referenceNorthingAccuracy = CurrentCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
+                referenceEastingAccuracy = CurrentCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
                 groundMudLineDepthWGS84 = CurrentCluster.GroundMudLineDepth?.GaussianValue?.Mean;
                 groundMudLineDepthAccuracy = CurrentCluster.GroundMudLineDepth?.GaussianValue?.StandardDeviation;
                 topWaterDepthWGS84 = CurrentCluster.TopWaterDepth?.GaussianValue?.Mean;
@@ -647,19 +648,19 @@
                     CalculateWGS84();
                     if (maxAccuracyNorthing > double.MinValue)
                     {
-                        slotNorthingAccuracy = maxAccuracyNorthing * APIUtils.EarthRadiusWGS84;
+                        slotNorthingAccuracy = maxAccuracyNorthing * Api.EarthRadiusWGS84;
                     }
                     else
                     {
-                        slotNorthingAccuracy = 0.01 * APIUtils.EarthRadiusWGS84;
+                        slotNorthingAccuracy = 0.01 * Api.EarthRadiusWGS84;
                     }
                     if (maxAccuracyEasting > double.MinValue)
                     {
-                        slotEastingAccuracy = maxAccuracyEasting * APIUtils.EarthRadiusWGS84;
+                        slotEastingAccuracy = maxAccuracyEasting * Api.EarthRadiusWGS84;
                     }
                     else
                     {
-                        slotEastingAccuracy = 0.01 * APIUtils.EarthRadiusWGS84;
+                        slotEastingAccuracy = 0.01 * Api.EarthRadiusWGS84;
                     }
                     UpdateSlotPlot();
                     UpdateDepthPlot();
@@ -698,7 +699,7 @@
     {
         try
         {
-            var rigs = await APIUtils.ClientRig.GetAllRigLightAsync();
+            var rigs = await Api.ClientRig.GetAllRigLightAsync();
             // Only fixed platform rigs are relevant when selecting a fixed platform cluster
             _rigs = rigs?.Where(r => r.IsFixedPlatform).OrderBy(r => r.Name).ToList() ?? new List<RigLight>();
         }
@@ -771,7 +772,7 @@
                         GaussianValue = new GaussianDistribution()
                         {
                             Mean = referenceLatitudeWGS84,
-                            StandardDeviation = (referenceNorthingAccuracy == null) ? 0.01 / APIUtils.EarthRadiusWGS84 : referenceNorthingAccuracy / APIUtils.EarthRadiusWGS84
+                            StandardDeviation = (referenceNorthingAccuracy == null) ? 0.01 / Api.EarthRadiusWGS84 : referenceNorthingAccuracy / Api.EarthRadiusWGS84
                         },
                     } : null,
                     ReferenceLongitude = (referenceLongitudeWGS84 != null) ? new GaussianDrillingProperty()
@@ -779,7 +780,7 @@
                         GaussianValue = new GaussianDistribution()
                         {
                             Mean = referenceLongitudeWGS84,
-                            StandardDeviation = (referenceEastingAccuracy == null) ? 0.01 / APIUtils.EarthRadiusWGS84 : referenceEastingAccuracy / APIUtils.EarthRadiusWGS84
+                            StandardDeviation = (referenceEastingAccuracy == null) ? 0.01 / Api.EarthRadiusWGS84 : referenceEastingAccuracy / Api.EarthRadiusWGS84
                         },
                     } : null,
                     GroundMudLineDepth = (groundMudLineDepthWGS84 != null) ? new GaussianDrillingProperty()
@@ -808,15 +809,15 @@
                         cluster.Slots = new Dictionary<string, Slot>();
                     }
                     cluster.Slots.Clear();
-                    double latitudeAccuracy = 0.01 / APIUtils.EarthRadiusWGS84;
+                    double latitudeAccuracy = 0.01 / Api.EarthRadiusWGS84;
                     if (slotNorthingAccuracy != null)
                     {
-                        latitudeAccuracy = slotNorthingAccuracy.Value / APIUtils.EarthRadiusWGS84;
+                        latitudeAccuracy = slotNorthingAccuracy.Value / Api.EarthRadiusWGS84;
                     }
-                    double longitudeAccuracy = 0.01 / APIUtils.EarthRadiusWGS84;
+                    double longitudeAccuracy = 0.01 / Api.EarthRadiusWGS84;
                     if (slotEastingAccuracy != null)
                     {
-                        longitudeAccuracy = slotEastingAccuracy.Value / APIUtils.EarthRadiusWGS84;
+                        longitudeAccuracy = slotEastingAccuracy.Value / Api.EarthRadiusWGS84;
                     }
                     foreach (SlotTemplate slotTemplate in _slots)
                     {
@@ -833,7 +834,7 @@
                         }
                     }
                 }
-                await APIUtils.ClientCluster.PutClusterByIdAsync(CurrentCluster.MetaInfo.ID, cluster);
+                await Api.ClientCluster.PutClusterByIdAsync(CurrentCluster.MetaInfo.ID, cluster);
                 logger.LogInformation("Updated the Cluster successfully");
                 Snackbar.Add("Updated the Cluster successfully", Severity.Success);
             }
@@ -1083,7 +1084,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -1101,8 +1102,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -1114,7 +1115,7 @@
                         referenceNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
                         referenceEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
                 }
             }
             catch (Exception e)
@@ -1129,7 +1130,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -1147,8 +1148,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -1160,7 +1161,7 @@
                         referenceNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
                         referenceEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
 
                 }
             }
@@ -1176,7 +1177,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -1192,8 +1193,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -1205,7 +1206,7 @@
                         referenceLatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
                         referenceLongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
 
                 }
             }
@@ -1244,7 +1245,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -1262,8 +1263,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -1271,7 +1272,7 @@
                     {
                         depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthDatum;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
                 }
             }
             catch (Exception e)
@@ -1286,7 +1287,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -1304,8 +1305,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -1313,7 +1314,7 @@
                     {
                         depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
                 }
             }
             catch (Exception e)
@@ -1391,7 +1392,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -1409,8 +1410,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -1421,7 +1422,7 @@
                         slot.Northing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
                         slot.Easting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
                 }
             }
             catch (Exception e)
@@ -1435,7 +1436,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -1453,8 +1454,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -1465,7 +1466,7 @@
                         slot.Northing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
                         slot.Easting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
                 }
             }
             catch (Exception e)
@@ -1479,7 +1480,7 @@
         {
             try
             {
-                if (APIUtils.ClientField != null)
+                if (Api.ClientField != null)
                 {
                     FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                     {
@@ -1495,8 +1496,8 @@
                             }
                         }
                     };
-                    APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                    FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                    Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                    FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                     if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                         calculatedConversionSet.CartographicCoordinateList != null &&
                         calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
@@ -1507,7 +1508,7 @@
                         slot.LatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
                         slot.LongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
                     }
-                    APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                    Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
                 }
             }
             catch (Exception e)
@@ -1520,7 +1521,7 @@
     {
         try
         {
-            if (APIUtils.ClientField != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+            if (Api.ClientField != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
             {
                 FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
                 {
@@ -1657,8 +1658,8 @@
                         conversionSet.CartographicCoordinateList.Add(coordinate);
                     }
                 }
-                APIUtils.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-                FieldCartographicConversionSet calculatedConversionSet = APIUtils.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+                Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
+                FieldCartographicConversionSet calculatedConversionSet = Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
                 if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
                     calculatedConversionSet.CartographicCoordinateList != null &&
                     calculatedConversionSet.CartographicCoordinateList.Count == toBeProcessed.Count &&
@@ -1704,7 +1705,7 @@
                         }
                     }
                 }
-                APIUtils.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
+                Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
             }
         }
         catch (Exception e)
@@ -1718,4 +1719,5 @@
         InvokeAsync(() => { StateHasChanged(); }).Wait();
     }
 }
+
 
