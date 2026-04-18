@@ -1,11 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <RootNamespace>NORCE.Drilling.Cluster.WebPages</RootNamespace>
+	<AssemblyName>NORCE.Drilling.Cluster.WebPages</AssemblyName>
+	<RootNamespace>NORCE.Drilling.Cluster.WebPages</RootNamespace>
     <PackageId>NORCE.Drilling.Cluster.WebPages</PackageId>
     <Title>NORCE.Drilling.Cluster.WebPages</Title>
     <Authors>Eric Cayeux</Authors>
