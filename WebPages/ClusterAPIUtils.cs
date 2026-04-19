@@ -19,6 +19,10 @@ public class ClusterAPIUtils : APIUtils, IClusterAPIUtils
         HttpClientRig = SetHttpClient(HostNameRig, HostBasePathRig);
         ClientRig = new Client(HttpClientRig.BaseAddress!.ToString(), HttpClientRig);
 
+        HostNameTrajectory = string.IsNullOrWhiteSpace(configuration.TrajectoryHostURL) ? HostNameCluster : configuration.TrajectoryHostURL;
+        HttpClientTrajectory = SetHttpClient(HostNameTrajectory, HostBasePathTrajectory);
+        ClientTrajectory = new Client(HttpClientTrajectory.BaseAddress!.ToString(), HttpClientTrajectory);
+
         HostNameUnitConversion = Require(configuration.UnitConversionHostURL, nameof(configuration.UnitConversionHostURL));
     }
 
@@ -46,6 +50,11 @@ public class ClusterAPIUtils : APIUtils, IClusterAPIUtils
     public string HostBasePathRig { get; } = "Rig/api/";
     public HttpClient HttpClientRig { get; }
     public Client ClientRig { get; }
+
+    public string HostNameTrajectory { get; }
+    public string HostBasePathTrajectory { get; } = "Trajectory/api/";
+    public HttpClient HttpClientTrajectory { get; }
+    public Client ClientTrajectory { get; }
 
     public string HostNameUnitConversion { get; }
     public string HostBasePathUnitConversion { get; } = "UnitConversion/api/";

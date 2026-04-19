@@ -1,0 +1,460 @@
+@page "/ClusterTrajectories"
+@inject ILogger<ClusterTrajectories> logger
+@inject ISnackbar Snackbar
+@inject IClusterAPIUtils Api
+@using ClusterModelShared = NORCE.Drilling.Cluster.ModelShared
+
+<MudUnitAndReferenceChoiceTag HttpHost=@Api.HostNameUnitConversion
+                              HttpBasePath=@Api.HostBasePathUnitConversion
+                              HttpController="UnitSystem/"
+                              UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
+                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
+                              PositionReferenceName="WGS84"
+                              CartographicGridPositionReferenceSource="_cartographicReference"
+                              ClusterPositionReferenceSource="_clusterReference"
+                              DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
+                              DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
+                              GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
+                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource">
+    @if (fieldList == null || clusterList == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudStack Spacing="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudGrid>
+                    <MudItem xs="12" md="5">
+                        <MudText Typo="Typo.h5">Cluster Trajectories</MudText>
+                        <MudText Typo="Typo.body2">All wellbore trajectories for the selected real cluster, shown in 3D and as a horizontal projection.</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudSelect Label="Field" T="Guid?" Value="@selectedFieldId" ValueChanged="OnFieldChanged" ShrinkLabel Clearable="true">
+                            @foreach (ClusterModelShared.Field field in AvailableFields)
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)field.MetaInfo.ID)">@field.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudSelect Label="Cluster"
+                                   T="Guid?"
+                                   Value="@selectedClusterId"
+                                   ValueChanged="OnClusterChanged"
+                                   ShrinkLabel
+                                   Clearable="true"
+                                   Disabled="@(selectedFieldId == null || AvailableClusters.Count == 0)">
+                            @foreach (ClusterModelShared.Cluster cluster in AvailableClusters)
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)cluster.MetaInfo.ID)">@cluster.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="1">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   FullWidth="true"
+                                   OnClick="ReloadSelectedClusterAsync"
+                                   Disabled="@(selectedClusterId == null)">
+                            Reload
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            @if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Dense="true">@errorMessage</MudAlert>
+            }
+            else if (isLoadingTrajectories)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Loading trajectories for the selected cluster.</MudAlert>
+            }
+            else if (selectedFieldId == null)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Select a field to display its clusters.</MudAlert>
+            }
+            else if (AvailableClusters.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">No real clusters were found for the selected field.</MudAlert>
+            }
+            else if (selectedClusterId == null)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Select a cluster to display its trajectories.</MudAlert>
+            }
+            else if (trajectoryList.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">No trajectories were found for the selected cluster.</MudAlert>
+            }
+            else
+            {
+                <MudGrid>
+                    <MudItem xs="12" xl="6">
+                        <MudPaper Class="pa-4" Elevation="2">
+                            <MudText Typo="Typo.h6">3D View</MudText>
+                            <Scatter3DPlot XUnit="PositionDrilling"
+                                           YUnit="PositionDrilling"
+                                           ZUnit="DepthDrilling"
+                                           NameList="@PlotNames"
+                                           ModeFlagList="@PlotModeFlags"
+                                           ColorList="@PlotColors"
+                                           XValuesList="@EastValuesList"
+                                           YValuesList="@NorthValuesList"
+                                           ZValuesList="@TvdValuesList"
+                                           XAxisTitle="Easting"
+                                           YAxisTitle="Northing"
+                                           ZAxisTitle="TVD"
+                                           PlotTitle="Cluster trajectories"
+                                           PlotHeight="600"
+                                           ZAxisReversed="true"
+                                           XDrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                           YDrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                           ZDrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                           PositionDirectionX="@PositionDirectionType.East"
+                                           PositionDirectionY="@PositionDirectionType.North" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" xl="6">
+                        <MudPaper Class="pa-4" Elevation="2">
+                            <MudText Typo="Typo.h6">Horizontal Projection</MudText>
+                            <ScatterPlot XUnit="PositionDrilling"
+                                         YUnit="PositionDrilling"
+                                         NameList="@PlotNames"
+                                         ModeFlagList="@PlotModeFlags"
+                                         ColorList="@PlotColors"
+                                         XValuesList="@EastValuesList"
+                                         YValuesList="@NorthValuesList"
+                                         XAxisTitle="Easting"
+                                         YAxisTitle="Northing"
+                                         PlotTitle="Horizontal projection"
+                                         PlotHeight="600"
+                                         AspectRatio="1"
+                                         XDrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                         YDrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                         PositionDirectionX="@PositionDirectionType.East"
+                                         PositionDirectionY="@PositionDirectionType.North" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+
+                <MudPaper Class="pa-4" Elevation="2">
+                    <MudText Typo="Typo.h6">Legend</MudText>
+                    <MudGrid>
+                        @foreach (var trace in plotTraces)
+                        {
+                            <MudItem xs="12" sm="6" md="4" lg="3">
+                                <div style="display:flex;align-items:center;gap:12px;">
+                                    <span style="@($"width:18px;height:18px;border-radius:50%;display:inline-block;background:{trace.Color};")"></span>
+                                    <MudText Typo="Typo.body2">@trace.Name</MudText>
+                                </div>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudPaper>
+            }
+        </MudStack>
+    }
+</MudUnitAndReferenceChoiceTag>
+
+@code {
+    private List<ClusterModelShared.Field>? fieldList;
+    private List<ClusterModelShared.Cluster>? clusterList;
+    private List<ClusterModelShared.TrajectoryLight> trajectoryLightList = [];
+    private List<ClusterModelShared.Trajectory> trajectoryList = [];
+    private Guid? selectedFieldId;
+    private Guid? selectedClusterId;
+    private string? errorMessage;
+    private bool isLoadingTrajectories;
+    private readonly CartographicReference _cartographicReference = new() { CartographicGridNorthPositionReference = 0, CartographicGridEastPositionReference = 0 };
+    private readonly ClusterReference _clusterReference = new() { ClusterNorthPositionReference = 0, ClusterEastPositionReference = 0 };
+    private List<PlotTrace> plotTraces = [];
+
+    private List<string> PlotNames => plotTraces.Select(trace => trace.Name).ToList();
+    private List<int> PlotModeFlags => plotTraces.Select(trace => trace.ModeFlag).ToList();
+    private List<string> PlotColors => plotTraces.Select(trace => trace.Color).ToList();
+    private List<List<object>> NorthValuesList => plotTraces.Select(trace => trace.NorthValues).ToList();
+    private List<List<object>> EastValuesList => plotTraces.Select(trace => trace.EastValues).ToList();
+    private List<List<object>> TvdValuesList => plotTraces.Select(trace => trace.TvdValues).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            logger.LogInformation("Trying to load list of Fields and Clusters");
+            Task<ICollection<ClusterModelShared.Field>> fieldTask = Api.ClientField.GetAllFieldAsync();
+            Task<ICollection<ClusterModelShared.Cluster>> clusterTask = Api.ClientCluster.GetAllClusterAsync();
+
+            await Task.WhenAll(fieldTask, clusterTask);
+
+            fieldList = fieldTask.Result
+                .Where(field => field?.MetaInfo != null)
+                .OrderBy(field => field.Name)
+                .ToList();
+
+            clusterList = clusterTask.Result
+                .Where(cluster => cluster?.MetaInfo != null && !cluster.IsSingleWell)
+                .OrderBy(cluster => cluster.Name)
+                .ToList();
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError(ex, "Problem while loading fields and clusters");
+            errorMessage = "Unable to load fields and clusters.";
+            Snackbar.Add(errorMessage, Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected problem while loading fields and clusters");
+            errorMessage = "Unable to load fields and clusters.";
+            Snackbar.Add(errorMessage, Severity.Error);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private List<ClusterModelShared.Field> AvailableFields =>
+        fieldList?
+            .Where(field => field?.MetaInfo != null)
+            .OrderBy(field => field.Name)
+            .ToList() ?? [];
+
+    private List<ClusterModelShared.Cluster> AvailableClusters =>
+        clusterList?
+            .Where(cluster => cluster?.MetaInfo != null && cluster.FieldID == selectedFieldId && !cluster.IsSingleWell)
+            .OrderBy(cluster => cluster.Name)
+            .ToList() ?? [];
+
+    private async Task OnFieldChanged(Guid? fieldId)
+    {
+        selectedFieldId = fieldId;
+        selectedClusterId = null;
+        trajectoryLightList.Clear();
+        trajectoryList.Clear();
+        ClearPlots();
+        errorMessage = null;
+        DataUtils.ApplyClusterReferenceValues(null);
+        ResetPositionReferences();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnClusterChanged(Guid? clusterId)
+    {
+        selectedClusterId = clusterId;
+        if (selectedClusterId is Guid selected && selectedFieldId is Guid fieldId)
+        {
+            ApplySelectedClusterReferenceValues(selected);
+            await LoadTrajectoriesAsync(fieldId, selected);
+        }
+        else
+        {
+            trajectoryLightList.Clear();
+            trajectoryList.Clear();
+            ClearPlots();
+            errorMessage = null;
+            DataUtils.ApplyClusterReferenceValues(null);
+            ResetPositionReferences();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task ReloadSelectedClusterAsync()
+    {
+        if (selectedFieldId is Guid fieldId && selectedClusterId is Guid clusterId)
+        {
+            ApplySelectedClusterReferenceValues(clusterId);
+            await LoadTrajectoriesAsync(fieldId, clusterId);
+        }
+    }
+
+    private void ApplySelectedClusterReferenceValues(Guid clusterId)
+    {
+        ClusterModelShared.Cluster? selectedCluster = clusterList?.FirstOrDefault(cluster => cluster.MetaInfo?.ID == clusterId);
+        DataUtils.ApplyClusterReferenceValues(selectedCluster);
+        ResetPositionReferences();
+    }
+
+    private void ResetPositionReferences()
+    {
+        _cartographicReference.CartographicGridNorthPositionReference = 0;
+        _cartographicReference.CartographicGridEastPositionReference = 0;
+        _clusterReference.ClusterNorthPositionReference = 0;
+        _clusterReference.ClusterEastPositionReference = 0;
+    }
+
+    private async Task LoadTrajectoriesAsync(Guid fieldId, Guid clusterId)
+    {
+        try
+        {
+            errorMessage = null;
+            isLoadingTrajectories = true;
+            trajectoryLightList.Clear();
+            trajectoryList.Clear();
+            ClearPlots();
+            await InvokeAsync(StateHasChanged);
+
+            logger.LogInformation("Loading trajectory light data for field {FieldId} and cluster {ClusterId}", fieldId, clusterId);
+            trajectoryLightList = (await Api.ClientTrajectory.GetAllTrajectoryLightAsync(fieldId: fieldId, clusterId: clusterId))
+                .Where(trajectory => trajectory?.MetaInfo != null && trajectory.MetaInfo.ID != Guid.Empty)
+                .OrderBy(trajectory => trajectory.Name)
+                .ToList();
+
+            List<Task<ClusterModelShared.Trajectory>> detailTasks = trajectoryLightList
+                .Select(light => Api.ClientTrajectory.GetTrajectoryByIdAsync(light.MetaInfo.ID))
+                .ToList();
+
+            trajectoryList = (await Task.WhenAll(detailTasks))
+                .Where(trajectory => trajectory != null)
+                .OrderBy(trajectory => trajectory.Name)
+                .ToList();
+
+            UpdatePlots();
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError(ex, "Problem while loading trajectories for cluster {ClusterId}", clusterId);
+            errorMessage = "Unable to load trajectories for the selected cluster.";
+            Snackbar.Add(errorMessage, Severity.Error);
+            trajectoryLightList.Clear();
+            trajectoryList.Clear();
+            ClearPlots();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected problem while loading trajectories for cluster {ClusterId}", clusterId);
+            errorMessage = "Unable to load trajectories for the selected cluster.";
+            Snackbar.Add(errorMessage, Severity.Error);
+            trajectoryLightList.Clear();
+            trajectoryList.Clear();
+            ClearPlots();
+        }
+        finally
+        {
+            isLoadingTrajectories = false;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdatePlots()
+    {
+        int colorIndex = 0;
+        List<PlotTrace> nextPlotTraces = [];
+
+        foreach (ClusterModelShared.Trajectory trajectory in trajectoryList)
+        {
+            if (trajectory?.SurveyStationList == null || trajectory.SurveyStationList.Count == 0)
+            {
+                continue;
+            }
+
+            List<object> northValues = [];
+            List<object> eastValues = [];
+            List<object> tvdValues = [];
+
+            foreach (ClusterModelShared.SurveyStation station in trajectory.SurveyStationList)
+            {
+                AppendPoint(station, northValues, eastValues, tvdValues);
+            }
+
+            if (northValues.Count < 2 || northValues.Count != eastValues.Count || northValues.Count != tvdValues.Count)
+            {
+                continue;
+            }
+
+            nextPlotTraces.Add(new PlotTrace(
+                string.IsNullOrWhiteSpace(trajectory.Name) ? "trajectory" : trajectory.Name,
+                1,
+                Colors[colorIndex % Colors.Length],
+                northValues,
+                eastValues,
+                tvdValues));
+            colorIndex++;
+        }
+
+        plotTraces = nextPlotTraces;
+    }
+
+    private static void AppendPoint(ClusterModelShared.SurveyStation? point, List<object> northValues, List<object> eastValues, List<object> tvdValues)
+    {
+        if (point?.X is not { } north || point.Y is not { } east)
+        {
+            return;
+        }
+
+        double tvd = point.TVD ?? point.Z ?? 0.0;
+        AppendPointValues(north, east, tvd, northValues, eastValues, tvdValues);
+    }
+
+    private static void AppendPointValues(double north, double east, double tvd, List<object> northValues, List<object> eastValues, List<object> tvdValues)
+    {
+        if (northValues.Count > 0 &&
+            eastValues.Count == northValues.Count &&
+            tvdValues.Count == northValues.Count &&
+            TryGetLastDouble(northValues, out double lastNorth) &&
+            TryGetLastDouble(eastValues, out double lastEast) &&
+            TryGetLastDouble(tvdValues, out double lastTvd) &&
+            AreClose(lastNorth, north) &&
+            AreClose(lastEast, east) &&
+            AreClose(lastTvd, tvd))
+        {
+            return;
+        }
+
+        northValues.Add(north);
+        eastValues.Add(east);
+        tvdValues.Add(tvd);
+    }
+
+    private static bool TryGetLastDouble(List<object> values, out double value)
+    {
+        value = default;
+        if (values.Count == 0)
+        {
+            return false;
+        }
+
+        object last = values[^1];
+        return last switch
+        {
+            double d => (value = d) == d,
+            float f => (value = f) == f,
+            decimal m => (value = (double)m) == (double)m,
+            int i => (value = i) == i,
+            long l => (value = l) == l,
+            _ => false
+        };
+    }
+
+    private static bool AreClose(double left, double right)
+    {
+        return Math.Abs(left - right) <= 1e-6;
+    }
+
+    private void ClearPlots()
+    {
+        plotTraces = [];
+    }
+
+    private static readonly string[] Colors =
+    [
+        "black",
+        "blue",
+        "grey",
+        "red",
+        "orange",
+        "green",
+        "yellow",
+        "pink",
+        "brown",
+        "purple"
+    ];
+
+    private sealed record PlotTrace(
+        string Name,
+        int ModeFlag,
+        string Color,
+        List<object> NorthValues,
+        List<object> EastValues,
+        List<object> TvdValues);
+}

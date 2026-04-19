@@ -10,6 +10,7 @@ WebPagesHostConfiguration webPagesConfiguration = new()
     ClusterHostURL = builder.Configuration["ClusterHostURL"] ?? string.Empty,
     FieldHostURL = builder.Configuration["FieldHostURL"] ?? string.Empty,
     RigHostURL = builder.Configuration["RigHostURL"] ?? string.Empty,
+    TrajectoryHostURL = builder.Configuration["TrajectoryHostURL"] ?? string.Empty,
     UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"] ?? string.Empty,
 };
 

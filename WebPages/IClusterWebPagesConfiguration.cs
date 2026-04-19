@@ -6,6 +6,7 @@ public interface IClusterWebPagesConfiguration :
     IClusterHostURL,
     IFieldHostURL,
     IRigHostURL,
+    ITrajectoryHostURL,
     IUnitConversionHostURL
 {
 }
