@@ -279,7 +279,148 @@ namespace NORCE.Drilling.Cluster.Service.Managers
             }
             return null;
         }
-
+        
+        
+        /// <summary>
+        /// Returns the list of all Cluster by given field id present in the microservice database 
+        /// </summary>
+        /// <returns>the list of all Cluster by given field id present in the microservice database</returns>
+        public List<Model.Cluster?>? GetAllClusterByFieldId(Guid fieldId)
+        {
+            List<Model.Cluster?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT Cluster FROM ClusterTable WHERE FieldID = '{fieldId}'";
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.Cluster? cluster = JsonSerializer.Deserialize<Model.Cluster>(data, JsonSettings.Options);
+                        vals.Add(cluster);
+                    }
+                    _logger.LogInformation("Returning the list of existing Cluster from ClusterTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get Cluster from ClusterTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
+        /// <summary>
+        /// Returns the list of all Cluster by given rig id present in the microservice database 
+        /// </summary>
+        /// <returns>the list of all Cluster by given rig id present in the microservice database</returns>
+        public List<Model.Cluster?>? GetAllClusterByRigId(Guid guid)
+        {
+            List<Model.Cluster?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT Cluster FROM ClusterTable WHERE RigID = '{guid}'";
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.Cluster? cluster = JsonSerializer.Deserialize<Model.Cluster>(data, JsonSettings.Options);
+                        vals.Add(cluster);
+                    }
+                    _logger.LogInformation("Returning the list of existing Cluster from ClusterTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get Cluster from ClusterTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
+        /// <summary>
+        /// Returns the list of all single well Clusters present in the microservice database 
+        /// </summary>
+        /// <returns>the list of all single well Clusters present in the microservice database</returns>
+        public List<Model.Cluster?>? GetAllSingleWellCluster(bool IsSingleWell)
+        {
+            List<Model.Cluster?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT Cluster FROM ClusterTable WHERE IsSingleWell = {IsSingleWell}";
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.Cluster? cluster = JsonSerializer.Deserialize<Model.Cluster>(data, JsonSettings.Options);
+                        vals.Add(cluster);
+                    }
+                    _logger.LogInformation("Returning the list of existing Cluster from ClusterTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get Cluster from ClusterTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
+        /// <summary>
+        /// Returns the list of all fixed-platform Clusters present in the microservice database 
+        /// </summary>
+        /// <returns>the list of all fixed-platform Clusters present in the microservice database</returns>
+        public List<Model.Cluster?>? GetAllFixedPlatformCluster(bool fixedBool)
+        {
+            List<Model.Cluster?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT Cluster FROM ClusterTable WHERE IsFixedPlatform = {fixedBool}";
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.Cluster? cluster = JsonSerializer.Deserialize<Model.Cluster>(data, JsonSettings.Options);
+                        vals.Add(cluster);
+                    }
+                    _logger.LogInformation("Returning the list of existing Cluster from ClusterTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get Cluster from ClusterTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
         /// <summary>
         /// Performs calculation on the given Cluster and adds it to the microservice database
         /// </summary>

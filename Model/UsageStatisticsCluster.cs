@@ -69,6 +69,11 @@ namespace NORCE.Drilling.Cluster.Model
         public History GetAllClusterMetaInfoPerDay { get; set; } = new History();
         public History GetClusterByIdPerDay { get; set; } = new History();
         public History GetAllClusterPerDay { get; set; } = new History();
+        public History GetAllClusterByFieldIdPerDay { get; set; } = new History();
+        public History GetAllClusterByRigIdPerDay { get; set; } = new History();
+        public History GetAllSingleWellClusterPerDay { get; set; } = new History();
+        public History GetAllFixedPlatformClusterPerDay { get; set; } = new History();
+        
         public History PostClusterPerDay { get; set; } = new History();
         public History PutClusterByIdPerDay { get; set; } = new History();
         public History DeleteClusterByIdPerDay { get; set; } = new History();
@@ -171,6 +176,54 @@ namespace NORCE.Drilling.Cluster.Model
                     GetAllClusterPerDay = new History();
                 }
                 GetAllClusterPerDay.Increment();
+                ManageBackup();
+            }
+        }
+        public void IncrementGetAllClusterByFieldIdPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllClusterByFieldIdPerDay == null)
+                {
+                    GetAllClusterByFieldIdPerDay = new History();
+                }
+                GetAllClusterByFieldIdPerDay.Increment();
+                ManageBackup();
+            }
+        }
+        public void IncrementGetAllClusterByRigIdPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllClusterByRigIdPerDay == null)
+                {
+                    GetAllClusterByRigIdPerDay = new History();
+                }
+                GetAllClusterByRigIdPerDay.Increment();
+                ManageBackup();
+            }
+        }
+        public void IncrementGetAllSingleWellClusterPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllSingleWellClusterPerDay == null)
+                {
+                    GetAllSingleWellClusterPerDay = new History();
+                }
+                GetAllSingleWellClusterPerDay.Increment();
+                ManageBackup();
+            }
+        }
+        public void IncrementGetAllFixedPlatformClusterPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllFixedPlatformClusterPerDay == null)
+                {
+                    GetAllFixedPlatformClusterPerDay = new History();
+                }
+                GetAllFixedPlatformClusterPerDay.Increment();
                 ManageBackup();
             }
         }
