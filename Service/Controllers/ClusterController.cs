@@ -109,6 +109,79 @@ namespace NORCE.Drilling.Cluster.Service.Controllers
         }
 
         /// <summary>
+        /// Returns the list of all Cluster with given field id present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData
+        /// </summary>
+        /// <returns>the list of all Cluster with given field id present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData</returns>
+        [HttpGet("ByFieldId", Name = "GetAllClusterByFieldId")]
+        public ActionResult<IEnumerable<Model.Cluster?>> GetAllClusterByFieldId(Guid guid)
+        {
+            UsageStatisticsCluster.Instance.IncrementGetAllClusterByFieldIdPerDay();
+            var vals = _clusterManager.GetAllClusterByFieldId(guid);
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        /// <summary>
+        /// Returns the list of all Cluster with given rig id present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData
+        /// </summary>
+        /// <returns>the list of all Cluster with given rig id present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData</returns>
+        [HttpGet("ByRigId", Name = "GetAllClusterByRigId")]
+        public ActionResult<IEnumerable<Model.Cluster?>> GetAllClusterByRigId(Guid guid)
+        {
+            UsageStatisticsCluster.Instance.IncrementGetAllClusterByRigIdPerDay();
+            var vals = _clusterManager.GetAllClusterByRigId(guid);
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        /// <summary>
+        /// Returns the list of all single well Clusters present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData
+        /// </summary>
+        /// <returns>the list of all single well Cluster present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData</returns>
+        [HttpGet("SingleWell", Name = "GetAllSingleWellCluster")]
+        public ActionResult<IEnumerable<Model.Cluster?>> GetAllSingleWellCluster(bool? IsSingleWellNullable)
+        {
+            UsageStatisticsCluster.Instance.IncrementGetAllSingleWellClusterPerDay();
+            bool IsSingleWell = IsSingleWellNullable ?? true;
+            var vals = _clusterManager.GetAllSingleWellCluster(IsSingleWell);
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        /// <summary>
+        /// Returns the list of all fixed platform Clusters present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData
+        /// </summary>
+        /// <returns>the list of all fixed platform Cluster present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData</returns>
+        [HttpGet("FixedPlatform", Name = "GetAllFixedPlatformCluster")]
+        public ActionResult<IEnumerable<Model.Cluster?>> GetAllFixedPlatformCluster(bool fixedBool)
+        {
+            UsageStatisticsCluster.Instance.IncrementGetAllFixedPlatformClusterPerDay();
+            var vals = _clusterManager.GetAllFixedPlatformCluster(fixedBool);
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        /// <summary>
         /// Performs calculation on the given Cluster and adds it to the microservice database, at the endpoint Cluster/api/Cluster
         /// </summary>
         /// <param name="cluster"></param>

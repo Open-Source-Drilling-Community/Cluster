@@ -200,6 +200,136 @@
         }
       }
     },
+    "/Cluster/ByFieldId": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "GetAllClusterByFieldId",
+        "parameters": [
+          {
+            "name": "guid",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Cluster"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cluster/ByRigId": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "GetAllClusterByRigId",
+        "parameters": [
+          {
+            "name": "guid",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Cluster"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cluster/SingleWell": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "GetAllSingleWellCluster",
+        "parameters": [
+          {
+            "name": "IsSingleWellNullable",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Cluster"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cluster/FixedPlatform": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "GetAllFixedPlatformCluster",
+        "parameters": [
+          {
+            "name": "fixedBool",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Cluster"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ClusterUsageStatistics": {
       "get": {
         "tags": [
