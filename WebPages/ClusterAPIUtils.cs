@@ -24,6 +24,9 @@ public class ClusterAPIUtils : APIUtils, IClusterAPIUtils
         ClientTrajectory = new Client(HttpClientTrajectory.BaseAddress!.ToString(), HttpClientTrajectory);
 
         HostNameUnitConversion = Require(configuration.UnitConversionHostURL, nameof(configuration.UnitConversionHostURL));
+
+        HostNameVerticalDatum = Require(configuration.VerticalDatumHostURL, nameof(configuration.VerticalDatumHostURL));
+        HttpClientVerticalDatum = SetHttpClient(HostNameVerticalDatum, HostBasePathVerticalDatum);
     }
 
     private static string Require(string? value, string propertyName)
@@ -58,6 +61,10 @@ public class ClusterAPIUtils : APIUtils, IClusterAPIUtils
 
     public string HostNameUnitConversion { get; }
     public string HostBasePathUnitConversion { get; } = "UnitConversion/api/";
+
+    public string HostNameVerticalDatum { get; }
+    public string HostBasePathVerticalDatum { get; } = "VerticalDatum/api/";
+    public HttpClient HttpClientVerticalDatum { get; }
 
     public double EarthRadiusWGS84 { get; } = 6378137.0;
 }

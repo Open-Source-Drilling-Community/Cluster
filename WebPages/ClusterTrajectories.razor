@@ -17,7 +17,8 @@
                               DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
                               DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
                               GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
-                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource">
+                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource"
+                              MeanSeaLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource">
     @if (fieldList == null || clusterList == null)
     {
         <p><em>Loading...</em></p>
@@ -286,7 +287,7 @@
         trajectoryList.Clear();
         ClearPlots();
         errorMessage = null;
-        DataUtils.ApplyClusterReferenceValues(null);
+        await ApplySelectedClusterReferenceValuesAsync(null);
         ResetPositionReferences();
         await InvokeAsync(StateHasChanged);
     }
@@ -296,7 +297,7 @@
         selectedClusterId = clusterId;
         if (selectedClusterId is Guid selected && selectedFieldId is Guid fieldId)
         {
-            ApplySelectedClusterReferenceValues(selected);
+            await ApplySelectedClusterReferenceValuesAsync(selected);
             await LoadTrajectoriesAsync(fieldId, selected);
         }
         else
@@ -305,7 +306,7 @@
             trajectoryList.Clear();
             ClearPlots();
             errorMessage = null;
-            DataUtils.ApplyClusterReferenceValues(null);
+            await ApplySelectedClusterReferenceValuesAsync(null);
             ResetPositionReferences();
             await InvokeAsync(StateHasChanged);
         }
@@ -315,15 +316,17 @@
     {
         if (selectedFieldId is Guid fieldId && selectedClusterId is Guid clusterId)
         {
-            ApplySelectedClusterReferenceValues(clusterId);
+            await ApplySelectedClusterReferenceValuesAsync(clusterId);
             await LoadTrajectoriesAsync(fieldId, clusterId);
         }
     }
 
-    private void ApplySelectedClusterReferenceValues(Guid clusterId)
+    private async Task ApplySelectedClusterReferenceValuesAsync(Guid? clusterId)
     {
         ClusterModelShared.Cluster? selectedCluster = clusterList?.FirstOrDefault(cluster => cluster.MetaInfo?.ID == clusterId);
         DataUtils.ApplyClusterReferenceValues(selectedCluster);
+        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
+            await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, selectedCluster);
         ResetPositionReferences();
     }
 
@@ -358,7 +361,7 @@
 
     private async Task ReloadCurrentSelectionAsync()
     {
-        if (selectedFieldId is Guid fieldId && selectedClusterId is Guid clusterId) { ApplySelectedClusterReferenceValues(clusterId); await LoadTrajectoriesAsync(fieldId, clusterId); }
+        if (selectedFieldId is Guid fieldId && selectedClusterId is Guid clusterId) { await ApplySelectedClusterReferenceValuesAsync(clusterId); await LoadTrajectoriesAsync(fieldId, clusterId); }
     }
 
     private async Task LoadTrajectoriesAsync(Guid fieldId, Guid clusterId)

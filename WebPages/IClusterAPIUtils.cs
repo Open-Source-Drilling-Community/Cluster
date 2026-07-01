@@ -27,5 +27,9 @@ public interface IClusterAPIUtils
     string HostNameUnitConversion { get; }
     string HostBasePathUnitConversion { get; }
 
+    string HostNameVerticalDatum { get; }
+    string HostBasePathVerticalDatum { get; }
+    HttpClient HttpClientVerticalDatum { get; }
+
     double EarthRadiusWGS84 { get; }
 }

@@ -20,12 +20,14 @@ public static class DataUtils
         public static string? DateReferenceName { get; set; }
         public static GroundMudLineDepthReferenceSource GroundMudLineDepthReferenceSource { get; set; } = new();
         public static SeaWaterLevelDepthReferenceSource SeaWaterLevelDepthReferenceSource { get; set; } = new();
+        public static MeanSeaLevelDepthReferenceSource MeanSeaLevelDepthReferenceSource { get; set; } = new();
     }
 
     public static void ApplyClusterReferenceValues(NORCE.Drilling.Cluster.ModelShared.Cluster? cluster)
     {
         UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = 0;
         UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = 0;
+        UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = null;
         if (cluster?.GroundMudLineDepth?.GaussianValue?.Mean != null)
         {
             ApplyGroundMudLineDepthWGS84(cluster.GroundMudLineDepth.GaussianValue.Mean);
@@ -80,5 +82,10 @@ public static class DataUtils
     public class SeaWaterLevelDepthReferenceSource : ISeaWaterLevelDepthReferenceSource
     {
         public double? SeaWaterLevelDepthReference { get; set; }
+    }
+
+    public class MeanSeaLevelDepthReferenceSource : IMeanSeaLevelDepthReferenceSource
+    {
+        public double? MeanSeaLevelDepthReference { get; set; }
     }
 }

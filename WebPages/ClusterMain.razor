@@ -14,7 +14,8 @@
                               DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
                               DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
                               GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
-                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource">
+                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource"
+                              MeanSeaLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource">
     @if (clusterList == null)
     {
         <p><em>Loading...</em></p>
@@ -173,7 +174,7 @@
                 LastModificationDate = creationDate,
 
             };
-            UpdateSelectedClusterDepthReferenceSource();
+            await UpdateSelectedClusterDepthReferenceSourceAsync();
             await Api.ClientCluster.PostClusterAsync(currentCluster);
             await OnInitializedAsync();
             // Find the newly created datum in the refreshed list
@@ -208,7 +209,7 @@
         try
         {
             currentCluster = await Api.ClientCluster.GetClusterByIdAsync(id);
-            UpdateSelectedClusterDepthReferenceSource();
+            await UpdateSelectedClusterDepthReferenceSourceAsync();
             if (currentCluster != null)
             {
                 isHiddenMainPanel = true;
@@ -232,7 +233,7 @@
         try
         {
             await Api.ClientCluster.DeleteClusterByIdAsync(id);
-            UpdateSelectedClusterDepthReferenceSource();
+            await UpdateSelectedClusterDepthReferenceSourceAsync();
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -249,7 +250,7 @@
             {
                 await Api.ClientCluster.DeleteClusterByIdAsync(cluster.MetaInfo.ID);
             }
-            UpdateSelectedClusterDepthReferenceSource();
+            await UpdateSelectedClusterDepthReferenceSourceAsync();
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -300,6 +301,11 @@
         await OnInitializedAsync();
     }
 
-    private void UpdateSelectedClusterDepthReferenceSource() =>  DataUtils.ApplyClusterReferenceValues(currentCluster);
+    private async Task UpdateSelectedClusterDepthReferenceSourceAsync()
+    {
+        DataUtils.ApplyClusterReferenceValues(currentCluster);
+        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
+            await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, currentCluster);
+    }
 }
 
