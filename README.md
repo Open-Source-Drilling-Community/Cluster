@@ -66,6 +66,7 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 - Slot editing: slots can be edited with north/east and latitude/longitude coordinates through the unit/reference system; the slot table summarizes assigned features.
 - Survey/trajectory displays: cluster survey runs and trajectories are shown in 3D and in horizontal projection, with optional uncertainty ellipses.
 - Field delineation overlays: when a cluster belongs to a field with delineation lines, those lines and their calculated boundaries are displayed together with cluster survey runs and trajectories. In 3D, delineation lines are placed on the north/east plane at the top or bottom of the displayed survey/trajectory bounding box. The bounding box itself is based on survey/trajectory data, not on delineation extents.
+- Calculators: the web app exposes cartographic conversions from the Field web pages and vertical datum single conversions from the VerticalDatum web page under the `Calculators` menu.
 
 ## Docker (Optional)
 - Build images from repo root:
@@ -79,7 +80,7 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 - Runtime packages (high level):
   - Service: `Microsoft.Data.Sqlite`, `Swashbuckle.AspNetCore.*`, `Microsoft.OpenApi*`.
   - Model: `OSDC.DotnetLibraries.*` (Common, DataManagement, Statistics, DrillingProperties).
-  - WebApp: `OSDC.UnitConversion.DrillingRazorMudComponents`, `Plotly.Blazor`, `OSDC.DotnetLibraries.General.DataManagement`.
+  - WebApp: `OSDC.UnitConversion.DrillingRazorMudComponents`, `Plotly.Blazor`, `OSDC.DotnetLibraries.General.DataManagement`, and reusable Field, CartographicProjection, GeodeticDatum, and VerticalDatum web page packages.
   - ModelSharedOut: `Microsoft.OpenApi.Readers`, `NSwag.CodeGeneration.CSharp`.
 - Project references:
   - Service → Model
