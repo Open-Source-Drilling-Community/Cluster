@@ -69,6 +69,7 @@ namespace NORCE.Drilling.Cluster.Model
         public History GetAllClusterMetaInfoPerDay { get; set; } = new History();
         public History GetClusterByIdPerDay { get; set; } = new History();
         public History GetAllClusterPerDay { get; set; } = new History();
+        public History GetAllClusterLightPerDay { get; set; } = new History();
         public History GetAllClusterByFieldIdPerDay { get; set; } = new History();
         public History GetAllClusterByRigIdPerDay { get; set; } = new History();
         public History GetAllSingleWellClusterPerDay { get; set; } = new History();
@@ -77,6 +78,32 @@ namespace NORCE.Drilling.Cluster.Model
         public History PostClusterPerDay { get; set; } = new History();
         public History PutClusterByIdPerDay { get; set; } = new History();
         public History DeleteClusterByIdPerDay { get; set; } = new History();
+
+        public History GetAllClusterIdentityIdPerDay { get; set; } = new History();
+        public History GetAllClusterIdentityMetaInfoPerDay { get; set; } = new History();
+        public History GetClusterIdentityByIdPerDay { get; set; } = new History();
+        public History GetAllClusterIdentityPerDay { get; set; } = new History();
+        public History PostClusterIdentityPerDay { get; set; } = new History();
+        public History PutClusterIdentityByIdPerDay { get; set; } = new History();
+        public History DeleteClusterIdentityByIdPerDay { get; set; } = new History();
+
+        public History GetAllClusterFeatureCategoryIdPerDay { get; set; } = new History();
+        public History GetAllClusterFeatureCategoryMetaInfoPerDay { get; set; } = new History();
+        public History GetClusterFeatureCategoryByIdPerDay { get; set; } = new History();
+        public History GetAllClusterFeatureCategoryPerDay { get; set; } = new History();
+        public History PostClusterFeatureCategoryPerDay { get; set; } = new History();
+        public History PutClusterFeatureCategoryByIdPerDay { get; set; } = new History();
+        public History DeleteClusterFeatureCategoryByIdPerDay { get; set; } = new History();
+
+        public History GetAllSlotFeatureCategoryIdPerDay { get; set; } = new History();
+        public History GetAllSlotFeatureCategoryMetaInfoPerDay { get; set; } = new History();
+        public History GetSlotFeatureCategoryByIdPerDay { get; set; } = new History();
+        public History GetAllSlotFeatureCategoryPerDay { get; set; } = new History();
+        public History PostSlotFeatureCategoryPerDay { get; set; } = new History();
+        public History PutSlotFeatureCategoryByIdPerDay { get; set; } = new History();
+        public History DeleteSlotFeatureCategoryByIdPerDay { get; set; } = new History();
+
+        public History GetClusterUsageStatisticsPerDay { get; set; } = new History();
 
         private static object lock_ = new object();
 
@@ -105,7 +132,7 @@ namespace NORCE.Drilling.Cluster.Model
                                 }
                             }
                         }
-                        catch (Exception ex)
+                        catch
                         {
 
                         }
@@ -114,9 +141,52 @@ namespace NORCE.Drilling.Cluster.Model
                     {
                         instance_ = new UsageStatisticsCluster();
                     }
+                    instance_.EnsureInitialized();
                 }
                 return instance_;
             }
+        }
+
+        public void EnsureInitialized()
+        {
+            GetAllClusterIdPerDay ??= new History();
+            GetAllClusterMetaInfoPerDay ??= new History();
+            GetClusterByIdPerDay ??= new History();
+            GetAllClusterPerDay ??= new History();
+            GetAllClusterLightPerDay ??= new History();
+            GetAllClusterByFieldIdPerDay ??= new History();
+            GetAllClusterByRigIdPerDay ??= new History();
+            GetAllSingleWellClusterPerDay ??= new History();
+            GetAllFixedPlatformClusterPerDay ??= new History();
+            PostClusterPerDay ??= new History();
+            PutClusterByIdPerDay ??= new History();
+            DeleteClusterByIdPerDay ??= new History();
+
+            GetAllClusterIdentityIdPerDay ??= new History();
+            GetAllClusterIdentityMetaInfoPerDay ??= new History();
+            GetClusterIdentityByIdPerDay ??= new History();
+            GetAllClusterIdentityPerDay ??= new History();
+            PostClusterIdentityPerDay ??= new History();
+            PutClusterIdentityByIdPerDay ??= new History();
+            DeleteClusterIdentityByIdPerDay ??= new History();
+
+            GetAllClusterFeatureCategoryIdPerDay ??= new History();
+            GetAllClusterFeatureCategoryMetaInfoPerDay ??= new History();
+            GetClusterFeatureCategoryByIdPerDay ??= new History();
+            GetAllClusterFeatureCategoryPerDay ??= new History();
+            PostClusterFeatureCategoryPerDay ??= new History();
+            PutClusterFeatureCategoryByIdPerDay ??= new History();
+            DeleteClusterFeatureCategoryByIdPerDay ??= new History();
+
+            GetAllSlotFeatureCategoryIdPerDay ??= new History();
+            GetAllSlotFeatureCategoryMetaInfoPerDay ??= new History();
+            GetSlotFeatureCategoryByIdPerDay ??= new History();
+            GetAllSlotFeatureCategoryPerDay ??= new History();
+            PostSlotFeatureCategoryPerDay ??= new History();
+            PutSlotFeatureCategoryByIdPerDay ??= new History();
+            DeleteSlotFeatureCategoryByIdPerDay ??= new History();
+
+            GetClusterUsageStatisticsPerDay ??= new History();
         }
 
         public void IncrementGetAllClusterIdPerDay()
@@ -176,6 +246,18 @@ namespace NORCE.Drilling.Cluster.Model
                     GetAllClusterPerDay = new History();
                 }
                 GetAllClusterPerDay.Increment();
+                ManageBackup();
+            }
+        }
+        public void IncrementGetAllClusterLightPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllClusterLightPerDay == null)
+                {
+                    GetAllClusterLightPerDay = new History();
+                }
+                GetAllClusterLightPerDay.Increment();
                 ManageBackup();
             }
         }
@@ -252,6 +334,48 @@ namespace NORCE.Drilling.Cluster.Model
             }
         }
 
+        public void IncrementGetAllClusterIdentityIdPerDay() => IncrementHistory(() => GetAllClusterIdentityIdPerDay, value => GetAllClusterIdentityIdPerDay = value);
+        public void IncrementGetAllClusterIdentityMetaInfoPerDay() => IncrementHistory(() => GetAllClusterIdentityMetaInfoPerDay, value => GetAllClusterIdentityMetaInfoPerDay = value);
+        public void IncrementGetClusterIdentityByIdPerDay() => IncrementHistory(() => GetClusterIdentityByIdPerDay, value => GetClusterIdentityByIdPerDay = value);
+        public void IncrementGetAllClusterIdentityPerDay() => IncrementHistory(() => GetAllClusterIdentityPerDay, value => GetAllClusterIdentityPerDay = value);
+        public void IncrementPostClusterIdentityPerDay() => IncrementHistory(() => PostClusterIdentityPerDay, value => PostClusterIdentityPerDay = value);
+        public void IncrementPutClusterIdentityByIdPerDay() => IncrementHistory(() => PutClusterIdentityByIdPerDay, value => PutClusterIdentityByIdPerDay = value);
+        public void IncrementDeleteClusterIdentityByIdPerDay() => IncrementHistory(() => DeleteClusterIdentityByIdPerDay, value => DeleteClusterIdentityByIdPerDay = value);
+
+        public void IncrementGetAllClusterFeatureCategoryIdPerDay() => IncrementHistory(() => GetAllClusterFeatureCategoryIdPerDay, value => GetAllClusterFeatureCategoryIdPerDay = value);
+        public void IncrementGetAllClusterFeatureCategoryMetaInfoPerDay() => IncrementHistory(() => GetAllClusterFeatureCategoryMetaInfoPerDay, value => GetAllClusterFeatureCategoryMetaInfoPerDay = value);
+        public void IncrementGetClusterFeatureCategoryByIdPerDay() => IncrementHistory(() => GetClusterFeatureCategoryByIdPerDay, value => GetClusterFeatureCategoryByIdPerDay = value);
+        public void IncrementGetAllClusterFeatureCategoryPerDay() => IncrementHistory(() => GetAllClusterFeatureCategoryPerDay, value => GetAllClusterFeatureCategoryPerDay = value);
+        public void IncrementPostClusterFeatureCategoryPerDay() => IncrementHistory(() => PostClusterFeatureCategoryPerDay, value => PostClusterFeatureCategoryPerDay = value);
+        public void IncrementPutClusterFeatureCategoryByIdPerDay() => IncrementHistory(() => PutClusterFeatureCategoryByIdPerDay, value => PutClusterFeatureCategoryByIdPerDay = value);
+        public void IncrementDeleteClusterFeatureCategoryByIdPerDay() => IncrementHistory(() => DeleteClusterFeatureCategoryByIdPerDay, value => DeleteClusterFeatureCategoryByIdPerDay = value);
+
+        public void IncrementGetAllSlotFeatureCategoryIdPerDay() => IncrementHistory(() => GetAllSlotFeatureCategoryIdPerDay, value => GetAllSlotFeatureCategoryIdPerDay = value);
+        public void IncrementGetAllSlotFeatureCategoryMetaInfoPerDay() => IncrementHistory(() => GetAllSlotFeatureCategoryMetaInfoPerDay, value => GetAllSlotFeatureCategoryMetaInfoPerDay = value);
+        public void IncrementGetSlotFeatureCategoryByIdPerDay() => IncrementHistory(() => GetSlotFeatureCategoryByIdPerDay, value => GetSlotFeatureCategoryByIdPerDay = value);
+        public void IncrementGetAllSlotFeatureCategoryPerDay() => IncrementHistory(() => GetAllSlotFeatureCategoryPerDay, value => GetAllSlotFeatureCategoryPerDay = value);
+        public void IncrementPostSlotFeatureCategoryPerDay() => IncrementHistory(() => PostSlotFeatureCategoryPerDay, value => PostSlotFeatureCategoryPerDay = value);
+        public void IncrementPutSlotFeatureCategoryByIdPerDay() => IncrementHistory(() => PutSlotFeatureCategoryByIdPerDay, value => PutSlotFeatureCategoryByIdPerDay = value);
+        public void IncrementDeleteSlotFeatureCategoryByIdPerDay() => IncrementHistory(() => DeleteSlotFeatureCategoryByIdPerDay, value => DeleteSlotFeatureCategoryByIdPerDay = value);
+
+        public void IncrementGetClusterUsageStatisticsPerDay() => IncrementHistory(() => GetClusterUsageStatisticsPerDay, value => GetClusterUsageStatisticsPerDay = value);
+
+        private void IncrementHistory(Func<History?> getHistory, Action<History> setHistory)
+        {
+            lock (lock_)
+            {
+                History? history = getHistory();
+                if (history == null)
+                {
+                    history = new History();
+                    setHistory(history);
+                }
+
+                history.Increment();
+                ManageBackup();
+            }
+        }
+
         private void ManageBackup()
         {
             if (DateTime.UtcNow > LastSaved + BackUpInterval)
@@ -260,8 +384,9 @@ namespace NORCE.Drilling.Cluster.Model
                 try
                 {
                     string jsonStr = JsonSerializer.Serialize(this);
-                    if (!string.IsNullOrEmpty(jsonStr) && Directory.Exists(HOME_DIRECTORY))
+                    if (!string.IsNullOrEmpty(jsonStr))
                     {
+                        Directory.CreateDirectory(HOME_DIRECTORY);
                         using (StreamWriter writer = new StreamWriter(HOME_DIRECTORY + "history.json"))
                         {
                             writer.Write(jsonStr);
@@ -269,7 +394,7 @@ namespace NORCE.Drilling.Cluster.Model
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                 }
             }

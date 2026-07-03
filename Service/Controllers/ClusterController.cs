@@ -66,7 +66,7 @@ namespace NORCE.Drilling.Cluster.Service.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns>the Cluster identified by its Guid from the microservice database, at endpoint Cluster/api/Cluster/MetaInfo/id</returns>
-        [HttpGet("{id}", Name = "GetClusterById")]
+        [HttpGet("{id:guid}", Name = "GetClusterById")]
         public ActionResult<Model.Cluster?> GetClusterById(Guid id)
         {
             UsageStatisticsCluster.Instance.IncrementGetClusterByIdPerDay();
@@ -98,6 +98,25 @@ namespace NORCE.Drilling.Cluster.Service.Controllers
         {
             UsageStatisticsCluster.Instance.IncrementGetAllClusterPerDay();
             var vals = _clusterManager.GetAllCluster();
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of all ClusterLight present in the microservice database, at endpoint Cluster/api/Cluster/LightData
+        /// </summary>
+        /// <returns>the list of all ClusterLight present in the microservice database, at endpoint Cluster/api/Cluster/LightData</returns>
+        [HttpGet("LightData", Name = "GetAllClusterLight")]
+        public ActionResult<IEnumerable<Model.ClusterLight>> GetAllClusterLight()
+        {
+            UsageStatisticsCluster.Instance.IncrementGetAllClusterLightPerDay();
+            var vals = _clusterManager.GetAllClusterLight();
             if (vals != null)
             {
                 return Ok(vals);
@@ -225,7 +244,7 @@ namespace NORCE.Drilling.Cluster.Service.Controllers
         /// </summary>
         /// <param name="cluster"></param>
         /// <returns>true if the given Cluster has been updated successfully to the microservice database, at the endpoint Cluster/api/Cluster/id</returns>
-        [HttpPut("{id}", Name = "PutClusterById")]
+        [HttpPut("{id:guid}", Name = "PutClusterById")]
         public ActionResult PutClusterById(Guid id, [FromBody] Model.Cluster? data)
         {
             UsageStatisticsCluster.Instance.IncrementPutClusterByIdPerDay();
@@ -262,7 +281,7 @@ namespace NORCE.Drilling.Cluster.Service.Controllers
         /// </summary>
         /// <param name="guid"></param>
         /// <returns>true if the Cluster was deleted from the microservice database, at the endpoint Cluster/api/Cluster/id</returns>
-        [HttpDelete("{id}", Name = "DeleteClusterById")]
+        [HttpDelete("{id:guid}", Name = "DeleteClusterById")]
         public ActionResult DeleteClusterById(Guid id)
         {
             UsageStatisticsCluster.Instance.IncrementDeleteClusterByIdPerDay();

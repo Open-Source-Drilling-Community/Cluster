@@ -1,144 +1,217 @@
 @implements IUnitAwareComponent
 @inject ILogger<ClusterEdit> logger
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @inject IClusterAPIUtils Api
+@inject IJSRuntime JSRuntime
+@using System.Net.Http.Json
+@using MathPoint3DGlobalCoordinates = OSDC.DotnetLibraries.General.Math.Point3DGlobalCoordinates
+@using DtoPoint3DGlobalCoordinates = NORCE.Drilling.Cluster.ModelShared.Point3DGlobalCoordinates
 
-<MudText Class="mt-4 mb-4" Typo="Typo.h6">Edit Cluster</MudText>
-<MudContainer Class="d-flex flex-row mt-4 mb-4">
-    <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="Update">Update</MudButton>
-    <MudButton Class="me-1" Variant="Variant.Filled" OnClick="Cancel">Cancel</MudButton>
-</MudContainer>
+<MudUnitAndReferenceChoiceTag HttpHost="@Api.HostNameUnitConversion"
+                              HttpBasePath="@Api.HostBasePathUnitConversion"
+                              HttpController="UnitSystem/"
+                              UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
+                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
+                              DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
+                              DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
+                              GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
+                              MeanSeaLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource"
+                              PositionReferenceName="@DataUtils.UnitAndReferenceParameters.PositionReferenceName"
+                              PositionReferenceNameChanged="@DataUtils.UpdatePositionReferenceName"
+                              GeodeticReferenceName="@DataUtils.UnitAndReferenceParameters.GeodeticReferenceName"
+                              GeodeticReferenceNameChanged="@DataUtils.UpdateGeodeticReferenceName"
+                              FieldPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.FieldPositionReferenceSource"
+                              ClusterPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.ClusterPositionReferenceSource"
+                              CartographicGridPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.CartographicGridPositionReferenceSource"
+                              CartographicProjectionDatumGeodeticReferenceSource="@DataUtils.UnitAndReferenceParameters.CartographicProjectionDatumGeodeticReferenceSource">
+    <MudText Class="mt-4 mb-4" Typo="Typo.h6">Edit Cluster</MudText>
+    <MudContainer Class="d-flex flex-row mt-4 mb-4">
+    <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save</MudButton>
+    <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Error" OnClick="CloseEditorAsync">Close</MudButton>
+    <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Primary" OnClick="ExportClusterAsync">Export</MudButton>
+    <label class="mud-button-root mud-button mud-button-filled mud-button-filled-primary mud-button-filled-size-medium">
+        Import
+        <InputFile OnChange="ImportClusterAsync" style="display:none" />
+    </label>
+    </MudContainer>
 
-<MudExpansionPanels Class="mt-4 mb-4">
+    <MudExpansionPanels Class="mt-4 mb-4">
     <MudExpansionPanel Text="Description" Expanded="true">
-        <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
-            <MudTextField @bind-Value="@_name" Label="Name" Variant="Variant.Filled"></MudTextField>
-            <MudTextField @bind-Value="@_descr" Label="Description" Variant="Variant.Filled"></MudTextField>
-        </MudContainer>
-        @if (Fields != null && Fields.Count > 0)
-        {
-            <MudSelect @bind-Value="@_field" Label="Field" Variant="Variant.Filled" ToStringFunc="@(s => s?.Name)">
-                @foreach (var f in Fields)
-                {
-                    <MudSelectItem Value="@f">@f.Name</MudSelectItem>
-                }
-            </MudSelect>
-        }
-        <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
-            <MudSwitch T="bool" @bind-Value="IsFixedPlatform" Label="Fixed Platform" Color="Color.Primary" />
+        <MudGrid>
+            <MudItem xs="12" md="3">
+                <MudTextField @bind-Value="@_name" Label="Name" Required="true" ShrinkLabel />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="@_descr" Label="Description" ShrinkLabel />
+            </MudItem>
+            @if (Fields != null && Fields.Count > 0)
+            {
+                <MudItem xs="12" md="3">
+                    <MudSelect T="FieldLight" Value="@_field" ValueChanged="@SetField" Label="Field" ShrinkLabel ToStringFunc="@(s => s?.Name)">
+                        @foreach (var f in Fields)
+                        {
+                            <MudSelectItem T="FieldLight" Value="@f">@f.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            <MudItem xs="12" md="3">
+                <MudSwitch T="bool" @bind-Value="IsFixedPlatform" Label="Fixed Platform" Color="Color.Primary" />
+            </MudItem>
             @if (IsFixedPlatform)
             {
                 @if (_rigs == null || !_rigs.Any())
                 {
-                    <MudText Color="Color.Warning">No rigs loaded. Check configuration or click Reload.</MudText>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadRigs">Reload rigs</MudButton>
+                    <MudItem xs="12" md="6">
+                        <MudText Color="Color.Warning">No rigs loaded. Check configuration or click Reload.</MudText>
+                    </MudItem>
+                    <MudItem xs="12" md="3">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadRigs">Reload rigs</MudButton>
+                    </MudItem>
                 }
                 else
                 {
-                    <MudSelect T="RigLight" @bind-Value="_rig" Label="Rig" Variant="Variant.Filled" ToStringFunc="@(r => GetRigName(r))">
-                        @foreach (var rig in _rigs)
-                        {
-                            @if (rig is not null && rig.MetaInfo is not null && !string.IsNullOrEmpty(rig.Name))
+                    <MudItem xs="12" md="3">
+                        <MudSelect T="RigLight" @bind-Value="_rig" Label="Rig" ShrinkLabel ToStringFunc="@(r => GetRigName(r))">
+                            @foreach (var rig in _rigs)
                             {
-                                <MudSelectItem Value="rig">@rig.Name</MudSelectItem>
+                                @if (rig is not null && rig.MetaInfo is not null && !string.IsNullOrEmpty(rig.Name))
+                                {
+                                    <MudSelectItem Value="rig">@rig.Name</MudSelectItem>
+                                }
                             }
-                        }
-                    </MudSelect>
+                        </MudSelect>
+                    </MudItem>
                 }
             }
-        </MudContainer>
+        </MudGrid>
     </MudExpansionPanel>
     <MudExpansionPanel Text="Reference">
-        <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
-            <MudGrid>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputAngleWithUnitAdornment QuantityLabel="Ref. Latitude (WGS84)"
-                                                    SIValueNullable="referenceLatitudeWGS84"
-                                                    SIValueNullableChanged="@ChangeReferenceLatitudeWGS84" />
+        <MudGrid>
+            <MudItem xs="12" md="3">
+                <MudInputWithUnitAdornment QuantityName="PositionDrilling"
+                                           QuantityLabel="Reference North"
+                                           DrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                           PositionDirection="@PositionDirectionType.North"
+                                           SIValueNullable="@_referencePoint.RiemannianNorth"
+                                           SIValueNullableChanged="@SetReferenceNorth"
+                                           Immediate="true" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudInputWithUnitAdornment QuantityName="PositionDrilling"
+                                           QuantityLabel="Reference East"
+                                           DrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                           PositionDirection="@PositionDirectionType.East"
+                                           SIValueNullable="@_referencePoint.RiemannianEast"
+                                           SIValueNullableChanged="@SetReferenceEast"
+                                           Immediate="true" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
+                                           QuantityLabel="Reference Latitude"
+                                           DrillingSignalReference="@DrillingSignalReferenceType.Geodetic"
+                                           PositionDirection="@PositionDirectionType.North"
+                                           SIValueNullable="@_referencePoint.Latitude"
+                                           SIValueNullableChanged="@SetReferenceLatitude"
+                                           Immediate="true" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
+                                           QuantityLabel="Reference Longitude"
+                                           DrillingSignalReference="@DrillingSignalReferenceType.Geodetic"
+                                           PositionDirection="@PositionDirectionType.East"
+                                           SIValueNullable="@_referencePoint.Longitude"
+                                           SIValueNullableChanged="@SetReferenceLongitude"
+                                           Immediate="true" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                           QuantityLabel="Reference Depth"
+                                           DrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                           SIValueNullable="@_referencePoint.TVD"
+                                           SIValueNullableChanged="@SetReferenceDepth"
+                                           Immediate="true" />
+            </MudItem>
+        </MudGrid>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Identities">
+        @if (_clusterIdentities.Count > 0)
+        {
+            <MudGrid Class="mt-2">
+                <MudItem xs="12" md="5">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Available</MudText>
+                    @foreach (ClusterIdentity identity in _clusterIdentities)
+                    {
+                        <MudButton Class="me-1 mb-1" Variant="@GetIdentityButtonVariant(identity)" Color="@GetIdentityButtonColor(identity)" Size="Size.Small" Disabled="@IsIdentityAssigned(identity)" OnClick="@(() => SelectClusterIdentity(identity))">
+                            @GetIdentityDisplayName(identity)
+                        </MudButton>
+                    }
                 </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
-                                               QuantityLabel="Ref. Latitude (WGS84)"
-                                               SIValueNullable="referenceLatitudeWGS84"
-                                               SIValueNullableChanged="@ChangeReferenceLatitudeWGS84" />
+                <MudItem xs="12" md="2" Class="d-flex flex-column justify-center">
+                    <MudButton Class="mb-2" Variant="Variant.Filled" Color="Color.Success" Disabled="@(!CanAssignSelectedIdentity())" OnClick="AssignSelectedIdentity">Assign</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(!_selectedIdentityAssignmentId.HasValue)" OnClick="UnassignSelectedIdentity">Unassign</MudButton>
                 </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputAngleWithUnitAdornment QuantityLabel="Ref. Latitude (Datum)"
-                                                    SIValueNullable="referenceLatitudeDatum"
-                                                    SIValueNullableChanged="@ChangeReferenceLatitudeDatum" />
-                </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
-                                               QuantityLabel="Ref. Latitude (Datum)"
-                                               SIValueNullable="referenceLatitudeDatum"
-                                               SIValueNullableChanged="@ChangeReferenceLatitudeDatum" />
-                </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputWithUnitAdornment QuantityName="PositionDrilling"
-                                               QuantityLabel="Ref. Northing (Carto)"
-                                               SIValueNullable="referenceNorthing"
-                                               SIValueNullableChanged="@ChangeReferenceNorthing" />
-                </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
-                                               QuantityLabel="Ref. Northing Accuracy"
-                                               SIValueNullable="referenceNorthingAccuracy"
-                                               SIValueNullableChanged="@(val => referenceNorthingAccuracy = val)" />
-                </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputAngleWithUnitAdornment QuantityLabel="Ref. Longitude (WGS84)"
-                                                    SIValueNullable="referenceLongitudeWGS84"
-                                                    SIValueNullableChanged="@ChangeReferenceLongitudeWGS84" />
-                </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
-                                               QuantityLabel="Ref. Longitude (WGS84)"
-                                               SIValueNullable="referenceLongitudeWGS84"
-                                               SIValueNullableChanged="@ChangeReferenceLongitudeWGS84" />
-                </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputAngleWithUnitAdornment QuantityLabel="Ref. Longitude (Datum)"
-                                                    SIValueNullable="referenceLongitudeDatum"
-                                                    SIValueNullableChanged="@ChangeReferenceLongitudeDatum" />
-                </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputWithUnitAdornment QuantityName="PlaneAngleGeodesic"
-                                               QuantityLabel="Ref. Longitude (Datum)"
-                                               SIValueNullable="referenceLongitudeDatum"
-                                               SIValueNullableChanged="@ChangeReferenceLongitudeDatum" />
-                </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputWithUnitAdornment QuantityName="PositionDrilling"
-                                               QuantityLabel="Ref. Easting (Carto)"
-                                               SIValueNullable="referenceEasting"
-                                               SIValueNullableChanged="@ChangeReferenceEasting" />
-                </MudItem>
-                <MudItem xs="12" sm="2" md="2" lg="2">
-                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
-                                               QuantityLabel="Ref. Easting Accuracy"
-                                               SIValueNullable="referenceEastingAccuracy"
-                                               SIValueNullableChanged="@(val => referenceEastingAccuracy = val)" />
-                </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
-                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Ref. Depth (WGS84)"
-                                               SIValueNullable="referenceDepthWGS84"
-                                               SIValueNullableChanged="@ChangeReferenceDepthWGS84" />
-                </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
-                    <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                               QuantityLabel="Ref. Depth (Datum)"
-                                               SIValueNullable="referenceDepthDatum"
-                                               SIValueNullableChanged="@ChangeReferenceDepthDatum" />
-                </MudItem>
-                <MudItem xs="12" sm="4" md="4" lg="4">
-                    <MudInputWithUnitAdornment QuantityName="LengthSmall"
-                                               QuantityLabel="Ref. Depth Accuracy"
-                                               SIValueNullable="referenceDepthAccuracy"
-                                               SIValueNullableChanged="@(val => referenceDepthAccuracy = val)" />
+                <MudItem xs="12" md="5">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Selected</MudText>
+                    <MudDataGrid T="ClusterIdentityAssignment" Items="@_clusterIdentityAssignments" SelectedItem="@_selectedIdentityAssignment" SelectedItemChanged="SetSelectedIdentityAssignment" Hover="true" Dense="true" Elevation="0">
+                        <Columns>
+                            <PropertyColumn Property="x => GetIdentityAssignmentDisplayName(x)" Title="Name" Editable="false" />
+                            <TemplateColumn Title="Value">
+                                <CellTemplate>
+                                    <MudTextField @bind-Value="context.Item.Value" Required="true" />
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
                 </MudItem>
             </MudGrid>
-        </MudContainer>
+        }
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Features">
+        @if (_clusterFeatureCategories.Count > 0)
+        {
+            <MudGrid Class="mt-2">
+                <MudItem xs="12" md="5">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Available</MudText>
+                    <MudExpansionPanels MultiExpansion="true">
+                        @foreach (ClusterFeatureCategory category in _clusterFeatureCategories)
+                        {
+                            <MudExpansionPanel Text="@GetCategoryDisplayName(category)">
+                                @foreach (ClusterFeatureOption option in category.Options ?? [])
+                                {
+                                    <MudButton Class="me-1 mb-1" Variant="@GetOptionButtonVariant(category, option)" Color="@GetOptionButtonColor(category, option)" Size="Size.Small" Disabled="@IsOptionUnavailable(category)" OnClick="@(() => SelectFeatureOption(category, option))">
+                                        @option.Name
+                                    </MudButton>
+                                }
+                            </MudExpansionPanel>
+                        }
+                    </MudExpansionPanels>
+                </MudItem>
+                <MudItem xs="12" md="2" Class="d-flex flex-column justify-center">
+                    <MudButton Class="mb-2" Variant="Variant.Filled" Color="Color.Success" Disabled="@(!CanAssignSelectedOption())" OnClick="AssignSelectedOption">Assign</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(!_selectedFeatureAssignmentId.HasValue)" OnClick="UnassignSelectedFeature">Unassign</MudButton>
+                </MudItem>
+                <MudItem xs="12" md="5">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Selected</MudText>
+                    <MudDataGrid T="ClusterFeatureAssignment" Items="@_clusterFeatureAssignments" SelectedItem="@_selectedFeatureAssignment" SelectedItemChanged="SetSelectedFeatureAssignment" Hover="true" Dense="true" Elevation="0">
+                        <Columns>
+                            <PropertyColumn Property="x => GetAssignmentDisplayName(x)" Title="Name" Editable="false" />
+                            <TemplateColumn Title="From">
+                                <CellTemplate>
+                                    <MudDatePicker Date="@ToDateTime(context.Item.FromDate)" DateChanged="@((DateTime? value) => SetAssignmentFromDate(context.Item, value))" Clearable="true" Disabled="@(!CategoryHasValidityPeriod(context.Item))" />
+                                </CellTemplate>
+                            </TemplateColumn>
+                            <TemplateColumn Title="To">
+                                <CellTemplate>
+                                    <MudDatePicker Date="@ToDateTime(context.Item.ToDate)" DateChanged="@((DateTime? value) => SetAssignmentToDate(context.Item, value))" Clearable="true" Disabled="@(!CategoryHasValidityPeriod(context.Item))" />
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
+                </MudItem>
+            </MudGrid>
+        }
     </MudExpansionPanel>
     <MudExpansionPanel Text="Environment Description">
         <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
@@ -178,34 +251,23 @@
     <MudExpansionPanel Text="Slots">
         <MudContainer Class="d-flex flex-column" style="max-width: 1000px; width: 100%;">
             <MudGrid>
-                <MudItem xs="12" sm="1" md="1" lg="1">
+                <MudItem xs="12" sm="2" md="2" lg="2">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddSlot" Class="mt-2">
                         Add Slot
                     </MudButton>
                 </MudItem>
-                <MudItem xs="12" sm="3" md="3" lg="3">
-                    <MudRadioGroup T="string" @bind-Value="SlotTableColumnChoice" Class="mt-2">
-                        <MudRadio Value="@_geodeticWGS84">@_geodeticWGS84</MudRadio>
-                        <MudRadio Value="@_geodeticDatum">@_geodeticDatum</MudRadio>
-                        <MudRadio Value="@_cartographic">@_cartographic</MudRadio>
-                    </MudRadioGroup>
-                </MudItem>
                 <MudItem xs="12" sm="2" md="2" lg="2">
-                    @if (_slotTableColumnChoice == _geodeticWGS84 || _slotTableColumnChoice == _geodeticDatum)
-                    {
-                        <MudRadioGroup T="string" @bind-Value="SlotTableAngleChoice" Class="mt-2">
-                            <MudRadio Value="@_decimal">@_decimal</MudRadio>
-                            <MudRadio Value="@_sexagesimal">@_sexagesimal</MudRadio>
-                        </MudRadioGroup>
-                    }
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="RemoveSelectedSlots" Disabled="@(!_slots.Any(slot => slot.IsSelected))" Class="mt-2">
+                        Delete Selected
+                    </MudButton>
                 </MudItem>
-                <MudItem xs="12" sm="3" md="3" lg="3">
+                <MudItem xs="12" sm="4" md="4" lg="4">
                     <MudInputWithUnitAdornment QuantityName="LengthSmall"
                                                QuantityLabel="Northing Accuracy"
                                                SIValueNullable="slotNorthingAccuracy"
                                                SIValueNullableChanged="@(val => slotNorthingAccuracy = val)" />
                 </MudItem>
-                <MudItem xs="12" sm="3" md="3" lg="3">
+                <MudItem xs="12" sm="4" md="4" lg="4">
                     <MudInputWithUnitAdornment QuantityName="LengthSmall"
                                                QuantityLabel="Easting Accuracy"
                                                SIValueNullable="slotEastingAccuracy"
@@ -214,154 +276,74 @@
             </MudGrid>
             <MudTable Items="_slots" Hover="true" Dense="true" Bordered="true">
                 <HeaderContent>
+                    <MudTh>
+                        <MudCheckBox T="bool" Value="@AreAllSlotsSelected" ValueChanged="@SetAllSlotsSelected" Dense="true" />
+                    </MudTh>
                     <MudTh>Name</MudTh>
-                    @if (_geodeticWGS84ColumnVisible)
-                    {
-                        if (_decimalAngleVisible)
-                        {
-                            <MudTh>
-                                <MudText>Latitude (WGS84)</MudText>
-                                <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
-                            </MudTh>
-                            <MudTh>
-                                <MudText>Longitude (WGS84)</MudText>
-                                <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
-                            </MudTh>
-                        }
-                        else
-                        {
-                            <MudTh>
-                                <MudText>Latitude (WGS84)</MudText>
-                            </MudTh>
-                            <MudTh>
-                                <MudText>Longitude (WGS84)</MudText>
-                            </MudTh>
-                        }
-                    }
-                    @if (_geodeticDatumColumnVisible)
-                    {
-                        if (_decimalAngleVisible)
-                        {
-                            <MudTh>
-                                <MudText>Latitude (Datum)</MudText>
-                                <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
-                            </MudTh>
-                            <MudTh>
-                                <MudText>Longitude (Datum)</MudText>
-                                <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text" />
-                            </MudTh>
-                        }
-                        else
-                        {
-                            <MudTh>
-                                <MudText>Latitude (Datum)</MudText>
-                            </MudTh>
-                            <MudTh>
-                                <MudText>Longitude (Datum)</MudText>
-                            </MudTh>
-                        }
-                    }
-                    @if (_cartographicColumnVisible)
-                    {
-                        <MudTh>
-                            <MudText>Northing</MudText>
-                            <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text"
-                                              DrillingSignalReference="@DrillingSignalReferenceType.Position" />
-                        </MudTh>
-                        <MudTh>
-                            <MudText>Easting</MudText>
-                            <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text"
-                                              DrillingSignalReference="@DrillingSignalReferenceType.Position" />
-                        </MudTh>
-                    }
+                    <MudTh>
+                        <MudText>North</MudText>
+                        <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text"
+                                          DrillingSignalReference="@DrillingSignalReferenceType.Position" />
+                    </MudTh>
+                    <MudTh>
+                        <MudText>East</MudText>
+                        <MudSpanUnitLabel QuantityName="PositionDrilling" VariantType="Variant.Text"
+                                          DrillingSignalReference="@DrillingSignalReferenceType.Position" />
+                    </MudTh>
+                    <MudTh>
+                        <MudText>Latitude</MudText>
+                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text"
+                                          DrillingSignalReference="@DrillingSignalReferenceType.Geodetic" />
+                    </MudTh>
+                    <MudTh>
+                        <MudText>Longitude</MudText>
+                        <MudSpanUnitLabel QuantityName="PlaneAngleGeodesic" VariantType="Variant.Text"
+                                          DrillingSignalReference="@DrillingSignalReferenceType.Geodetic" />
+                    </MudTh>
+                    <MudTh>Features</MudTh>
                     <MudTh></MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>
+                        <MudCheckBox T="bool" Value="@context.IsSelected" ValueChanged="@((bool selected) => SetSlotSelected(context, selected))" Dense="true" />
+                    </MudTd>
+                    <MudTd>
                         <MudTextField @bind-Value="@context.Name"
                                       Variant="Variant.Text"
-                                      Style="width:40px"
+                                      Style="min-width:90px"
                                       Immediate="true" />
                     </MudTd>
-                    @if (_geodeticWGS84ColumnVisible)
-                    {
-                        if (_decimalAngleVisible)
-                        {
-                            <MudTd>
-                                <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
-                                                  SIValueNullable="@context.LatitudeWGS84"
-                                                  SIValueNullableChanged="@(val => UpdateSlotLatitudeWGS84(val, context))" />
-                            </MudTd>
-                            <MudTd>
-                                <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
-                                                  SIValueNullable="@context.LongitudeWGS84"
-                                                  SIValueNullableChanged="@(val => UpdateSlotLongitudeWGS84(val, context))" />
-
-                            </MudTd>
-                        }
-                        else
-                        {
-                            <MudTd>
-                                <MudInputAngleWithUnit SIValueNullable="@context.LatitudeWGS84"
-                                                       SIValueNullableChanged="@(val => UpdateSlotLatitudeWGS84(val, context))" />
-                            </MudTd>
-                            <MudTd>
-                                <MudInputAngleWithUnit SIValueNullable="@context.LongitudeWGS84"
-                                                       SIValueNullableChanged="@(val => UpdateSlotLongitudeWGS84(val, context))" />
-
-                            </MudTd>
-                        }
-                    }
-                    @if (_geodeticDatumColumnVisible)
-                    {
-                        if (_decimalAngleVisible)
-                        {
-                            <MudTd>
-                                <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
-                                                  SIValueNullable="@context.LatitudeDatum"
-                                                  SIValueNullableChanged="@(val => UpdateSlotLatitudeDatum(val, context))" />
-
-                            </MudTd>
-                            <MudTd>
-                                <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
-                                                  SIValueNullable="@context.LongitudeDatum"
-                                                  SIValueNullableChanged="@(val => UpdateSlotLongitudeDatum(val, context))" />
-
-                            </MudTd>
-                        }
-                        else
-                        {
-                            <MudTd>
-                                <MudInputAngleWithUnit SIValueNullable="@context.LatitudeDatum"
-                                                       SIValueNullableChanged="@(val => UpdateSlotLatitudeDatum(val, context))" />
-
-                            </MudTd>
-                            <MudTd>
-                                <MudInputAngleWithUnit SIValueNullable="@context.LongitudeDatum"
-                                                       SIValueNullableChanged="@(val => UpdateSlotLongitudeDatum(val, context))" />
-
-                            </MudTd>
-                        }
-                    }
-                    @if (_cartographicColumnVisible)
-                    {
-                        <MudTd>
-                            <MudInputWithUnit QuantityName="PositionDrilling"
-                                              DrillingSignalReference="@DrillingSignalReferenceType.Position"
-                                              PositionDirection="@PositionDirectionType.North"
-                                              SIValueNullable="@context.Northing"
-                                              SIValueNullableChanged="@(val => UpdateSlotNorthing(val, context))" />
-
-                        </MudTd>
-                        <MudTd>
-                            <MudInputWithUnit QuantityName="PositionDrilling"
-                                              DrillingSignalReference="@DrillingSignalReferenceType.Position"
-                                              PositionDirection="@PositionDirectionType.East"
-                                              SIValueNullable="@context.Easting"
-                                              SIValueNullableChanged="@(val => UpdateSlotEasting(val, context))" />
-
-                        </MudTd>
-                    }
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PositionDrilling"
+                                          DrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                          PositionDirection="@PositionDirectionType.North"
+                                          SIValueNullable="@context.Northing"
+                                          SIValueNullableChanged="@(val => UpdateSlotNorthing(val, context))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PositionDrilling"
+                                          DrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                          PositionDirection="@PositionDirectionType.East"
+                                          SIValueNullable="@context.Easting"
+                                          SIValueNullableChanged="@(val => UpdateSlotEasting(val, context))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                          DrillingSignalReference="@DrillingSignalReferenceType.Geodetic"
+                                          PositionDirection="@PositionDirectionType.North"
+                                          SIValueNullable="@context.LatitudeWGS84"
+                                          SIValueNullableChanged="@(val => UpdateSlotLatitudeWGS84(val, context))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudInputWithUnit QuantityName="PlaneAngleGeodesic"
+                                          DrillingSignalReference="@DrillingSignalReferenceType.Geodetic"
+                                          PositionDirection="@PositionDirectionType.East"
+                                          SIValueNullable="@context.LongitudeWGS84"
+                                          SIValueNullableChanged="@(val => UpdateSlotLongitudeWGS84(val, context))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudText Typo="Typo.body2" Style="min-width:140px">@GetSlotFeatureSummary(context)</MudText>
+                    </MudTd>
                     <MudTd>
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                        Color="Color.Error"
@@ -370,6 +352,55 @@
                     </MudTd>
                 </RowTemplate>
             </MudTable>
+            @if (_slots.Count > 0 && _slotFeatureCategories.Count > 0)
+            {
+                <MudDivider Class="my-4" />
+                <MudText Typo="Typo.subtitle2" Class="mb-2">Slot Features</MudText>
+                @if (SelectedSlotsForFeatureEditing.Count > 0)
+                {
+                    <MudText Typo="Typo.caption" Class="mb-2">Selected slots: @SelectedSlotsForFeatureEditing.Count</MudText>
+                    <MudGrid Class="mt-2">
+                        <MudItem xs="12" md="5">
+                            <MudText Typo="Typo.subtitle2" Class="mb-2">Available</MudText>
+                            <MudExpansionPanels MultiExpansion="true">
+                                @foreach (SlotFeatureCategory category in _slotFeatureCategories)
+                                {
+                                    <MudExpansionPanel Text="@GetSlotFeatureCategoryDisplayName(category)">
+                                        @foreach (SlotFeatureOption option in category.Options ?? [])
+                                        {
+                                            <MudButton Class="me-1 mb-1" Variant="@GetSlotFeatureOptionButtonVariant(category, option)" Color="@GetSlotFeatureOptionButtonColor(category, option)" Size="Size.Small" Disabled="@IsSlotFeatureOptionUnavailable(category)" OnClick="@(() => SelectSlotFeatureOption(category, option))">
+                                                @option.Name
+                                            </MudButton>
+                                        }
+                                    </MudExpansionPanel>
+                                }
+                            </MudExpansionPanels>
+                        </MudItem>
+                        <MudItem xs="12" md="2" Class="d-flex flex-column justify-center">
+                            <MudButton Class="mb-2" Variant="Variant.Filled" Color="Color.Success" Disabled="@(!CanAssignSelectedSlotFeatureOption())" OnClick="AssignSelectedSlotFeatureOption">Assign</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(!_selectedSlotFeatureAssignmentId.HasValue)" OnClick="UnassignSelectedSlotFeature">Unassign</MudButton>
+                        </MudItem>
+                        <MudItem xs="12" md="5">
+                            <MudText Typo="Typo.subtitle2" Class="mb-2">Selected</MudText>
+                            <MudDataGrid T="SlotFeatureAssignment" Items="@SelectedSlotForFeatureEditing!.SlotFeatureAssignments" SelectedItem="@_selectedSlotFeatureAssignment" SelectedItemChanged="SetSelectedSlotFeatureAssignment" Hover="true" Dense="true" Elevation="0">
+                                <Columns>
+                                    <PropertyColumn Property="x => GetSlotFeatureAssignmentDisplayName(x)" Title="Name" Editable="false" />
+                                    <TemplateColumn Title="From">
+                                        <CellTemplate>
+                                            <MudDatePicker Date="@ToDateTime(context.Item.FromDate)" DateChanged="@((DateTime? value) => SetSlotFeatureAssignmentFromDate(context.Item, value))" Clearable="true" Disabled="@(!SlotFeatureCategoryHasValidityPeriod(context.Item))" />
+                                        </CellTemplate>
+                                    </TemplateColumn>
+                                    <TemplateColumn Title="To">
+                                        <CellTemplate>
+                                            <MudDatePicker Date="@ToDateTime(context.Item.ToDate)" DateChanged="@((DateTime? value) => SetSlotFeatureAssignmentToDate(context.Item, value))" Clearable="true" Disabled="@(!SlotFeatureCategoryHasValidityPeriod(context.Item))" />
+                                        </CellTemplate>
+                                    </TemplateColumn>
+                                </Columns>
+                            </MudDataGrid>
+                        </MudItem>
+                    </MudGrid>
+                }
+            }
         </MudContainer>
     </MudExpansionPanel>
     <MudExpansionPanel Text="Cluster Display">
@@ -402,16 +433,14 @@
             </MudItem>
         </MudGrid>
     </MudExpansionPanel>
-</MudExpansionPanels>
+    </MudExpansionPanels>
+</MudUnitAndReferenceChoiceTag>
 @code {
-    [CascadingParameter]
-    private MudUnitAndReferenceChoiceTag? Parent { get; set; }
-
     [Parameter]
     public Cluster? CurrentCluster { get; set; }
 
     [Parameter]
-    public List<Field>? Fields { get; set; }
+    public List<FieldLight>? Fields { get; set; }
 
     [Parameter]
     public List<Slot?>? AvailableSlotList { get; set; }
@@ -419,29 +448,19 @@
     [Parameter]
     public Action? OnUpdate { get; set; }
 
-    [Parameter]
-    public CartographicReference? CartographicReference { get; set; }
-
-    [Parameter]
-    public ClusterReference? ClusterReference { get; set; }
-
     // Local variables used to retrieve user-defined parameters
     private string? _name;
     private string? _descr;
-    private Field? _field;
-    private double? referenceLatitudeWGS84 = null;
-    private double? referenceLongitudeWGS84 = null;
+    private FieldLight? _field;
+    private MathPoint3DGlobalCoordinates _referencePoint = new();
+    private double? referenceLatitudeWGS84 { get => _referencePoint.Latitude; set => _referencePoint.Latitude = value; }
+    private double? referenceLongitudeWGS84 { get => _referencePoint.Longitude; set => _referencePoint.Longitude = value; }
     private double? referenceLatitudeDatum = null;
     private double? referenceLongitudeDatum = null;
-    private double? _referenceNorthing = null;
-    private double? _referenceEasting = null;
-    private double? referenceNorthing { get { return _referenceNorthing; } set { _referenceNorthing = value; ManageReferenceNorthingEasting(); } }
-    private double? referenceEasting { get { return _referenceEasting; } set { _referenceEasting = value; ManageReferenceNorthingEasting(); } }
-    private double? referenceNorthingAccuracy = null;
-    private double? referenceEastingAccuracy = null;
-    private double? referenceDepthWGS84 = null;
+    private double? referenceNorthing { get => _referencePoint.RiemannianNorth; set { _referencePoint.RiemannianNorth = value; ManageReferenceNorthingEasting(); } }
+    private double? referenceEasting { get => _referencePoint.RiemannianEast; set { _referencePoint.RiemannianEast = value; ManageReferenceNorthingEasting(); } }
+    private double? referenceDepthWGS84 { get => _referencePoint.TVD; set { _referencePoint.TVD = value; _referencePoint.Z = value; } }
     private double? referenceDepthDatum = null;
-    private double? referenceDepthAccuracy = null;
     private double? groundMudLineDepthWGS84 = null;
     private double? groundMudLineDepthAccuracy = null;
     private double? topWaterDepthWGS84 = null;
@@ -454,6 +473,9 @@
     private bool _isFixedPlatform = false;
     private bool _shouldLoadRigsAfterRender = false;
     private bool _disposed = false;
+    private string? cleanClusterSnapshot_;
+    private bool isRefreshingReferenceSources_;
+    private bool hasPendingReferenceSourceRefresh_;
 
     private bool IsFixedPlatform
     {
@@ -474,84 +496,56 @@
 
     private RigLight? _rig = null;
     private List<RigLight> _rigs = new List<RigLight>();
+    private List<ClusterIdentity> _clusterIdentities = new();
+    private List<ClusterIdentityAssignment> _clusterIdentityAssignments = new();
+    private Guid? _selectedIdentityId;
+    private Guid? _selectedIdentityAssignmentId;
+    private ClusterIdentityAssignment? _selectedIdentityAssignment;
+    private List<ClusterFeatureCategory> _clusterFeatureCategories = new();
+    private List<ClusterFeatureAssignment> _clusterFeatureAssignments = new();
+    private Guid? _selectedFeatureCategoryId;
+    private Guid? _selectedFeatureOptionId;
+    private Guid? _selectedFeatureAssignmentId;
+    private ClusterFeatureAssignment? _selectedFeatureAssignment;
+    private List<SlotFeatureCategory> _slotFeatureCategories = new();
+    private Guid? _selectedSlotFeatureCategoryId;
+    private Guid? _selectedSlotFeatureOptionId;
+    private Guid? _selectedSlotFeatureAssignmentId;
+    private SlotFeatureAssignment? _selectedSlotFeatureAssignment;
 
-    private bool _geodeticWGS84ColumnVisible = true;
-    private bool _geodeticDatumColumnVisible = false;
-    private bool _cartographicColumnVisible = false;
-    private bool _decimalAngleVisible = true;
-    private bool _sexagesimalAngleVisible = false;
-    private static readonly string _geodeticWGS84 = "Geodetic (WGS84)";
-    private static readonly string _geodeticDatum = "Geodetic (Datum)";
-    private static readonly string _cartographic = "Cartographic";
-    private static readonly string _decimal = "decimal";
-    private static readonly string _sexagesimal = "sexagesimal";
-    private string _slotTableColumnChoice = _geodeticWGS84;
-    private string _slotTableAngleChoice = _decimal;
-    private string SlotTableColumnChoice
+    private List<SlotTemplate> SelectedSlotsForFeatureEditing =>
+        _slots.Where(slot => slot.IsSelected).ToList();
+
+    private SlotTemplate? SelectedSlotForFeatureEditing =>
+        _slots.FirstOrDefault(slot => slot.IsSelected);
+
+    private bool AreAllSlotsSelected => _slots.Count > 0 && _slots.All(slot => slot.IsSelected);
+
+    private void SetAllSlotsSelected(bool selected)
     {
-        get { return _slotTableColumnChoice; }
-        set
+        foreach (SlotTemplate slot in _slots)
         {
-            _slotTableColumnChoice = value;
-            ManageSlotTableColumnChoice();
+            slot.IsSelected = selected;
         }
-    }
-    private string SlotTableAngleChoice
-    {
-        get { return _slotTableAngleChoice; }
-        set
-        {
-            _slotTableAngleChoice = value;
-            ManageSlotTableAngleChoice();
-        }
+        ResetSelectedSlotFeatureAssignment();
     }
 
-    private void ManageSlotTableColumnChoice()
+    private void SetSlotSelected(SlotTemplate slot, bool selected)
     {
-        _geodeticWGS84ColumnVisible = false;
-        _geodeticDatumColumnVisible = false;
-        _cartographicColumnVisible = false;
-        if (_geodeticWGS84.Equals(_slotTableColumnChoice))
-        {
-            _geodeticWGS84ColumnVisible = true;
-        }
-        else if (_geodeticDatum.Equals(_slotTableColumnChoice))
-        {
-            _geodeticDatumColumnVisible = true;
-        }
-        else
-        {
-            _cartographicColumnVisible = true;
-        }
-        InvokeAsync(() => { StateHasChanged(); }).Wait();
-    }
-    private void ManageSlotTableAngleChoice()
-    {
-        _decimalAngleVisible = false;
-        _sexagesimalAngleVisible = false;
-        if (_decimal.Equals(_slotTableAngleChoice))
-        {
-            _decimalAngleVisible = true;
-        }
-        else
-        {
-            _sexagesimalAngleVisible = true;
-        }
-        InvokeAsync(() => { StateHasChanged(); }).Wait();
+        slot.IsSelected = selected;
+        ResetSelectedSlotFeatureAssignment();
     }
 
     private void ManageReferenceNorthingEasting()
     {
-        if (ClusterReference != null && referenceNorthing != null && referenceEasting != null)
-        {
-            ClusterReference.ClusterNorthPositionReference = -referenceNorthing;
-            ClusterReference.ClusterEastPositionReference = -referenceEasting;
-        }
+        DataUtils.UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterNorthPositionReference = -referenceNorthing;
+        DataUtils.UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterEastPositionReference = -referenceEasting;
     }
 
     // Plot variables
     string[] colorScale = { "black", "blue", "grey", "red", "orange", "green", "yellow", "pink", "brown", "purple" };
-    ScatterPlot clusterPlot = new ScatterPlot();
+    private ScatterPlot? clusterPlot;
+    private bool _plotsReady;
     List<string> nameSlotList = new List<string>(); //name of each curve in the list to plot
     List<int> modeFlagSlotList = new List<int>(); //modeFlag of each curve in the list to plot (1 = lines; 2 = markers)
     List<string> colorSlotList = new List<string>(); //color of each curve in the list of curves to plot
@@ -560,7 +554,7 @@
     List<bool> showSlotLegends = new List<bool>(); // list of booleans to indicate if the legend must be shown for each curve
     List<bool> showSlotMarkers = new List<bool>(); // list of booleans to indicate if the marker must be shown or not
 
-    ScatterPlot depthPlot = new ScatterPlot();
+    private ScatterPlot? depthPlot;
     List<string> nameDepthList = new List<string>(); //name of each curve in the list to plot
     List<int> modeFlagDepthList = new List<int>(); //modeFlag of each curve in the list to plot (1 = lines; 2 = markers)
     List<string> colorDepthList = new List<string>(); //color of each curve in the list of curves to plot
@@ -577,13 +571,13 @@
     {
         try
         {
-            if (Parent == null)
-                throw new ArgumentNullException(nameof(Parent), "TargetEdit page must exist within a MudUnitAndReferenceChoiceTag");
-            Parent.Add(this);
             ManageUnits();
 
             // Load available rigs for fixed platform assignment
             await LoadRigs();
+            await LoadClusterIdentitiesAsync();
+            await LoadClusterFeatureCategoriesAsync();
+            await LoadSlotFeatureCategoriesAsync();
 
             if (CurrentCluster != null && CurrentCluster.MetaInfo != null)
             {
@@ -592,6 +586,8 @@
                 _field = Fields?.FirstOrDefault(f => f.MetaInfo != null && f.MetaInfo.ID == CurrentCluster.FieldID);
                 IsFixedPlatform = CurrentCluster.IsFixedPlatform;
                 _rig = null;
+                _clusterIdentityAssignments = CloneIdentityAssignments(CurrentCluster.ClusterIdentityAssignments);
+                _clusterFeatureAssignments = CloneFeatureAssignments(CurrentCluster.ClusterFeatureAssignments);
                 if (CurrentCluster.RigID is not null && _rigs is not null)
                 {
                     foreach (var rig in _rigs)
@@ -603,12 +599,7 @@
                         }
                     }
                 }
-                referenceLatitudeWGS84 = CurrentCluster.ReferenceLatitude?.GaussianValue?.Mean;
-                referenceLongitudeWGS84 = CurrentCluster.ReferenceLongitude?.GaussianValue?.Mean;
-                referenceDepthWGS84 = CurrentCluster.ReferenceDepth?.GaussianValue?.Mean;
-                referenceDepthAccuracy = CurrentCluster.ReferenceDepth?.GaussianValue?.StandardDeviation;
-                referenceNorthingAccuracy = CurrentCluster.ReferenceLatitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
-                referenceEastingAccuracy = CurrentCluster.ReferenceLongitude?.GaussianValue?.StandardDeviation * Api.EarthRadiusWGS84;
+                _referencePoint = CloneReferencePointForEditor(CurrentCluster.ReferencePoint);
                 groundMudLineDepthWGS84 = CurrentCluster.GroundMudLineDepth?.GaussianValue?.Mean;
                 groundMudLineDepthAccuracy = CurrentCluster.GroundMudLineDepth?.GaussianValue?.StandardDeviation;
                 topWaterDepthWGS84 = CurrentCluster.TopWaterDepth?.GaussianValue?.Mean;
@@ -624,6 +615,7 @@
                         SlotTemplate slotTemplate = new SlotTemplate();
                         slotTemplate.Name = slot.Name;
                         slotTemplate.ID = slot.ID;
+                        slotTemplate.SlotFeatureAssignments = CloneSlotFeatureAssignments(slot.SlotFeatureAssignments);
                         if (slot.Latitude != null && slot.Latitude.GaussianValue != null)
                         {
                             slotTemplate.LatitudeWGS84 = slot.Latitude.GaussianValue.Mean;
@@ -645,7 +637,6 @@
                         }
                         _slots.Add(slotTemplate);
                     }
-                    CalculateWGS84();
                     if (maxAccuracyNorthing > double.MinValue)
                     {
                         slotNorthingAccuracy = maxAccuracyNorthing * Api.EarthRadiusWGS84;
@@ -665,6 +656,8 @@
                     UpdateSlotPlot();
                     UpdateDepthPlot();
                 }
+                MarkClusterClean();
+                await RefreshReferenceSourcesAsync();
             }
             else
             {
@@ -695,6 +688,185 @@
 
     }
 
+    private Task SetField(FieldLight? field)
+    {
+        _field = field;
+        _ = RefreshReferenceSourcesAsync();
+        return Task.CompletedTask;
+    }
+
+    private async Task RefreshReferenceSourcesAsync()
+    {
+        if (isRefreshingReferenceSources_)
+        {
+            hasPendingReferenceSourceRefresh_ = true;
+            return;
+        }
+
+        try
+        {
+            isRefreshingReferenceSources_ = true;
+            Cluster cluster = BuildEditedCluster(CurrentCluster?.LastModificationDate);
+            DataUtils.ApplyClusterReferenceValues(cluster);
+            DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
+                await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, cluster);
+            UpdateDepthPlot();
+            ManageReferenceNorthingEasting();
+
+            ReferencePositionSample? fieldReference = await TryLoadFieldReferenceSampleAsync(_field?.MetaInfo?.ID);
+            UpdateFieldPositionReferenceSource(fieldReference);
+
+            ReferencePositionSample? conversionReference = fieldReference ?? TryBuildClusterReferenceSample();
+            await RefreshCartographicAndGeodeticReferenceSourcesAsync(conversionReference);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to update cluster editor unit and reference sources");
+            ClearCartographicAndGeodeticReferenceSources();
+        }
+        finally
+        {
+            isRefreshingReferenceSources_ = false;
+            await InvokeAsync(StateHasChanged);
+            if (hasPendingReferenceSourceRefresh_)
+            {
+                hasPendingReferenceSourceRefresh_ = false;
+                _ = RefreshReferenceSourcesAsync();
+            }
+        }
+    }
+
+    private ReferencePositionSample? TryBuildClusterReferenceSample()
+    {
+        return referenceLatitudeWGS84 == null || referenceLongitudeWGS84 == null
+            ? null
+            : new ReferencePositionSample(referenceNorthing, referenceEasting, referenceLatitudeWGS84.Value, referenceLongitudeWGS84.Value);
+    }
+
+    private async Task<ReferencePositionSample?> TryLoadFieldReferenceSampleAsync(Guid? fieldId)
+    {
+        if (fieldId == null || fieldId == Guid.Empty)
+        {
+            return null;
+        }
+
+        try
+        {
+            Field field = await Api.ClientField.GetFieldByIdAsync(fieldId.Value);
+            Point3DGlobalCoordinates? referencePoint = field.ReferencePoint;
+            if (referencePoint == null)
+            {
+                return null;
+            }
+
+            return new ReferencePositionSample(
+                referencePoint.RiemannianNorth,
+                referencePoint.RiemannianEast,
+                referencePoint.Latitude,
+                referencePoint.Longitude);
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "Unable to load field reference point for field {FieldId}", fieldId);
+            return null;
+        }
+    }
+
+    private static void UpdateFieldPositionReferenceSource(ReferencePositionSample? sample)
+    {
+        DataUtils.UnitAndReferenceParameters.FieldPositionReferenceSource.FieldNorthPositionReference = -sample?.RiemannianNorth;
+        DataUtils.UnitAndReferenceParameters.FieldPositionReferenceSource.FieldEastPositionReference = -sample?.RiemannianEast;
+    }
+
+    private async Task RefreshCartographicAndGeodeticReferenceSourcesAsync(ReferencePositionSample? sample)
+    {
+        if (sample?.Latitude == null || sample.Value.Longitude == null || _field?.MetaInfo?.ID == null || _field.MetaInfo.ID == Guid.Empty)
+        {
+            ClearCartographicAndGeodeticReferenceSources();
+            return;
+        }
+
+        ReferencePositionSample referenceSample = sample.Value;
+        CartographicCoordinate? coordinate = await ConvertReferenceSampleToCartographicAsync(_field.MetaInfo.ID, referenceSample);
+        if (coordinate == null)
+        {
+            ClearCartographicAndGeodeticReferenceSources();
+            return;
+        }
+
+        DataUtils.UnitAndReferenceParameters.CartographicProjectionDatumGeodeticReferenceSource.CartographicProjectionDatumLatitudeReference =
+            coordinate.GeodeticCoordinate?.LatitudeDatum == null ? null : coordinate.GeodeticCoordinate.LatitudeDatum.Value - referenceSample.Latitude!.Value;
+        DataUtils.UnitAndReferenceParameters.CartographicProjectionDatumGeodeticReferenceSource.CartographicProjectionDatumLongitudeReference =
+            coordinate.GeodeticCoordinate?.LongitudeDatum == null ? null : coordinate.GeodeticCoordinate.LongitudeDatum.Value - referenceSample.Longitude!.Value;
+
+        DataUtils.UnitAndReferenceParameters.CartographicGridPositionReferenceSource.CartographicGridNorthPositionReference =
+            coordinate.Northing == null || referenceSample.RiemannianNorth == null ? null : coordinate.Northing.Value - referenceSample.RiemannianNorth.Value;
+        DataUtils.UnitAndReferenceParameters.CartographicGridPositionReferenceSource.CartographicGridEastPositionReference =
+            coordinate.Easting == null || referenceSample.RiemannianEast == null ? null : coordinate.Easting.Value - referenceSample.RiemannianEast.Value;
+    }
+
+    private async Task<CartographicCoordinate?> ConvertReferenceSampleToCartographicAsync(Guid fieldId, ReferencePositionSample sample)
+    {
+        Guid conversionId = Guid.NewGuid();
+        FieldCartographicConversionSet conversionSet = new()
+        {
+            MetaInfo = new MetaInfo { ID = conversionId },
+            Name = "Calculate Cluster Reference Sources",
+            Description = "Temporary conversion for cluster unit and reference sources.",
+            CreationDate = DateTimeOffset.UtcNow,
+            LastModificationDate = DateTimeOffset.UtcNow,
+            FieldID = fieldId,
+            CartographicCoordinateList =
+            [
+                new CartographicCoordinate
+                {
+                    GeodeticCoordinate = new GeodeticCoordinate
+                    {
+                        LatitudeWGS84 = sample.Latitude,
+                        LongitudeWGS84 = sample.Longitude,
+                        VerticalDepthWGS84 = referenceDepthWGS84 ?? 0
+                    }
+                }
+            ]
+        };
+
+        bool posted = false;
+        try
+        {
+            await Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet);
+            posted = true;
+            FieldCartographicConversionSet calculated = await Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionId);
+            return calculated.CartographicCoordinateList?.FirstOrDefault();
+        }
+        finally
+        {
+            if (posted)
+            {
+                try
+                {
+                    await Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionId);
+                }
+                catch
+                {
+                }
+            }
+        }
+    }
+
+    private static void ClearCartographicAndGeodeticReferenceSources()
+    {
+        DataUtils.UnitAndReferenceParameters.CartographicGridPositionReferenceSource.CartographicGridNorthPositionReference = null;
+        DataUtils.UnitAndReferenceParameters.CartographicGridPositionReferenceSource.CartographicGridEastPositionReference = null;
+        DataUtils.UnitAndReferenceParameters.CartographicProjectionDatumGeodeticReferenceSource.CartographicProjectionDatumLatitudeReference = null;
+        DataUtils.UnitAndReferenceParameters.CartographicProjectionDatumGeodeticReferenceSource.CartographicProjectionDatumLongitudeReference = null;
+    }
+
+    private readonly record struct ReferencePositionSample(
+        double? RiemannianNorth,
+        double? RiemannianEast,
+        double? Latitude,
+        double? Longitude);
+
     private async Task LoadRigs()
     {
         try
@@ -721,8 +893,66 @@
         }
     }
 
+    private async Task LoadClusterIdentitiesAsync()
+    {
+        try
+        {
+            _clusterIdentities = ((IEnumerable<ClusterIdentity>)await Api.ClientCluster.GetAllClusterIdentityAsync())
+                .Where(identity => identity?.MetaInfo?.ID != null)
+                .OrderBy(identity => identity.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to load cluster identities");
+            Snackbar.Add("Unable to load cluster identities", Severity.Warning);
+            _clusterIdentities = [];
+        }
+    }
+
+    private async Task LoadClusterFeatureCategoriesAsync()
+    {
+        try
+        {
+            _clusterFeatureCategories = ((IEnumerable<ClusterFeatureCategory>)await Api.ClientCluster.GetAllClusterFeatureCategoryAsync())
+                .Where(category => category?.MetaInfo?.ID != null)
+                .OrderBy(category => category.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to load cluster feature categories");
+            Snackbar.Add("Unable to load cluster feature categories", Severity.Warning);
+            _clusterFeatureCategories = [];
+        }
+    }
+
+    private async Task LoadSlotFeatureCategoriesAsync()
+    {
+        try
+        {
+            _slotFeatureCategories = ((IEnumerable<SlotFeatureCategory>)await Api.ClientCluster.GetAllSlotFeatureCategoryAsync())
+                .Where(category => category?.MetaInfo?.ID != null)
+                .OrderBy(category => category.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to load slot feature categories");
+            Snackbar.Add("Unable to load slot feature categories", Severity.Warning);
+            _slotFeatureCategories = [];
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            _plotsReady = true;
+            UpdateSlotPlot();
+            UpdateDepthPlot();
+        }
+
         if (!_disposed && _shouldLoadRigsAfterRender)
         {
             _shouldLoadRigsAfterRender = false;
@@ -745,121 +975,435 @@
         return Task.CompletedTask;
     }
 
-    private async Task Update()
+    private async Task Save()
     {
         try
         {
             if (CurrentCluster != null && CurrentCluster.MetaInfo != null)
             {
-                Cluster cluster = new()
+                if (!TryValidateIdentityAssignments() || !TryValidateFeatureAssignments() || !TryValidateSlotFeatureAssignments())
                 {
-                    MetaInfo = CurrentCluster.MetaInfo,
-                    Name = _name,
-                    Description = _descr,
-                    CreationDate = CurrentCluster.CreationDate,
-                    LastModificationDate = DateTimeOffset.UtcNow,
-                    FieldID = (_field != null && _field.MetaInfo != null) ? _field.MetaInfo.ID : null,
-                    ReferenceDepth = (referenceDepthWGS84 != null) ? new GaussianDrillingProperty()
-                    {
-                        GaussianValue = new GaussianDistribution()
-                        {
-                            Mean = referenceDepthWGS84,
-                            StandardDeviation = (referenceDepthAccuracy == null) ? 0.01 : referenceDepthAccuracy
-                        },
-                    } : null,
-                    ReferenceLatitude = (referenceLatitudeWGS84 != null) ? new GaussianDrillingProperty()
-                    {
-                        GaussianValue = new GaussianDistribution()
-                        {
-                            Mean = referenceLatitudeWGS84,
-                            StandardDeviation = (referenceNorthingAccuracy == null) ? 0.01 / Api.EarthRadiusWGS84 : referenceNorthingAccuracy / Api.EarthRadiusWGS84
-                        },
-                    } : null,
-                    ReferenceLongitude = (referenceLongitudeWGS84 != null) ? new GaussianDrillingProperty()
-                    {
-                        GaussianValue = new GaussianDistribution()
-                        {
-                            Mean = referenceLongitudeWGS84,
-                            StandardDeviation = (referenceEastingAccuracy == null) ? 0.01 / Api.EarthRadiusWGS84 : referenceEastingAccuracy / Api.EarthRadiusWGS84
-                        },
-                    } : null,
-                    GroundMudLineDepth = (groundMudLineDepthWGS84 != null) ? new GaussianDrillingProperty()
-                    {
-                        GaussianValue = new GaussianDistribution()
-                        {
-                            Mean = groundMudLineDepthWGS84,
-                            StandardDeviation = (groundMudLineDepthAccuracy == null) ? 0.01 : groundMudLineDepthAccuracy
-                        },
-                    } : null,
-                    TopWaterDepth = (topWaterDepthWGS84 != null) ? new GaussianDrillingProperty()
-                    {
-                        GaussianValue = new GaussianDistribution()
-                        {
-                            Mean = topWaterDepthWGS84,
-                            StandardDeviation = (topWaterDepthAccuracy == null) ? 0.01 : topWaterDepthAccuracy
-                        },
-                    } : null,
-                    IsFixedPlatform = _isFixedPlatform,
-                    RigID = _isFixedPlatform ? ((_rig != null && _rig.MetaInfo != null) ? _rig.MetaInfo.ID : null) : null
-                };
-                if (_slots != null)
-                {
-                    if (cluster.Slots == null)
-                    {
-                        cluster.Slots = new Dictionary<string, Slot>();
-                    }
-                    cluster.Slots.Clear();
-                    double latitudeAccuracy = 0.01 / Api.EarthRadiusWGS84;
-                    if (slotNorthingAccuracy != null)
-                    {
-                        latitudeAccuracy = slotNorthingAccuracy.Value / Api.EarthRadiusWGS84;
-                    }
-                    double longitudeAccuracy = 0.01 / Api.EarthRadiusWGS84;
-                    if (slotEastingAccuracy != null)
-                    {
-                        longitudeAccuracy = slotEastingAccuracy.Value / Api.EarthRadiusWGS84;
-                    }
-                    foreach (SlotTemplate slotTemplate in _slots)
-                    {
-                        if (slotTemplate != null && slotTemplate.ID != Guid.Empty)
-                        {
-                            Slot slot = new Slot()
-                            {
-                                Name = slotTemplate.Name,
-                                ID = slotTemplate.ID,
-                                Latitude = (slotTemplate.LatitudeWGS84 != null) ? new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = slotTemplate.LatitudeWGS84, StandardDeviation = latitudeAccuracy } } : null,
-                                Longitude = (slotTemplate.LongitudeWGS84 != null) ? new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = slotTemplate.LongitudeWGS84, StandardDeviation = longitudeAccuracy } } : null
-                            };
-                            cluster.Slots.Add(slot.ID.ToString(), slot);
-                        }
-                    }
+                    return;
                 }
+
+                Cluster cluster = BuildEditedCluster(DateTimeOffset.UtcNow);
                 await Api.ClientCluster.PutClusterByIdAsync(CurrentCluster.MetaInfo.ID, cluster);
-                logger.LogInformation("Updated the Cluster successfully");
-                Snackbar.Add("Updated the Cluster successfully", Severity.Success);
+                CurrentCluster = await Api.ClientCluster.GetClusterByIdAsync(CurrentCluster.MetaInfo.ID);
+                ApplyClusterToEditor(CurrentCluster);
+                await RefreshReferenceSourcesAsync();
+                MarkClusterClean();
+                logger.LogInformation("Saved the Cluster successfully");
+                Snackbar.Add("Saved the Cluster successfully", Severity.Success);
             }
             else
             {
-                logger.LogWarning("Problem while updating the Cluster");
-                Snackbar.Add("Problem while updating the Cluster", Severity.Warning);
+                logger.LogWarning("Problem while saving the Cluster");
+                Snackbar.Add("Problem while saving the Cluster", Severity.Warning);
             }
         }
         catch (ApiException ex)
         {
-            logger.LogError(ex, "Problem while updating the Cluster");
-            Snackbar.Add("Problem while updating the Cluster", Severity.Warning);
+            logger.LogError(ex, "Problem while saving the Cluster");
+            Snackbar.Add("Problem while saving the Cluster", Severity.Warning);
         }
         UpdateSlotPlot();
     }
 
-    private void Cancel()
+    private async Task ExportClusterAsync()
     {
+        if (CurrentCluster?.MetaInfo == null)
+        {
+            Snackbar.Add("No cluster is available for export", Severity.Warning);
+            return;
+        }
+
+        Cluster cluster = BuildEditedCluster(CurrentCluster.LastModificationDate);
+        await DownloadJsonAsync(cluster, SanitizeFileName($"{_name ?? "cluster"}.json"));
+        Snackbar.Add("Exported cluster", Severity.Success);
+    }
+
+    private async Task ImportClusterAsync(InputFileChangeEventArgs args)
+    {
+        if (CurrentCluster?.MetaInfo == null)
+        {
+            Snackbar.Add("No current cluster is available for import", Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            using System.IO.Stream stream = args.File.OpenReadStream(128 * 1024 * 1024);
+            Cluster? imported = await System.Text.Json.JsonSerializer.DeserializeAsync<Cluster>(
+                stream,
+                new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (imported == null)
+            {
+                Snackbar.Add("The selected file does not contain a cluster", Severity.Warning);
+                return;
+            }
+
+            ApplyClusterToEditor(imported);
+            _ = RefreshReferenceSourcesAsync();
+            Snackbar.Add("Imported cluster into the editor. Save to persist the changes.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Problem importing the Cluster");
+            Snackbar.Add("Error importing cluster: " + ex.Message, Severity.Error);
+        }
+    }
+
+    private async Task CloseEditorAsync()
+    {
+        if (HasUnsavedClusterChanges() && !await ConfirmCloseWithoutSavingAsync())
+        {
+            return;
+        }
+
         OnUpdate?.Invoke();
+    }
+
+    private Cluster BuildEditedCluster(DateTimeOffset? lastModificationDate)
+    {
+        Cluster cluster = new()
+        {
+            MetaInfo = CurrentCluster?.MetaInfo,
+            Name = _name,
+            Description = _descr,
+            CreationDate = CurrentCluster?.CreationDate,
+            LastModificationDate = lastModificationDate,
+            FieldID = (_field != null && _field.MetaInfo != null) ? _field.MetaInfo.ID : null,
+            ClusterIdentityAssignments = CloneIdentityAssignments(_clusterIdentityAssignments),
+            ClusterFeatureAssignments = CloneFeatureAssignments(_clusterFeatureAssignments),
+            ReferencePoint = CloneReferencePointForStorage(_referencePoint),
+            GroundMudLineDepth = (groundMudLineDepthWGS84 != null) ? new GaussianDrillingProperty()
+            {
+                GaussianValue = new GaussianDistribution()
+                {
+                    Mean = groundMudLineDepthWGS84,
+                    StandardDeviation = (groundMudLineDepthAccuracy == null) ? 0.01 : groundMudLineDepthAccuracy
+                },
+            } : null,
+            TopWaterDepth = (topWaterDepthWGS84 != null) ? new GaussianDrillingProperty()
+            {
+                GaussianValue = new GaussianDistribution()
+                {
+                    Mean = topWaterDepthWGS84,
+                    StandardDeviation = (topWaterDepthAccuracy == null) ? 0.01 : topWaterDepthAccuracy
+                },
+            } : null,
+            IsFixedPlatform = _isFixedPlatform,
+            RigID = _isFixedPlatform ? ((_rig != null && _rig.MetaInfo != null) ? _rig.MetaInfo.ID : null) : null
+        };
+
+        if (_slots != null)
+        {
+            cluster.Slots = new Dictionary<string, Slot>();
+            double latitudeAccuracy = slotNorthingAccuracy == null ? 0.01 / Api.EarthRadiusWGS84 : slotNorthingAccuracy.Value / Api.EarthRadiusWGS84;
+            double longitudeAccuracy = slotEastingAccuracy == null ? 0.01 / Api.EarthRadiusWGS84 : slotEastingAccuracy.Value / Api.EarthRadiusWGS84;
+            foreach (SlotTemplate slotTemplate in _slots)
+            {
+                if (slotTemplate != null && slotTemplate.ID != Guid.Empty)
+                {
+                    Slot slot = new()
+                    {
+                        Name = slotTemplate.Name,
+                        ID = slotTemplate.ID,
+                        Latitude = (slotTemplate.LatitudeWGS84 != null) ? new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = slotTemplate.LatitudeWGS84, StandardDeviation = latitudeAccuracy } } : null,
+                        Longitude = (slotTemplate.LongitudeWGS84 != null) ? new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = slotTemplate.LongitudeWGS84, StandardDeviation = longitudeAccuracy } } : null,
+                        SlotFeatureAssignments = CloneSlotFeatureAssignments(slotTemplate.SlotFeatureAssignments)
+                    };
+                    cluster.Slots.Add(slot.ID.ToString(), slot);
+                }
+            }
+        }
+
+        return cluster;
+    }
+
+    private static MathPoint3DGlobalCoordinates CloneReferencePointForEditor(DtoPoint3DGlobalCoordinates? point)
+    {
+        MathPoint3DGlobalCoordinates editorPoint = new();
+        if (point == null)
+        {
+            return editorPoint;
+        }
+
+        if (point.RiemannianNorth != null || point.RiemannianEast != null)
+        {
+            editorPoint.RiemannianNorth = point.RiemannianNorth;
+            editorPoint.RiemannianEast = point.RiemannianEast;
+        }
+        else
+        {
+            editorPoint.Latitude = point.Latitude;
+            editorPoint.Longitude = point.Longitude;
+        }
+
+        editorPoint.TVD = point.TVD;
+        editorPoint.Z = point.Z;
+        return editorPoint;
+    }
+
+    private static DtoPoint3DGlobalCoordinates? CloneReferencePointForStorage(MathPoint3DGlobalCoordinates point)
+    {
+        return IsEmptyReferencePoint(point)
+            ? null
+            : new DtoPoint3DGlobalCoordinates
+            {
+                RiemannianNorth = point.RiemannianNorth,
+                RiemannianEast = point.RiemannianEast,
+                Latitude = point.Latitude,
+                Longitude = point.Longitude,
+                X = point.RiemannianNorth,
+                Y = point.RiemannianEast,
+                TVD = point.TVD,
+                Z = point.Z
+            };
+    }
+
+    private static bool IsEmptyReferencePoint(MathPoint3DGlobalCoordinates point)
+    {
+        return point.RiemannianNorth == null &&
+            point.RiemannianEast == null &&
+            point.Latitude == null &&
+            point.Longitude == null &&
+            point.TVD == null &&
+            point.Z == null;
+    }
+
+    private void MarkClusterClean()
+    {
+        cleanClusterSnapshot_ = BuildClusterDirtySnapshot();
+    }
+
+    private static List<ClusterFeatureAssignment> CloneFeatureAssignments(IEnumerable<ClusterFeatureAssignment>? assignments)
+    {
+        return assignments?
+            .Select(assignment => new ClusterFeatureAssignment
+            {
+                ID = assignment.ID == Guid.Empty ? Guid.NewGuid() : assignment.ID,
+                FeatureCategoryID = assignment.FeatureCategoryID,
+                FeatureOptionID = assignment.FeatureOptionID,
+                FromDate = assignment.FromDate,
+                ToDate = assignment.ToDate
+            })
+            .ToList() ?? [];
+    }
+
+    private static List<SlotFeatureAssignment> CloneSlotFeatureAssignments(IEnumerable<SlotFeatureAssignment>? assignments)
+    {
+        return assignments?
+            .Select(assignment => new SlotFeatureAssignment
+            {
+                ID = assignment.ID == Guid.Empty ? Guid.NewGuid() : assignment.ID,
+                FeatureCategoryID = assignment.FeatureCategoryID,
+                FeatureOptionID = assignment.FeatureOptionID,
+                FromDate = assignment.FromDate,
+                ToDate = assignment.ToDate
+            })
+            .ToList() ?? [];
+    }
+
+    private static object BuildFeatureAssignmentDirtySnapshot(IEnumerable<ClusterFeatureAssignment> assignments)
+    {
+        return assignments
+            .OrderBy(assignment => assignment.FeatureCategoryID)
+            .ThenBy(assignment => assignment.FeatureOptionID)
+            .ThenBy(assignment => assignment.ID)
+            .Select(assignment => new
+            {
+                assignment.ID,
+                assignment.FeatureCategoryID,
+                assignment.FeatureOptionID,
+                assignment.FromDate,
+                assignment.ToDate
+            }).ToList();
+    }
+
+    private static List<ClusterIdentityAssignment> CloneIdentityAssignments(IEnumerable<ClusterIdentityAssignment>? assignments)
+    {
+        return assignments?
+            .Select(assignment => new ClusterIdentityAssignment
+            {
+                ID = assignment.ID == Guid.Empty ? Guid.NewGuid() : assignment.ID,
+                IdentityID = assignment.IdentityID,
+                Value = assignment.Value
+            })
+            .ToList() ?? [];
+    }
+
+    private static object BuildIdentityAssignmentDirtySnapshot(IEnumerable<ClusterIdentityAssignment> assignments)
+    {
+        return assignments
+            .OrderBy(assignment => assignment.IdentityID)
+            .ThenBy(assignment => assignment.ID)
+            .Select(assignment => new
+            {
+                assignment.ID,
+                assignment.IdentityID,
+                assignment.Value
+            })
+            .ToList();
+    }
+
+    private bool HasUnsavedClusterChanges()
+    {
+        return cleanClusterSnapshot_ != null &&
+            !string.Equals(cleanClusterSnapshot_, BuildClusterDirtySnapshot(), StringComparison.Ordinal);
+    }
+
+    private string BuildClusterDirtySnapshot()
+    {
+        Cluster cluster = BuildEditedCluster(CurrentCluster?.LastModificationDate);
+        return System.Text.Json.JsonSerializer.Serialize(new
+        {
+            cluster.MetaInfo?.ID,
+            cluster.Name,
+            cluster.Description,
+            cluster.FieldID,
+            cluster.ReferencePoint,
+            cluster.GroundMudLineDepth,
+            cluster.TopWaterDepth,
+            cluster.IsFixedPlatform,
+            cluster.RigID,
+            ClusterIdentityAssignments = BuildIdentityAssignmentDirtySnapshot(_clusterIdentityAssignments),
+            ClusterFeatureAssignments = BuildFeatureAssignmentDirtySnapshot(_clusterFeatureAssignments),
+            Slots = cluster.Slots?.OrderBy(slot => slot.Key).ToList()
+        });
+    }
+
+    private void ApplyClusterToEditor(Cluster cluster)
+    {
+        _name = cluster.Name;
+        _descr = cluster.Description;
+        _field = Fields?.FirstOrDefault(f => f.MetaInfo != null && f.MetaInfo.ID == cluster.FieldID);
+        IsFixedPlatform = cluster.IsFixedPlatform;
+        _rig = null;
+        _clusterIdentityAssignments = CloneIdentityAssignments(cluster.ClusterIdentityAssignments);
+        _selectedIdentityAssignment = null;
+        _selectedIdentityAssignmentId = null;
+        _clusterFeatureAssignments = CloneFeatureAssignments(cluster.ClusterFeatureAssignments);
+        _selectedFeatureAssignment = null;
+        _selectedFeatureAssignmentId = null;
+        if (cluster.RigID is not null && _rigs is not null)
+        {
+            foreach (var rig in _rigs)
+            {
+                if (rig is not null && rig.MetaInfo is not null && rig.MetaInfo.ID == cluster.RigID)
+                {
+                    _rig = rig;
+                    break;
+                }
+            }
+        }
+
+        _referencePoint = CloneReferencePointForEditor(cluster.ReferencePoint);
+        groundMudLineDepthWGS84 = cluster.GroundMudLineDepth?.GaussianValue?.Mean;
+        groundMudLineDepthAccuracy = cluster.GroundMudLineDepth?.GaussianValue?.StandardDeviation;
+        topWaterDepthWGS84 = cluster.TopWaterDepth?.GaussianValue?.Mean;
+        topWaterDepthAccuracy = cluster.TopWaterDepth?.GaussianValue?.StandardDeviation;
+
+        _slots ??= new List<SlotTemplate>();
+        _slots.Clear();
+        double maxAccuracyNorthing = double.MinValue;
+        double maxAccuracyEasting = double.MinValue;
+        if (cluster.Slots != null)
+        {
+            foreach (Slot slot in cluster.Slots.Values)
+            {
+                SlotTemplate slotTemplate = new()
+                {
+                    Name = slot.Name,
+                    ID = slot.ID,
+                    SlotFeatureAssignments = CloneSlotFeatureAssignments(slot.SlotFeatureAssignments)
+                };
+                if (slot.Latitude?.GaussianValue != null)
+                {
+                    slotTemplate.LatitudeWGS84 = slot.Latitude.GaussianValue.Mean;
+                    if (slot.Latitude.GaussianValue.StandardDeviation != null &&
+                        slot.Latitude.GaussianValue.StandardDeviation > maxAccuracyNorthing)
+                    {
+                        maxAccuracyNorthing = slot.Latitude.GaussianValue.StandardDeviation.Value;
+                    }
+                }
+
+                if (slot.Longitude?.GaussianValue != null)
+                {
+                    slotTemplate.LongitudeWGS84 = slot.Longitude.GaussianValue.Mean;
+                    if (slot.Longitude.GaussianValue.StandardDeviation != null &&
+                        slot.Longitude.GaussianValue.StandardDeviation > maxAccuracyEasting)
+                    {
+                        maxAccuracyEasting = slot.Longitude.GaussianValue.StandardDeviation.Value;
+                    }
+                }
+                _slots.Add(slotTemplate);
+            }
+        }
+        ResetSelectedSlotFeatureAssignment();
+
+        slotNorthingAccuracy = maxAccuracyNorthing > double.MinValue ? maxAccuracyNorthing * Api.EarthRadiusWGS84 : 0.01 * Api.EarthRadiusWGS84;
+        slotEastingAccuracy = maxAccuracyEasting > double.MinValue ? maxAccuracyEasting * Api.EarthRadiusWGS84 : 0.01 * Api.EarthRadiusWGS84;
+        UpdateSlotPlot();
+        UpdateDepthPlot();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DownloadJsonAsync<T>(T value, string fileName)
+    {
+        string json = System.Text.Json.JsonSerializer.Serialize(value, new System.Text.Json.JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        });
+        string base64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
+        string encodedFileName = System.Text.Json.JsonEncodedText.Encode(fileName).ToString();
+        string script =
+            "(() => {" +
+            $"const binary = atob(\"{base64}\");" +
+            "const bytes = new Uint8Array(binary.length);" +
+            "for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);" +
+            "const blob = new Blob([bytes], { type: \"application/json;charset=utf-8\" });" +
+            "const url = URL.createObjectURL(blob);" +
+            "const anchor = document.createElement(\"a\");" +
+            "anchor.href = url;" +
+            $"anchor.download = \"{encodedFileName}\";" +
+            "document.body.appendChild(anchor);" +
+            "anchor.click();" +
+            "anchor.remove();" +
+            "URL.revokeObjectURL(url);" +
+            "})()";
+        await JSRuntime.InvokeVoidAsync("eval", script);
+    }
+
+    private static string SanitizeFileName(string fileName)
+    {
+        char[] invalidChars = System.IO.Path.GetInvalidFileNameChars();
+        string sanitized = new(fileName.Select(character => invalidChars.Contains(character) ? '_' : character).ToArray());
+        return string.IsNullOrWhiteSpace(sanitized) ? "cluster.json" : sanitized;
+    }
+
+    private async Task<bool> ConfirmCloseWithoutSavingAsync()
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Unsaved changes",
+            "Some changes have not been saved. Close without saving?",
+            yesText: "Close without saving",
+            cancelText: "Stay",
+            options: new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                FullWidth = false,
+                MaxWidth = MaxWidth.ExtraSmall
+            });
+
+        return result == true;
     }
 
     private void UpdateDepthPlot()
     {
-        if (referenceDepthWGS84 != null || groundMudLineDepthWGS84 != null || topWaterDepthWGS84 != null)
+        double? meanSeaLevelDepthWGS84 = DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference;
+        if (referenceDepthWGS84 != null || groundMudLineDepthWGS84 != null || topWaterDepthWGS84 != null || meanSeaLevelDepthWGS84 != null)
         {
             //each list below is designed to contain N curves: in this case, we only plot 1 curve, corresponding to 1 trajectory
             nameDepthList.Clear();
@@ -883,6 +1427,22 @@
             nameDepthList.Add("WGS84 Datum");
             modeFlagDepthList.Add(1); //1 to 3
             colorDepthList.Add(colorScale[3]);
+            if (meanSeaLevelDepthWGS84 != null)
+            {
+                xValues = new List<object>();
+                yValues = new List<object>();
+
+                for (int i = 0; i < count; i++)
+                {
+                    xValues.Add(0.0 + i * step);
+                    yValues.Add(meanSeaLevelDepthWGS84.Value);
+                }
+                xValuesDepthList.Add(xValues);
+                yValuesDepthList.Add(yValues);
+                nameDepthList.Add("MSL");
+                modeFlagDepthList.Add(1); //1 to 3
+                colorDepthList.Add(colorScale[4]);
+            }
             if (referenceDepthWGS84 != null)
             {
                 xValues = new List<object>();
@@ -932,8 +1492,10 @@
                 colorDepthList.Add(colorScale[2]);
             }
 
-            //plot curves
-            depthPlot.Plot();
+            if (_plotsReady && depthPlot != null)
+            {
+                depthPlot.Plot();
+            }
         }
     }
     private void UpdateSlotPlot()
@@ -991,9 +1553,635 @@
                     colorSlotList.Add(colorScale[0]);
                 }
             }
-            //plot curves
-            clusterPlot.Plot();
+            if (_plotsReady && clusterPlot != null)
+            {
+                clusterPlot.Plot();
+            }
         }
+    }
+
+    private string GetCategoryDisplayName(ClusterFeatureCategory category)
+    {
+        string name = category.Name ?? "Unnamed category";
+        string mode = category.IsExclusive ? "exclusive" : "multiple";
+        string validity = category.HasValidityPeriod ? ", dated" : string.Empty;
+        return $"{name} ({mode}{validity})";
+    }
+
+    private Variant GetOptionButtonVariant(ClusterFeatureCategory category, ClusterFeatureOption option)
+    {
+        return category.MetaInfo?.ID == _selectedFeatureCategoryId && option.ID == _selectedFeatureOptionId
+            ? Variant.Filled
+            : Variant.Outlined;
+    }
+
+    private Color GetOptionButtonColor(ClusterFeatureCategory category, ClusterFeatureOption option)
+    {
+        return category.MetaInfo?.ID == _selectedFeatureCategoryId && option.ID == _selectedFeatureOptionId
+            ? Color.Primary
+            : Color.Default;
+    }
+
+    private bool IsOptionUnavailable(ClusterFeatureCategory category)
+    {
+        return category.IsExclusive &&
+            !category.HasValidityPeriod &&
+            category.MetaInfo?.ID is Guid categoryId &&
+            _clusterFeatureAssignments.Any(assignment => assignment.FeatureCategoryID == categoryId);
+    }
+
+    private void SelectFeatureOption(ClusterFeatureCategory category, ClusterFeatureOption option)
+    {
+        if (category.MetaInfo?.ID is not Guid categoryId || categoryId == Guid.Empty || option.ID == Guid.Empty)
+        {
+            return;
+        }
+
+        _selectedFeatureCategoryId = categoryId;
+        _selectedFeatureOptionId = option.ID;
+    }
+
+    private bool CanAssignSelectedOption()
+    {
+        if (_selectedFeatureCategoryId is not Guid categoryId || _selectedFeatureOptionId is not Guid optionId)
+        {
+            return false;
+        }
+
+        ClusterFeatureCategory? category = FindFeatureCategory(categoryId);
+        if (category == null || !CategoryContainsOption(category, optionId))
+        {
+            return false;
+        }
+
+        return !IsOptionUnavailable(category);
+    }
+
+    private void AssignSelectedOption()
+    {
+        if (!CanAssignSelectedOption())
+        {
+            return;
+        }
+
+        _clusterFeatureAssignments.Add(new ClusterFeatureAssignment
+        {
+            ID = Guid.NewGuid(),
+            FeatureCategoryID = _selectedFeatureCategoryId,
+            FeatureOptionID = _selectedFeatureOptionId
+        });
+    }
+
+    private void UnassignSelectedFeature()
+    {
+        if (_selectedFeatureAssignmentId is not Guid assignmentId)
+        {
+            return;
+        }
+
+        ClusterFeatureAssignment? assignment = _clusterFeatureAssignments.FirstOrDefault(item => item.ID == assignmentId);
+        if (assignment != null)
+        {
+            _clusterFeatureAssignments.Remove(assignment);
+        }
+        _selectedFeatureAssignment = null;
+        _selectedFeatureAssignmentId = null;
+    }
+
+    private void SetSelectedFeatureAssignment(ClusterFeatureAssignment? assignment)
+    {
+        _selectedFeatureAssignment = assignment;
+        _selectedFeatureAssignmentId = assignment?.ID;
+    }
+
+    private string GetAssignmentDisplayName(ClusterFeatureAssignment assignment)
+    {
+        ClusterFeatureCategory? category = assignment.FeatureCategoryID is Guid categoryId ? FindFeatureCategory(categoryId) : null;
+        ClusterFeatureOption? option = assignment.FeatureOptionID is Guid optionId ? FindFeatureOption(category, optionId) : null;
+        return $"{category?.Name ?? "Unknown category"}: {option?.Name ?? "Unknown option"}";
+    }
+
+    private bool CategoryHasValidityPeriod(ClusterFeatureAssignment assignment)
+    {
+        return assignment.FeatureCategoryID is Guid categoryId && FindFeatureCategory(categoryId)?.HasValidityPeriod == true;
+    }
+
+    private static DateTime? ToDateTime(DateTimeOffset? value)
+    {
+        return value?.Date;
+    }
+
+    private static DateTimeOffset? ToDateTimeOffset(DateTime? value)
+    {
+        return value == null ? null : new DateTimeOffset(DateTime.SpecifyKind(value.Value.Date, DateTimeKind.Utc));
+    }
+
+    private void SetAssignmentFromDate(ClusterFeatureAssignment assignment, DateTime? value)
+    {
+        assignment.FromDate = ToDateTimeOffset(value);
+    }
+
+    private void SetAssignmentToDate(ClusterFeatureAssignment assignment, DateTime? value)
+    {
+        assignment.ToDate = ToDateTimeOffset(value);
+    }
+
+    private ClusterFeatureCategory? FindFeatureCategory(Guid categoryId)
+    {
+        return _clusterFeatureCategories.FirstOrDefault(category => category.MetaInfo?.ID == categoryId);
+    }
+
+    private static ClusterFeatureOption? FindFeatureOption(ClusterFeatureCategory? category, Guid optionId)
+    {
+        return category?.Options?.FirstOrDefault(option => option.ID == optionId);
+    }
+
+    private static bool CategoryContainsOption(ClusterFeatureCategory category, Guid optionId)
+    {
+        return category.Options?.Any(option => option.ID == optionId) == true;
+    }
+
+    private bool TryValidateFeatureAssignments()
+    {
+        foreach (ClusterFeatureAssignment assignment in _clusterFeatureAssignments)
+        {
+            if (assignment.FeatureCategoryID is not Guid categoryId || assignment.FeatureOptionID is not Guid optionId)
+            {
+                Snackbar.Add("Feature assignments must have a category and an option", Severity.Warning);
+                return false;
+            }
+
+            ClusterFeatureCategory? category = FindFeatureCategory(categoryId);
+            if (category == null || !CategoryContainsOption(category, optionId))
+            {
+                Snackbar.Add("Feature assignments must reference existing categories and options", Severity.Warning);
+                return false;
+            }
+
+            if (!category.HasValidityPeriod)
+            {
+                assignment.FromDate = null;
+                assignment.ToDate = null;
+            }
+
+            if (assignment.FromDate != null && assignment.ToDate != null && assignment.FromDate > assignment.ToDate)
+            {
+                Snackbar.Add("Feature assignment From date cannot be after To date", Severity.Warning);
+                return false;
+            }
+        }
+
+        foreach (ClusterFeatureCategory category in _clusterFeatureCategories.Where(category => category.IsExclusive))
+        {
+            if (category.MetaInfo?.ID is not Guid categoryId)
+            {
+                continue;
+            }
+
+            List<ClusterFeatureAssignment> categoryAssignments = _clusterFeatureAssignments
+                .Where(assignment => assignment.FeatureCategoryID == categoryId)
+                .ToList();
+
+            if (!category.HasValidityPeriod && categoryAssignments.Count > 1)
+            {
+                Snackbar.Add($"Only one option can be assigned for '{category.Name}'", Severity.Warning);
+                return false;
+            }
+
+            if (category.HasValidityPeriod && HasOverlappingAssignments(categoryAssignments))
+            {
+                Snackbar.Add($"Feature assignment periods cannot overlap for '{category.Name}'", Severity.Warning);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool HasOverlappingAssignments(List<ClusterFeatureAssignment> assignments)
+    {
+        for (int i = 0; i < assignments.Count; i++)
+        {
+            for (int j = i + 1; j < assignments.Count; j++)
+            {
+                if (IntervalsOverlap(assignments[i], assignments[j]))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IntervalsOverlap(ClusterFeatureAssignment first, ClusterFeatureAssignment second)
+    {
+        DateTimeOffset firstStart = first.FromDate ?? DateTimeOffset.MinValue;
+        DateTimeOffset firstEnd = first.ToDate ?? DateTimeOffset.MaxValue;
+        DateTimeOffset secondStart = second.FromDate ?? DateTimeOffset.MinValue;
+        DateTimeOffset secondEnd = second.ToDate ?? DateTimeOffset.MaxValue;
+        return firstStart <= secondEnd && secondStart <= firstEnd;
+    }
+
+    private string GetSlotDisplayName(SlotTemplate slot)
+    {
+        return string.IsNullOrWhiteSpace(slot.Name) ? slot.ID.ToString() : slot.Name;
+    }
+
+    private void ResetSelectedSlotFeatureAssignment()
+    {
+        _selectedSlotFeatureAssignment = null;
+        _selectedSlotFeatureAssignmentId = null;
+    }
+
+    private string GetSlotFeatureSummary(SlotTemplate slot)
+    {
+        List<string> featureNames = slot.SlotFeatureAssignments
+            .Select(GetSlotFeatureAssignmentDisplayName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return featureNames.Count == 0 ? string.Empty : string.Join(", ", featureNames);
+    }
+
+    private string GetSlotFeatureCategoryDisplayName(SlotFeatureCategory category)
+    {
+        string name = category.Name ?? "Unnamed category";
+        string mode = category.IsExclusive ? "exclusive" : "multiple";
+        string validity = category.HasValidityPeriod ? ", dated" : string.Empty;
+        return $"{name} ({mode}{validity})";
+    }
+
+    private Variant GetSlotFeatureOptionButtonVariant(SlotFeatureCategory category, SlotFeatureOption option)
+    {
+        return category.MetaInfo?.ID == _selectedSlotFeatureCategoryId && option.ID == _selectedSlotFeatureOptionId
+            ? Variant.Filled
+            : Variant.Outlined;
+    }
+
+    private Color GetSlotFeatureOptionButtonColor(SlotFeatureCategory category, SlotFeatureOption option)
+    {
+        return category.MetaInfo?.ID == _selectedSlotFeatureCategoryId && option.ID == _selectedSlotFeatureOptionId
+            ? Color.Primary
+            : Color.Default;
+    }
+
+    private bool IsSlotFeatureOptionUnavailable(SlotFeatureCategory category)
+    {
+        List<SlotTemplate> slots = SelectedSlotsForFeatureEditing;
+        return slots.Count > 0 &&
+            category.IsExclusive &&
+            !category.HasValidityPeriod &&
+            category.MetaInfo?.ID is Guid categoryId &&
+            slots.Any(slot => slot.SlotFeatureAssignments.Any(assignment => assignment.FeatureCategoryID == categoryId));
+    }
+
+    private void SelectSlotFeatureOption(SlotFeatureCategory category, SlotFeatureOption option)
+    {
+        if (category.MetaInfo?.ID is not Guid categoryId || categoryId == Guid.Empty || option.ID == Guid.Empty)
+        {
+            return;
+        }
+
+        _selectedSlotFeatureCategoryId = categoryId;
+        _selectedSlotFeatureOptionId = option.ID;
+    }
+
+    private bool CanAssignSelectedSlotFeatureOption()
+    {
+        if (SelectedSlotsForFeatureEditing.Count == 0 ||
+            _selectedSlotFeatureCategoryId is not Guid categoryId ||
+            _selectedSlotFeatureOptionId is not Guid optionId)
+        {
+            return false;
+        }
+
+        SlotFeatureCategory? category = FindSlotFeatureCategory(categoryId);
+        if (category == null || !SlotFeatureCategoryContainsOption(category, optionId))
+        {
+            return false;
+        }
+
+        return !IsSlotFeatureOptionUnavailable(category);
+    }
+
+    private void AssignSelectedSlotFeatureOption()
+    {
+        if (!CanAssignSelectedSlotFeatureOption())
+        {
+            return;
+        }
+
+        foreach (SlotTemplate slot in SelectedSlotsForFeatureEditing)
+        {
+            slot.SlotFeatureAssignments.Add(new SlotFeatureAssignment
+            {
+                ID = Guid.NewGuid(),
+                FeatureCategoryID = _selectedSlotFeatureCategoryId,
+                FeatureOptionID = _selectedSlotFeatureOptionId
+            });
+        }
+    }
+
+    private void UnassignSelectedSlotFeature()
+    {
+        SlotFeatureAssignment? selectedAssignment = _selectedSlotFeatureAssignment;
+        if (selectedAssignment == null || _selectedSlotFeatureAssignmentId is not Guid assignmentId)
+        {
+            return;
+        }
+
+        foreach (SlotTemplate slot in SelectedSlotsForFeatureEditing)
+        {
+            slot.SlotFeatureAssignments.RemoveAll(assignment =>
+                assignment.ID == assignmentId ||
+                (assignment.FeatureCategoryID == selectedAssignment.FeatureCategoryID &&
+                 assignment.FeatureOptionID == selectedAssignment.FeatureOptionID));
+        }
+        ResetSelectedSlotFeatureAssignment();
+    }
+
+    private void SetSelectedSlotFeatureAssignment(SlotFeatureAssignment? assignment)
+    {
+        _selectedSlotFeatureAssignment = assignment;
+        _selectedSlotFeatureAssignmentId = assignment?.ID;
+    }
+
+    private string GetSlotFeatureAssignmentDisplayName(SlotFeatureAssignment assignment)
+    {
+        SlotFeatureCategory? category = assignment.FeatureCategoryID is Guid categoryId ? FindSlotFeatureCategory(categoryId) : null;
+        SlotFeatureOption? option = assignment.FeatureOptionID is Guid optionId ? FindSlotFeatureOption(category, optionId) : null;
+        return $"{category?.Name ?? "Unknown category"}: {option?.Name ?? "Unknown option"}";
+    }
+
+    private bool SlotFeatureCategoryHasValidityPeriod(SlotFeatureAssignment assignment)
+    {
+        return assignment.FeatureCategoryID is Guid categoryId && FindSlotFeatureCategory(categoryId)?.HasValidityPeriod == true;
+    }
+
+    private void SetSlotFeatureAssignmentFromDate(SlotFeatureAssignment assignment, DateTime? value)
+    {
+        DateTimeOffset? date = ToDateTimeOffset(value);
+        foreach (SlotFeatureAssignment matchingAssignment in GetMatchingSelectedSlotFeatureAssignments(assignment))
+        {
+            matchingAssignment.FromDate = date;
+        }
+    }
+
+    private void SetSlotFeatureAssignmentToDate(SlotFeatureAssignment assignment, DateTime? value)
+    {
+        DateTimeOffset? date = ToDateTimeOffset(value);
+        foreach (SlotFeatureAssignment matchingAssignment in GetMatchingSelectedSlotFeatureAssignments(assignment))
+        {
+            matchingAssignment.ToDate = date;
+        }
+    }
+
+    private IEnumerable<SlotFeatureAssignment> GetMatchingSelectedSlotFeatureAssignments(SlotFeatureAssignment selectedAssignment)
+    {
+        foreach (SlotTemplate slot in SelectedSlotsForFeatureEditing)
+        {
+            foreach (SlotFeatureAssignment assignment in slot.SlotFeatureAssignments)
+            {
+                if (assignment.ID == selectedAssignment.ID ||
+                    (assignment.FeatureCategoryID == selectedAssignment.FeatureCategoryID &&
+                     assignment.FeatureOptionID == selectedAssignment.FeatureOptionID))
+                {
+                    yield return assignment;
+                }
+            }
+        }
+    }
+
+    private SlotFeatureCategory? FindSlotFeatureCategory(Guid categoryId)
+    {
+        return _slotFeatureCategories.FirstOrDefault(category => category.MetaInfo?.ID == categoryId);
+    }
+
+    private static SlotFeatureOption? FindSlotFeatureOption(SlotFeatureCategory? category, Guid optionId)
+    {
+        return category?.Options?.FirstOrDefault(option => option.ID == optionId);
+    }
+
+    private static bool SlotFeatureCategoryContainsOption(SlotFeatureCategory category, Guid optionId)
+    {
+        return category.Options?.Any(option => option.ID == optionId) == true;
+    }
+
+    private bool TryValidateSlotFeatureAssignments()
+    {
+        foreach (SlotTemplate slot in _slots)
+        {
+            foreach (SlotFeatureAssignment assignment in slot.SlotFeatureAssignments)
+            {
+                if (assignment.FeatureCategoryID is not Guid categoryId || assignment.FeatureOptionID is not Guid optionId)
+                {
+                    Snackbar.Add($"Slot '{GetSlotDisplayName(slot)}' has a feature assignment without a category or option", Severity.Warning);
+                    return false;
+                }
+
+                SlotFeatureCategory? category = FindSlotFeatureCategory(categoryId);
+                if (category == null || !SlotFeatureCategoryContainsOption(category, optionId))
+                {
+                    Snackbar.Add($"Slot '{GetSlotDisplayName(slot)}' has a feature assignment that references an unknown category or option", Severity.Warning);
+                    return false;
+                }
+
+                if (!category.HasValidityPeriod)
+                {
+                    assignment.FromDate = null;
+                    assignment.ToDate = null;
+                }
+
+                if (assignment.FromDate != null && assignment.ToDate != null && assignment.FromDate > assignment.ToDate)
+                {
+                    Snackbar.Add($"Slot '{GetSlotDisplayName(slot)}' has a feature From date after the To date", Severity.Warning);
+                    return false;
+                }
+            }
+
+            foreach (SlotFeatureCategory category in _slotFeatureCategories.Where(category => category.IsExclusive))
+            {
+                if (category.MetaInfo?.ID is not Guid categoryId)
+                {
+                    continue;
+                }
+
+                List<SlotFeatureAssignment> categoryAssignments = slot.SlotFeatureAssignments
+                    .Where(assignment => assignment.FeatureCategoryID == categoryId)
+                    .ToList();
+
+                if (!category.HasValidityPeriod && categoryAssignments.Count > 1)
+                {
+                    Snackbar.Add($"Only one option can be assigned for '{category.Name}' on slot '{GetSlotDisplayName(slot)}'", Severity.Warning);
+                    return false;
+                }
+
+                if (category.HasValidityPeriod && HasOverlappingSlotFeatureAssignments(categoryAssignments))
+                {
+                    Snackbar.Add($"Slot feature assignment periods cannot overlap for '{category.Name}' on slot '{GetSlotDisplayName(slot)}'", Severity.Warning);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static bool HasOverlappingSlotFeatureAssignments(List<SlotFeatureAssignment> assignments)
+    {
+        for (int i = 0; i < assignments.Count; i++)
+        {
+            for (int j = i + 1; j < assignments.Count; j++)
+            {
+                if (SlotFeatureIntervalsOverlap(assignments[i], assignments[j]))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool SlotFeatureIntervalsOverlap(SlotFeatureAssignment first, SlotFeatureAssignment second)
+    {
+        DateTimeOffset firstStart = first.FromDate ?? DateTimeOffset.MinValue;
+        DateTimeOffset firstEnd = first.ToDate ?? DateTimeOffset.MaxValue;
+        DateTimeOffset secondStart = second.FromDate ?? DateTimeOffset.MinValue;
+        DateTimeOffset secondEnd = second.ToDate ?? DateTimeOffset.MaxValue;
+        return firstStart <= secondEnd && secondStart <= firstEnd;
+    }
+
+    private Variant GetIdentityButtonVariant(ClusterIdentity identity)
+    {
+        return identity.MetaInfo?.ID == _selectedIdentityId
+            ? Variant.Filled
+            : Variant.Outlined;
+    }
+
+    private Color GetIdentityButtonColor(ClusterIdentity identity)
+    {
+        return identity.MetaInfo?.ID == _selectedIdentityId
+            ? Color.Primary
+            : Color.Default;
+    }
+
+    private static string GetIdentityDisplayName(ClusterIdentity identity)
+    {
+        return identity.Name ?? "Unnamed identity";
+    }
+
+    private bool IsIdentityAssigned(ClusterIdentity identity)
+    {
+        return identity.MetaInfo?.ID is Guid identityId &&
+            _clusterIdentityAssignments.Any(assignment => assignment.IdentityID == identityId);
+    }
+
+    private void SelectClusterIdentity(ClusterIdentity identity)
+    {
+        if (identity.MetaInfo?.ID is not Guid identityId || identityId == Guid.Empty)
+        {
+            return;
+        }
+
+        _selectedIdentityId = identityId;
+    }
+
+    private bool CanAssignSelectedIdentity()
+    {
+        if (_selectedIdentityId is not Guid identityId)
+        {
+            return false;
+        }
+
+        ClusterIdentity? identity = FindClusterIdentity(identityId);
+        return identity != null && !IsIdentityAssigned(identity);
+    }
+
+    private void AssignSelectedIdentity()
+    {
+        if (!CanAssignSelectedIdentity())
+        {
+            return;
+        }
+
+        _clusterIdentityAssignments.Add(new ClusterIdentityAssignment
+        {
+            ID = Guid.NewGuid(),
+            IdentityID = _selectedIdentityId
+        });
+    }
+
+    private void UnassignSelectedIdentity()
+    {
+        if (_selectedIdentityAssignmentId is not Guid assignmentId)
+        {
+            return;
+        }
+
+        ClusterIdentityAssignment? assignment = _clusterIdentityAssignments.FirstOrDefault(item => item.ID == assignmentId);
+        if (assignment != null)
+        {
+            _clusterIdentityAssignments.Remove(assignment);
+        }
+        _selectedIdentityAssignment = null;
+        _selectedIdentityAssignmentId = null;
+    }
+
+    private void SetSelectedIdentityAssignment(ClusterIdentityAssignment? assignment)
+    {
+        _selectedIdentityAssignment = assignment;
+        _selectedIdentityAssignmentId = assignment?.ID;
+    }
+
+    private string GetIdentityAssignmentDisplayName(ClusterIdentityAssignment assignment)
+    {
+        return assignment.IdentityID is Guid identityId
+            ? FindClusterIdentity(identityId)?.Name ?? "Unknown identity"
+            : "Unknown identity";
+    }
+
+    private ClusterIdentity? FindClusterIdentity(Guid identityId)
+    {
+        return _clusterIdentities.FirstOrDefault(identity => identity.MetaInfo?.ID == identityId);
+    }
+
+    private bool TryValidateIdentityAssignments()
+    {
+        foreach (ClusterIdentityAssignment assignment in _clusterIdentityAssignments)
+        {
+            if (assignment.IdentityID is not Guid identityId)
+            {
+                Snackbar.Add("Identity assignments must have an identity", Severity.Warning);
+                return false;
+            }
+
+            if (FindClusterIdentity(identityId) == null)
+            {
+                Snackbar.Add("Identity assignments must reference existing identities", Severity.Warning);
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(assignment.Value))
+            {
+                Snackbar.Add("Identity assignment values cannot be empty", Severity.Warning);
+                return false;
+            }
+        }
+
+        if (_clusterIdentityAssignments
+            .Where(assignment => assignment.IdentityID != null)
+            .GroupBy(assignment => assignment.IdentityID)
+            .Any(group => group.Count() > 1))
+        {
+            Snackbar.Add("Each cluster identity can only be assigned once", Severity.Warning);
+            return false;
+        }
+
+        return true;
     }
 
     //Quick filter - filter gobally across multiple columns with the same input
@@ -1006,9 +2194,41 @@
 
         return false;
     };
+
+    private void SetReferenceNorth(double? value)
+    {
+        ChangeReferenceNorthing(value);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void SetReferenceEast(double? value)
+    {
+        ChangeReferenceEasting(value);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void SetReferenceLatitude(double? value)
+    {
+        ChangeReferenceLatitudeWGS84(value);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void SetReferenceLongitude(double? value)
+    {
+        ChangeReferenceLongitudeWGS84(value);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void SetReferenceDepth(double? value)
+    {
+        ChangeReferenceDepthWGS84(value);
+        InvokeAsync(StateHasChanged);
+    }
+
     private void ChangeReferenceLatitudeWGS84(double? val)
     {
         referenceLatitudeWGS84 = val;
+        _ = RefreshReferenceSourcesAsync();
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
         {
             CalculateReferenceWGS84();
@@ -1017,6 +2237,7 @@
     private void ChangeReferenceLongitudeWGS84(double? val)
     {
         referenceLongitudeWGS84 = val;
+        _ = RefreshReferenceSourcesAsync();
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
         {
             CalculateReferenceWGS84();
@@ -1041,6 +2262,7 @@
     private void ChangeReferenceNorthing(double? val)
     {
         referenceNorthing = val;
+        _ = RefreshReferenceSourcesAsync();
         if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null)
         {
             CalculateReferenceCartography();
@@ -1049,6 +2271,7 @@
     private void ChangeReferenceEasting(double? val)
     {
         referenceEasting = val;
+        _ = RefreshReferenceSourcesAsync();
         if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null)
         {
             CalculateReferenceCartography();
@@ -1057,6 +2280,7 @@
     private void ChangeReferenceDepthWGS84(double? val)
     {
         referenceDepthWGS84 = val;
+        _ = RefreshReferenceSourcesAsync();
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
         {
             CalculateReferenceWGS84();
@@ -1338,391 +2562,53 @@
     }
     private void AddSlot()
     {
-        _slots.Add(new SlotTemplate() { ID = Guid.NewGuid() });
+        SlotTemplate slot = new() { ID = Guid.NewGuid() };
+        _slots.Add(slot);
     }
 
     private void RemoveSlot(SlotTemplate slot)
     {
         _slots.Remove(slot);
+        ResetSelectedSlotFeatureAssignment();
         UpdateSlotPlot();
     }
+
+    private void RemoveSelectedSlots()
+    {
+        _slots.RemoveAll(slot => slot.IsSelected);
+        ResetSelectedSlotFeatureAssignment();
+        UpdateSlotPlot();
+    }
+
     private void UpdateSlotLatitudeWGS84(double? val, SlotTemplate context)
     {
         context.LatitudeWGS84 = val;
-        if (context.LatitudeWGS84 != null && context.LongitudeWGS84 != null && referenceDepthWGS84 != null)
-        {
-            CalculateSlotWGS84(context);
-            UpdateSlotPlot();
-        }
+        UpdateSlotPlot();
+        InvokeAsync(StateHasChanged);
     }
     private void UpdateSlotLongitudeWGS84(double? val, SlotTemplate context)
     {
         context.LongitudeWGS84 = val;
-        if (context.LatitudeWGS84 != null && context.LongitudeWGS84 != null && referenceDepthWGS84 != null)
-        {
-            CalculateSlotWGS84(context);
-            UpdateSlotPlot();
-        }
-    }
-    private void UpdateSlotLatitudeDatum(double? val, SlotTemplate context)
-    {
-        context.LatitudeDatum = val;
-        if (context.LatitudeDatum != null && context.LongitudeDatum != null && referenceDepthDatum != null)
-        {
-            CalculateDatum(context);
-            UpdateSlotPlot();
-        }
-    }
-    private void UpdateSlotLongitudeDatum(double? val, SlotTemplate context)
-    {
-        context.LongitudeDatum = val;
-        if (context.LatitudeDatum != null && context.LongitudeDatum != null && referenceDepthDatum != null)
-        {
-            CalculateDatum(context);
-            UpdateSlotPlot();
-        }
+        UpdateSlotPlot();
+        InvokeAsync(StateHasChanged);
     }
     private void UpdateSlotNorthing(double? val, SlotTemplate context)
     {
         context.Northing = val;
-        if (context.Northing != null && context.Easting != null && referenceDepthDatum != null)
-        {
-            CalculateCartographic(context);
-            UpdateSlotPlot();
-        }
+        UpdateSlotPlot();
+        InvokeAsync(StateHasChanged);
     }
     private void UpdateSlotEasting(double? val, SlotTemplate context)
     {
         context.Easting = val;
-        if (context.Northing != null && context.Easting != null && referenceDepthDatum != null)
-        {
-            CalculateCartographic(context);
-            UpdateSlotPlot();
-        }
-    }
-    private void CalculateSlotWGS84(SlotTemplate slot)
-    {
-        if (slot.LatitudeWGS84 != null && slot.LongitudeWGS84 != null && referenceDepthWGS84 != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
-        {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Slot Position",
-                        Description = "Calculate Slot Position",
-                        FieldID = _field.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeWGS84 = slot.LatitudeWGS84 ,
-                                    LongitudeWGS84 = slot.LongitudeWGS84,
-                                    VerticalDepthWGS84 = referenceDepthWGS84
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        slot.LatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
-                        slot.LongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
-                        slot.Northing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
-                        slot.Easting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
-        }
-    }
-    private void CalculateDatum(SlotTemplate slot)
-    {
-        if (slot.LatitudeDatum != null && slot.LongitudeDatum != null && referenceDepthDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
-        {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Slot Position",
-                        Description = "Calculate Slot Position",
-                        FieldID = _field.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeDatum = slot.LatitudeDatum ,
-                                    LongitudeDatum = slot.LongitudeDatum,
-                                    VerticalDepthDatum = referenceDepthDatum
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        slot.LatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
-                        slot.LongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
-                        slot.Northing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
-                        slot.Easting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
-        }
-    }
-    private void CalculateCartographic(SlotTemplate slot)
-    {
-        if (slot.Northing != null && slot.Easting != null && referenceDepthDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
-        {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Slot Position",
-                        Description = "Calculate Slot Position",
-                        FieldID = _field.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                Northing = slot.Northing,
-                                Easting = slot.Easting,
-                                VerticalDepth = referenceDepthDatum,
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        slot.LatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
-                        slot.LongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
-                        slot.LatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
-                        slot.LongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
-        }
-    }
-
-    private void CalculateWGS84()
-    {
-        try
-        {
-            if (Api.ClientField != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
-            {
-                FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                {
-                    MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                    Name = "Calculate Slot Position",
-                    Description = "Calculate Slot Position",
-                    FieldID = _field.MetaInfo.ID
-                };
-                conversionSet.CartographicCoordinateList ??= new List<CartographicCoordinate>();
-                conversionSet.CartographicCoordinateList.Clear();
-                double defaultLatitudeWGS84 = 0;
-                double defaultLongitudeWGS84 = 0;
-                if (referenceLatitudeWGS84 != null)
-                {
-                    defaultLatitudeWGS84 = referenceLatitudeWGS84.Value;
-                }
-                if (referenceLongitudeWGS84 != null)
-                {
-                    defaultLongitudeWGS84 = referenceLongitudeWGS84.Value;
-                }
-                List<bool> toBeProcessed = new List<bool>();
-                CartographicCoordinate coordinate;
-                if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = referenceLatitudeWGS84,
-                            LongitudeWGS84 = referenceLongitudeWGS84,
-                            VerticalDepthWGS84 = referenceDepthWGS84
-                        }
-                    };
-                    toBeProcessed.Add(true);
-                }
-                else
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = defaultLatitudeWGS84,
-                            LongitudeWGS84 = defaultLongitudeWGS84,
-                            VerticalDepthWGS84 = 0
-                        }
-                    };
-                    toBeProcessed.Add(false);
-                }
-                conversionSet.CartographicCoordinateList.Add(coordinate);
-                if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && groundMudLineDepthWGS84 != null)
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = referenceLatitudeWGS84,
-                            LongitudeWGS84 = referenceLongitudeWGS84,
-                            VerticalDepthWGS84 = groundMudLineDepthWGS84
-                        }
-                    };
-                    toBeProcessed.Add(true);
-                }
-                else
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = defaultLatitudeWGS84,
-                            LongitudeWGS84 = defaultLongitudeWGS84,
-                            VerticalDepthWGS84 = 0
-                        }
-                    };
-                    toBeProcessed.Add(false);
-                }
-                conversionSet.CartographicCoordinateList.Add(coordinate);
-                if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && topWaterDepthWGS84 != null)
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = referenceLatitudeWGS84,
-                            LongitudeWGS84 = referenceLongitudeWGS84,
-                            VerticalDepthWGS84 = topWaterDepthWGS84
-                        }
-                    };
-                    toBeProcessed.Add(true);
-                }
-                else
-                {
-                    coordinate = new CartographicCoordinate()
-                    {
-                        GeodeticCoordinate = new GeodeticCoordinate()
-                        {
-                            LatitudeWGS84 = defaultLatitudeWGS84,
-                            LongitudeWGS84 = defaultLongitudeWGS84,
-                            VerticalDepthWGS84 = 0
-                        }
-                    };
-                    toBeProcessed.Add(false);
-                }
-                conversionSet.CartographicCoordinateList.Add(coordinate);
-                if (_slots != null)
-                {
-                    foreach (SlotTemplate slotTemplate in _slots)
-                    {
-                        if (slotTemplate != null && slotTemplate.LatitudeWGS84 != null && slotTemplate.LongitudeWGS84 != null && referenceDepthWGS84 != null)
-                        {
-                            coordinate = new CartographicCoordinate()
-                            {
-                                GeodeticCoordinate = new GeodeticCoordinate()
-                                {
-                                    LatitudeWGS84 = slotTemplate.LatitudeWGS84,
-                                    LongitudeWGS84 = slotTemplate.LongitudeWGS84,
-                                    VerticalDepthWGS84 = referenceDepthWGS84
-                                }
-                            };
-                            toBeProcessed.Add(true);
-                        }
-                        else
-                        {
-                            coordinate = new CartographicCoordinate()
-                            {
-                                GeodeticCoordinate = new GeodeticCoordinate()
-                                {
-                                    LatitudeWGS84 = defaultLatitudeWGS84,
-                                    LongitudeWGS84 = defaultLongitudeWGS84,
-                                    VerticalDepthWGS84 = 0
-                                }
-                            };
-                            toBeProcessed.Add(false);
-                        }
-                        conversionSet.CartographicCoordinateList.Add(coordinate);
-                    }
-                }
-                FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                    calculatedConversionSet.CartographicCoordinateList != null &&
-                    calculatedConversionSet.CartographicCoordinateList.Count == toBeProcessed.Count &&
-                    calculatedConversionSet.CartographicCoordinateList.Count >= 3)
-                {
-                    CartographicCoordinate calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(0);
-                    if (calculatedCoordinate != null && toBeProcessed[0])
-                    {
-                        if (calculatedCoordinate.GeodeticCoordinate != null)
-                        {
-                            referenceDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
-                            referenceLatitudeDatum = calculatedCoordinate.GeodeticCoordinate.LatitudeDatum;
-                            referenceLongitudeDatum = calculatedCoordinate.GeodeticCoordinate.LongitudeDatum;
-                        }
-                        referenceNorthing = calculatedCoordinate.Northing;
-                        referenceEasting = calculatedCoordinate.Easting;
-                    }
-                    calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(1);
-                    if (calculatedCoordinate != null && toBeProcessed[1])
-                    {
-                        //groundMudLineDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
-                    }
-                    calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(2);
-                    if (calculatedCoordinate != null && toBeProcessed[2] && calculatedCoordinate.GeodeticCoordinate != null)
-                    {
-                        //topWaterDepthDatum = calculatedCoordinate.GeodeticCoordinate.VerticalDepthDatum;
-                    }
-                    if (_slots != null)
-                    {
-                        for (int i = 3; i < calculatedConversionSet.CartographicCoordinateList.Count; i++)
-                        {
-                            calculatedCoordinate = calculatedConversionSet.CartographicCoordinateList.ElementAt<CartographicCoordinate>(i);
-                            if (calculatedCoordinate != null && toBeProcessed[i])
-                            {
-                                if (calculatedCoordinate.GeodeticCoordinate != null)
-                                {
-                                    _slots[i - 3].LatitudeDatum = calculatedCoordinate.GeodeticCoordinate.LatitudeDatum;
-                                    _slots[i - 3].LongitudeDatum = calculatedCoordinate.GeodeticCoordinate.LongitudeDatum;
-                                }
-                                _slots[i - 3].Northing = calculatedCoordinate.Northing;
-                                _slots[i - 3].Easting = calculatedCoordinate.Easting;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-        }
+        UpdateSlotPlot();
+        InvokeAsync(StateHasChanged);
     }
     private void RefreshPlots()
     {
         UpdateDepthPlot();
         UpdateSlotPlot();
-        InvokeAsync(() => { StateHasChanged(); }).Wait();
+        _ = InvokeAsync(StateHasChanged);
     }
 }
 

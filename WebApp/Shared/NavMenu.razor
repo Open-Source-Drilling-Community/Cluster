@@ -1,10 +1,29 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="/Cluster/webapp/Cluster" Match="NavLinkMatch.Prefix">Cluster Management</MudNavLink>
-    <MudNavLink Href="/Cluster/webapp/ClusterTrajectories" Match="NavLinkMatch.Prefix">Cluster Trajectories</MudNavLink>
-    <MudNavLink Href="/Cluster/webapp/ClusterSurveyRuns" Match="NavLinkMatch.Prefix">Cluster Survey Runs</MudNavLink>
-    <MudNavLink Href="/Cluster/webapp/Field" Match="NavLinkMatch.All">Field</MudNavLink>
-    <MudNavLink Href="/Cluster/webapp/CartographicProjection" Match="NavLinkMatch.All">Cartographic Projection</MudNavLink>
-    <MudNavLink Href="/Cluster/webapp/GeodeticDatum" Match="NavLinkMatch.All">Geodetic Datum</MudNavLink>
-    <MudNavLink Href="/Cluster/webapp/Spheroid" Match="NavLinkMatch.All">Spheroid</MudNavLink>
-    <MudNavLink Href="/Cluster/webapp/StatisticsCluster" Match="NavLinkMatch.Prefix">Usage Statistics</MudNavLink>
+<MudNavMenu>
+    <MudNavGroup Title="Cluster Management" Expanded="true">
+        <MudNavLink Href="/Cluster/webapp/Cluster" Match="NavLinkMatch.All">Cluster</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/ClusterIdentities" Match="NavLinkMatch.All">Cluster Identities</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/ClusterFeatures" Match="NavLinkMatch.All">Cluster Features</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/SlotFeatures" Match="NavLinkMatch.All">Slot Features</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Survey Display" Expanded="false">
+        <MudNavLink Href="/Cluster/webapp/ClusterTrajectories" Match="NavLinkMatch.All">Cluster Trajectories</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/ClusterSurveyRuns" Match="NavLinkMatch.All">Cluster Survey Runs</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Contextual Data" Expanded="false">
+        <MudNavLink Href="/Cluster/webapp/Field" Match="NavLinkMatch.All">Field</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/CartographicProjection" Match="NavLinkMatch.All">Cartographic Projections</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/GeodeticDatum" Match="NavLinkMatch.All">Geodetic Datum</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/Spheroid" Match="NavLinkMatch.All">Spheroid</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Calculators" Expanded="false">
+        <MudNavLink Href="/Cluster/webapp/FieldCartographicConverter" Match="NavLinkMatch.All">Cartographic Conversions</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/VerticalDatumConversion" Match="NavLinkMatch.All">Vertical Datum Conversions</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Diagnostics" Expanded="false">
+        <MudNavLink Href="/Cluster/webapp/StatisticsCluster" Match="NavLinkMatch.All">Usage Statistics</MudNavLink>
+    </MudNavGroup>
 </MudNavMenu>

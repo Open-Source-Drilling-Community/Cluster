@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
@@ -151,6 +152,22 @@ namespace ServiceTest.Controllers
             Assert.That(ok.Value, Is.InstanceOf<IEnumerable<NORCE.Drilling.Cluster.Model.Cluster?>>());
             var list = (IEnumerable<NORCE.Drilling.Cluster.Model.Cluster?>)ok.Value!;
             Assert.That(list, Is.Not.Null);
+        }
+
+        [Test]
+        public void GetAllClusterLight_ReturnsOkWithLightItems()
+        {
+            var id = Guid.NewGuid();
+            _controller!.PostCluster(MakeCluster(id));
+
+            var res = _controller!.GetAllClusterLight();
+            Assert.That(res.Result, Is.TypeOf<OkObjectResult>());
+            var ok = (OkObjectResult)res.Result!;
+            Assert.That(ok.Value, Is.InstanceOf<IEnumerable<NORCE.Drilling.Cluster.Model.ClusterLight>>());
+            var list = ((IEnumerable<NORCE.Drilling.Cluster.Model.ClusterLight>)ok.Value!).ToList();
+            Assert.That(list, Has.Count.EqualTo(1));
+            Assert.That(list[0].MetaInfo?.ID, Is.EqualTo(id));
+            Assert.That(list[0].Name, Is.EqualTo("Test Cluster"));
         }
 
         [Test]

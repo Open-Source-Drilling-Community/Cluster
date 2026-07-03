@@ -8,8 +8,15 @@ public static class MslDepthReferenceUtils
 {
     public static Task<double?> ResolveMeanSeaLevelDepthReferenceAsync(IClusterAPIUtils api, ModelShared.Cluster? cluster)
     {
-        double? latitude = cluster?.ReferenceLatitude?.GaussianValue?.Mean;
-        double? longitude = cluster?.ReferenceLongitude?.GaussianValue?.Mean;
+        double? latitude = cluster?.ReferencePoint?.Latitude;
+        double? longitude = cluster?.ReferencePoint?.Longitude;
+        return CalculateMeanSeaLevelDepthReferenceAsync(api.HttpClientVerticalDatum, api.HostNameVerticalDatum, api.HostBasePathVerticalDatum, latitude, longitude);
+    }
+
+    public static Task<double?> ResolveMeanSeaLevelDepthReferenceAsync(IClusterAPIUtils api, ModelShared.ClusterLight? cluster)
+    {
+        double? latitude = cluster?.ReferencePoint?.Latitude;
+        double? longitude = cluster?.ReferencePoint?.Longitude;
         return CalculateMeanSeaLevelDepthReferenceAsync(api.HttpClientVerticalDatum, api.HostNameVerticalDatum, api.HostBasePathVerticalDatum, latitude, longitude);
     }
 

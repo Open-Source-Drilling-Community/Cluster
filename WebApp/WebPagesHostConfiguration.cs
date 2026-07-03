@@ -6,7 +6,8 @@ public class WebPagesHostConfiguration :
     IClusterWebPagesConfiguration,
     NORCE.Drilling.Field.WebPages.IFieldWebPagesConfiguration,
     NORCE.Drilling.CartographicProjection.WebPages.ICartographicProjectionWebPagesConfiguration,
-    NORCE.Drilling.GeodeticDatum.WebPages.IGeodeticDatumWebPagesConfiguration
+    NORCE.Drilling.GeodeticDatum.WebPages.IGeodeticDatumWebPagesConfiguration,
+    NORCE.Drilling.VerticalDatum.WebPage.IVerticalDatumWebPageConfiguration
 {
     public string ClusterHostURL { get; set; } = string.Empty;
     public string FieldHostURL { get; set; } = string.Empty;
@@ -14,6 +15,6 @@ public class WebPagesHostConfiguration :
     public string TrajectoryHostURL { get; set; } = string.Empty;
     public string CartographicProjectionHostURL { get; set; } = string.Empty;
     public string GeodeticDatumHostURL { get; set; } = string.Empty;
-    public string? VerticalDatumHostURL { get; set; } = string.Empty;
+    public string VerticalDatumHostURL { get; set; } = string.Empty;
     public string UnitConversionHostURL { get; set; } = string.Empty;
 }

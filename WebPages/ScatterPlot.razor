@@ -17,6 +17,7 @@
     [Parameter] public List<string>? ColorList { get; set; }
     [Parameter] public List<bool>? ShowLegends { get; set; }
     [Parameter] public List<bool>? ShowMarkers { get; set; }
+    [Parameter] public List<string>? LineDashList { get; set; }
     [Parameter] public List<List<object>>? XValuesList { get; set; }
     [Parameter] public List<List<object>>? YValuesList { get; set; }
     [Parameter] public int PlotHeight { get; set; }
@@ -83,12 +84,22 @@
     public void ManageUnits()
     {
         _forceReplot = true;
+        if (!_plotlyReady || _disposed)
+        {
+            return;
+        }
+
         _ = InvokeAsync(PlotAsync);
     }
 
     public void Plot()
     {
         _forceReplot = true;
+        if (!_plotlyReady || _disposed)
+        {
+            return;
+        }
+
         _ = InvokeAsync(PlotAsync);
     }
 
@@ -203,6 +214,11 @@
             Marker marker = ColorList != null && i < ColorList.Count
                 ? new Marker { Color = ColorList[i] }
                 : new Marker { AutoColorScale = true };
+            Line line = new()
+            {
+                Color = ColorList != null && i < ColorList.Count ? ColorList[i] : null,
+                Dash = LineDashList != null && i < LineDashList.Count ? LineDashList[i] : null
+            };
 
             bool showLegend = ShowLegends != null && i < ShowLegends.Count ? ShowLegends[i] : true;
             bool showMarker = ShowMarkers != null && i < ShowMarkers.Count ? ShowMarkers[i] : false;
@@ -216,6 +232,7 @@
                     Name = name,
                     Mode = mode,
                     Marker = marker,
+                    Line = line,
                     ShowLegend = showLegend,
                     X = xValues,
                     Y = yValues
@@ -239,6 +256,7 @@
                     Name = name,
                     Mode = mode,
                     Marker = marker,
+                    Line = line,
                     ShowLegend = showLegend,
                     X = xValues,
                     Y = yValues
@@ -343,6 +361,7 @@
         AppendListSignature(builder, ColorList);
         AppendListSignature(builder, ShowLegends);
         AppendListSignature(builder, ShowMarkers);
+        AppendListSignature(builder, LineDashList);
         AppendNestedListSignature(builder, XValuesList);
         AppendNestedListSignature(builder, YValuesList);
         return builder.ToString();

@@ -46,6 +46,34 @@ namespace NORCE.Drilling.Cluster.Service.Managers
                     "IsFixedPlatform bool",
                     "Cluster text"
                     }
+                },
+                { "ClusterIdentityTable", new string[] {
+                    "ID text primary key",
+                    "MetaInfo text",
+                    "Name text",
+                    "CreationDate text",
+                    "LastModificationDate text",
+                    "ClusterIdentity text" }
+                },
+                { "ClusterFeatureCategoryTable", new string[] {
+                    "ID text primary key",
+                    "MetaInfo text",
+                    "Name text",
+                    "IsExclusive integer",
+                    "HasValidityPeriod integer",
+                    "CreationDate text",
+                    "LastModificationDate text",
+                    "ClusterFeatureCategory text" }
+                },
+                { "SlotFeatureCategoryTable", new string[] {
+                    "ID text primary key",
+                    "MetaInfo text",
+                    "Name text",
+                    "IsExclusive integer",
+                    "HasValidityPeriod integer",
+                    "CreationDate text",
+                    "LastModificationDate text",
+                    "SlotFeatureCategory text" }
                 }
             };
 

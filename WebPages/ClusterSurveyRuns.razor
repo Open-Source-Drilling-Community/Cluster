@@ -34,7 +34,7 @@
                     </MudItem>
                     <MudItem xs="12" sm="6" md="3">
                         <MudSelect Label="Field" T="Guid?" Value="@selectedFieldId" ValueChanged="OnFieldChanged" ShrinkLabel Clearable="true">
-                            @foreach (ClusterModelShared.Field field in AvailableFields)
+                            @foreach (ClusterModelShared.FieldLight field in AvailableFields)
                             {
                                 <MudSelectItem T="Guid?" Value="@((Guid?)field.MetaInfo.ID)">@field.Name</MudSelectItem>
                             }
@@ -48,7 +48,7 @@
                                    ShrinkLabel
                                    Clearable="true"
                                    Disabled="@(selectedFieldId == null || AvailableClusters.Count == 0)">
-                            @foreach (ClusterModelShared.Cluster cluster in AvailableClusters)
+                            @foreach (ClusterModelShared.ClusterLight cluster in AvailableClusters)
                             {
                                 <MudSelectItem T="Guid?" Value="@((Guid?)cluster.MetaInfo.ID)">@cluster.Name</MudSelectItem>
                             }
@@ -141,6 +141,8 @@
                                            ZDrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                            PositionDirectionX="@PositionDirectionType.East"
                                            PositionDirectionY="@PositionDirectionType.North"
+                                           ContributesToBounds="@Plot3DContributesToBounds"
+                                           CameraIsAboveSceneChanged="@OnCameraIsAboveSceneChanged"
                                            ShowLegends="@Plot3DShowLegends" />
                         </MudPaper>
                     </MudItem>
@@ -163,7 +165,8 @@
                                          YDrillingSignalReference="@DrillingSignalReferenceType.Position"
                                          PositionDirectionX="@PositionDirectionType.East"
                                          PositionDirectionY="@PositionDirectionType.North"
-                                           ShowLegends="@PlotHorizontalShowLegends" />
+                                         LineDashList="@PlotHorizontalLineDashes"
+                                         ShowLegends="@PlotHorizontalShowLegends" />
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
@@ -188,10 +191,11 @@
 </MudUnitAndReferenceChoiceTag>
 
 @code {
-    private List<ClusterModelShared.Field>? fieldList;
-    private List<ClusterModelShared.Cluster>? clusterList;
+    private List<ClusterModelShared.FieldLight>? fieldList;
+    private List<ClusterModelShared.ClusterLight>? clusterList;
     private List<ClusterModelShared.SurveyRunLight> surveyRunLightList = [];
     private List<ClusterModelShared.SurveyRun> surveyRunList = [];
+    private List<ClusterModelShared.FieldDelineationLine> selectedFieldDelineationLines = [];
     private Guid? selectedFieldId;
     private Guid? selectedClusterId;
     private string? errorMessage;
@@ -202,6 +206,7 @@
     private string selectedSurveyRunTypeFilter = SurveyRunTypeFilterAll;
     private bool isCalculatingEllipses;
     private double ellipseConfidenceFactor = 0.95;
+    private bool cameraIsAboveScene = true;
     private readonly CartographicReference _cartographicReference = new() { CartographicGridNorthPositionReference = 0, CartographicGridEastPositionReference = 0 };
     private readonly ClusterReference _clusterReference = new() { ClusterNorthPositionReference = 0, ClusterEastPositionReference = 0 };
     private List<PlotTrace> plotTraces = [];
@@ -218,6 +223,7 @@
     private List<int> Plot3DModeFlags => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.ModeFlag).ToList();
     private List<string> Plot3DColors => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.Color).ToList();
     private List<bool> Plot3DShowLegends => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.ShowLegend).ToList();
+    private List<bool> Plot3DContributesToBounds => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.ContributesToBounds).ToList();
     private List<List<object>> Plot3DNorthValuesList => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.NorthValues).ToList();
     private List<List<object>> Plot3DEastValuesList => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.EastValues).ToList();
     private List<List<object>> Plot3DTvdValuesList => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.TvdValues).ToList();
@@ -225,6 +231,7 @@
     private List<int> PlotHorizontalModeFlags => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.ModeFlag).ToList();
     private List<string> PlotHorizontalColors => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.Color).ToList();
     private List<bool> PlotHorizontalShowLegends => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.ShowLegend).ToList();
+    private List<string> PlotHorizontalLineDashes => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.LineDash).ToList();
     private List<List<object>> PlotHorizontalNorthValuesList => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.NorthValues).ToList();
     private List<List<object>> PlotHorizontalEastValuesList => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.EastValues).ToList();
 
@@ -233,8 +240,8 @@
         try
         {
             logger.LogInformation("Trying to load list of Fields and Clusters");
-            Task<ICollection<ClusterModelShared.Field>> fieldTask = Api.ClientField.GetAllFieldAsync();
-            Task<ICollection<ClusterModelShared.Cluster>> clusterTask = Api.ClientCluster.GetAllClusterAsync();
+            Task<ICollection<ClusterModelShared.FieldLight>> fieldTask = Api.ClientField.GetAllFieldLightAsync();
+            Task<ICollection<ClusterModelShared.ClusterLight>> clusterTask = Api.ClientCluster.GetAllClusterLightAsync();
 
             await Task.WhenAll(fieldTask, clusterTask);
 
@@ -264,13 +271,13 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private List<ClusterModelShared.Field> AvailableFields =>
+    private List<ClusterModelShared.FieldLight> AvailableFields =>
         fieldList?
             .Where(field => field?.MetaInfo != null)
             .OrderBy(field => field.Name)
             .ToList() ?? [];
 
-    private List<ClusterModelShared.Cluster> AvailableClusters =>
+    private List<ClusterModelShared.ClusterLight> AvailableClusters =>
         clusterList?
             .Where(cluster => cluster?.MetaInfo != null && cluster.FieldID == selectedFieldId && !cluster.IsSingleWell)
             .OrderBy(cluster => cluster.Name)
@@ -282,6 +289,7 @@
         selectedClusterId = null;
         surveyRunLightList.Clear();
         surveyRunList.Clear();
+        selectedFieldDelineationLines.Clear();
         ClearPlots();
         errorMessage = null;
         await ApplySelectedClusterReferenceValuesAsync(null);
@@ -301,6 +309,7 @@
         {
             surveyRunLightList.Clear();
             surveyRunList.Clear();
+            selectedFieldDelineationLines.Clear();
             ClearPlots();
             errorMessage = null;
             await ApplySelectedClusterReferenceValuesAsync(null);
@@ -320,7 +329,7 @@
 
     private async Task ApplySelectedClusterReferenceValuesAsync(Guid? clusterId)
     {
-        ClusterModelShared.Cluster? selectedCluster = clusterList?.FirstOrDefault(cluster => cluster.MetaInfo?.ID == clusterId);
+        ClusterModelShared.ClusterLight? selectedCluster = clusterList?.FirstOrDefault(cluster => cluster.MetaInfo?.ID == clusterId);
         DataUtils.ApplyClusterReferenceValues(selectedCluster);
         DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
             await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, selectedCluster);
@@ -362,8 +371,10 @@
             isLoadingSurveyRuns = true;
             surveyRunLightList.Clear();
             surveyRunList.Clear();
+            selectedFieldDelineationLines.Clear();
             ClearPlots();
             await InvokeAsync(StateHasChanged);
+            selectedFieldDelineationLines = await LoadSelectedFieldDelineationLinesAsync(fieldId);
 
             logger.LogInformation("Loading survey run light data for field {FieldId} and cluster {ClusterId}", fieldId, clusterId);
             surveyRunLightList = (await Api.ClientTrajectory.GetAllSurveyRunLightAsync(fieldId: fieldId, clusterId: clusterId))
@@ -390,6 +401,7 @@
             Snackbar.Add(errorMessage, Severity.Error);
             surveyRunLightList.Clear();
             surveyRunList.Clear();
+            selectedFieldDelineationLines.Clear();
             ClearPlots();
         }
         catch (Exception ex)
@@ -399,6 +411,7 @@
             Snackbar.Add(errorMessage, Severity.Error);
             surveyRunLightList.Clear();
             surveyRunList.Clear();
+            selectedFieldDelineationLines.Clear();
             ClearPlots();
         }
         finally
@@ -431,6 +444,22 @@
 
         surveyRun.SurveyStationList = stations;
         return surveyRun;
+    }
+
+    private async Task<List<ClusterModelShared.FieldDelineationLine>> LoadSelectedFieldDelineationLinesAsync(Guid fieldId)
+    {
+        try
+        {
+            ClusterModelShared.Field field = await Api.ClientField.GetFieldByIdAsync(fieldId);
+            return field.DelineationLines?
+                .Where(line => line?.Points?.Count >= 2)
+                .ToList() ?? [];
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to load delineation lines for field {FieldId}", fieldId);
+            return [];
+        }
     }
 
     private void UpdatePlots()
@@ -471,7 +500,105 @@
         }
 
         AddEllipseTracesForLoadedSurveyRuns(nextPlotTraces);
+        AppendDelineationTraces(nextPlotTraces);
         plotTraces = nextPlotTraces;
+    }
+
+    private async Task OnCameraIsAboveSceneChanged(bool value)
+    {
+        if (cameraIsAboveScene == value)
+        {
+            return;
+        }
+
+        cameraIsAboveScene = value;
+        UpdatePlots();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void AppendDelineationTraces(List<PlotTrace> traces)
+    {
+        if (selectedFieldDelineationLines.Count == 0)
+        {
+            return;
+        }
+
+        double planeTvd = GetDelineationPlaneTvd(traces);
+        int index = 0;
+        foreach (ClusterModelShared.FieldDelineationLine line in selectedFieldDelineationLines)
+        {
+            string color = Colors[(index + 4) % Colors.Length];
+            string name = string.IsNullOrWhiteSpace(line.Name) ? $"delineation {index + 1}" : line.Name;
+            if (BuildDelineationTrace(name, line.Points, color, "solid", true, planeTvd) is { } trace)
+            {
+                traces.Add(trace);
+            }
+
+            int boundaryIndex = 1;
+            foreach (ClusterModelShared.FieldDelineationBoundaryLine boundary in line.CalculatedBoundaryLines ?? [])
+            {
+                if (BuildDelineationTrace($"{name} boundary {boundaryIndex}", boundary.Points, color, "dash", false, planeTvd) is { } boundaryTrace)
+                {
+                    traces.Add(boundaryTrace);
+                }
+                boundaryIndex++;
+            }
+            index++;
+        }
+    }
+
+    private double GetDelineationPlaneTvd(IEnumerable<PlotTrace> traces)
+    {
+        List<double> tvdValues = traces
+            .Where(trace => trace.ContributesToBounds)
+            .SelectMany(trace => trace.TvdValues)
+            .SelectMany(ToDoubleValue)
+            .ToList();
+        if (tvdValues.Count == 0)
+        {
+            return 0.0;
+        }
+
+        return cameraIsAboveScene ? tvdValues.Min() : tvdValues.Max();
+    }
+
+    private static PlotTrace? BuildDelineationTrace(
+        string name,
+        ICollection<ClusterModelShared.Point3DGlobalCoordinates>? points,
+        string color,
+        string lineDash,
+        bool showLegend,
+        double planeTvd)
+    {
+        if (points == null || points.Count < 2)
+        {
+            return null;
+        }
+
+        List<object> northValues = [];
+        List<object> eastValues = [];
+        List<object> tvdValues = [];
+        foreach (ClusterModelShared.Point3DGlobalCoordinates point in points)
+        {
+            if (point.RiemannianNorth is not { } north || point.RiemannianEast is not { } east)
+            {
+                continue;
+            }
+
+            AppendPointValues(north, east, planeTvd, northValues, eastValues, tvdValues);
+        }
+
+        return northValues.Count >= 2 && northValues.Count == eastValues.Count
+            ? new PlotTrace(name, 1, color, showLegend, northValues, eastValues, tvdValues, true, true, false, lineDash)
+            : null;
+    }
+
+    private static IEnumerable<double> ToDoubleValue(object value)
+    {
+        if (TryGetDouble(value, out double converted))
+        {
+            yield return converted;
+        }
     }
 
 
@@ -759,6 +886,20 @@
         };
     }
 
+    private static bool TryGetDouble(object value, out double converted)
+    {
+        converted = default;
+        return value switch
+        {
+            double d => (converted = d) == d,
+            float f => (converted = f) == f,
+            decimal m => (converted = (double)m) == (double)m,
+            int i => (converted = i) == i,
+            long l => (converted = l) == l,
+            _ => false
+        };
+    }
+
     private static bool AreClose(double left, double right)
     {
         return Math.Abs(left - right) <= 1e-6;
@@ -792,7 +933,9 @@
         List<object> EastValues,
         List<object> TvdValues,
         bool ShowIn3D = true,
-        bool ShowInHorizontal = true);
+        bool ShowInHorizontal = true,
+        bool ContributesToBounds = true,
+        string LineDash = "solid");
 
 
     private const int MaxDisplayedUncertaintyEllipses = 200;

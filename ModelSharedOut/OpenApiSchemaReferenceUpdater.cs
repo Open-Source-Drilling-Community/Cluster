@@ -29,7 +29,11 @@ public class OpenApiSchemaReferenceUpdater
                 };
             }
 
-            target.Components.Schemas[newKey] = clonedSchema;
+            if (!target.Components.Schemas.TryGetValue(newKey, out var existingSchema) ||
+                CountDeclaredProperties(clonedSchema) > CountDeclaredProperties(existingSchema))
+            {
+                target.Components.Schemas[newKey] = clonedSchema;
+            }
         }
 
         UpdateAllReferences(target);
@@ -124,6 +128,30 @@ public class OpenApiSchemaReferenceUpdater
         if (schema.OneOf != null)
             foreach (var sub in schema.OneOf)
                 UpdateSchemaRef(sub);
+    }
+
+    private static int CountDeclaredProperties(OpenApiSchema schema)
+    {
+        if (schema == null)
+        {
+            return 0;
+        }
+
+        int count = schema.Properties?.Count ?? 0;
+        if (schema.AllOf != null)
+        {
+            count += schema.AllOf.Sum(CountDeclaredProperties);
+        }
+        if (schema.AnyOf != null)
+        {
+            count += schema.AnyOf.Sum(CountDeclaredProperties);
+        }
+        if (schema.OneOf != null)
+        {
+            count += schema.OneOf.Sum(CountDeclaredProperties);
+        }
+
+        return count;
     }
 
     /// <summary>

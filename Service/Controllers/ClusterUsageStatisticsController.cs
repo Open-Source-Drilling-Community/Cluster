@@ -23,6 +23,7 @@ namespace NORCE.Drilling.Cluster.Service.Controllers
         [HttpGet(Name = "GetClusterUsageStatistics")]
         public ActionResult<UsageStatisticsCluster> GetClusterUsageStatistics()
         {
+            UsageStatisticsCluster.Instance.IncrementGetClusterUsageStatisticsPerDay();
             if (UsageStatisticsCluster.Instance != null)
             {
                 return Ok(UsageStatisticsCluster.Instance);

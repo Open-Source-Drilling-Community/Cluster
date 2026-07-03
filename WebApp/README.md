@@ -5,7 +5,7 @@ The WebApp project is a Blazor Server application that provides a user interface
 ## Purpose In The Solution
 - Frontend UI hosted under the base path `/Cluster/webapp` (see `WebApp/Program.cs`).
 - Calls the Cluster microservice at `/Cluster/api` using generated clients from `ModelSharedOut`.
-- Also integrates with Field and UnitConversion services for auxiliary data and unit handling.
+- Also integrates with Field, Trajectory, Rig, VerticalDatum, CartographicProjection, GeodeticDatum, and UnitConversion services for auxiliary data, displays, and unit/reference handling.
 
 ## Prerequisites
 - .NET SDK 8.0+
@@ -15,6 +15,11 @@ The WebApp project is a Blazor Server application that provides a user interface
 - App settings: `WebApp/appsettings.Development.json`, `WebApp/appsettings.Production.json` expose host URLs:
   - `ClusterHostURL`: base URL of the Cluster Service (e.g., `https://localhost:5001/`).
   - `FieldHostURL`: base URL of the Field Service.
+  - `TrajectoryHostURL`: base URL of the Trajectory Service.
+  - `RigHostURL`: base URL of the Rig Service.
+  - `CartographicProjectionHostURL`: base URL of the Cartographic Projection Service.
+  - `GeodeticDatumHostURL`: base URL of the Geodetic Datum Service.
+  - `VerticalDatumHostURL`: base URL of the Vertical Datum Service.
   - `UnitConversionHostURL`: base URL of the UnitConversion Service.
 - Defaults for local development:
   - WebApp URLs: `https://localhost:5011; http://localhost:5012` (see `WebApp/Properties/launchSettings.json`).
@@ -31,11 +36,15 @@ The WebApp project is a Blazor Server application that provides a user interface
 
 ## Usage
 - Main page: Cluster list with search, selection, add, and delete actions.
-- Detail page: Edit cluster metadata, reference coordinates, slots, and related parameters.
+- Detail page: edit cluster metadata, field association, reference coordinates, identities, features, environment depths, slots, and slot features.
+- Admin pages: manage cluster identities, cluster feature categories/options, and slot feature categories/options.
+- Display pages: show cluster trajectories and survey runs in 3D and horizontal projection.
+- Field delineation overlays: cluster trajectory and survey-run displays load delineation lines from the selected field and draw original lines plus calculated boundaries. Boundaries are dashed in the horizontal projection. In 3D, delineation lines are placed on the north/east plane at the top or bottom of the survey/trajectory bounding box without changing the plot bounds.
 - The UI uses the generated `Client` from `ModelSharedOut` to call endpoints like:
   - `GET /Cluster/api/Cluster`, `GET /Cluster/api/Cluster/{id}`
   - `POST /Cluster/api/Cluster`, `PUT /Cluster/api/Cluster/{id}`, `DELETE /Cluster/api/Cluster/{id}`
 - Unit selection and conversions leverage components from `OSDC.UnitConversion.DrillingRazorMudComponents`.
+- Reference handling supports field, cluster, cartographic, geodetic, MSL, ground/mud line, and other configured reference sources through the shared unit/reference components.
 
 ## Docker
 - Build (from repo root):

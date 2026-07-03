@@ -21,9 +21,7 @@ namespace NORCE.Drilling.Cluster.ModelTest
             Assert.That(cluster.FieldID, Is.Null);
             Assert.That(cluster.IsSingleWell, Is.False);
 
-            // Gaussian properties default to null
-            Assert.That(cluster.ReferenceLatitude, Is.Null);
-            Assert.That(cluster.ReferenceLongitude, Is.Null);
+            Assert.That(cluster.ReferencePoint, Is.Null);
             Assert.That(cluster.GroundMudLineDepth, Is.Null);
             Assert.That(cluster.TopWaterDepth, Is.Null);
 

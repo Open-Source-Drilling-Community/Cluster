@@ -4,6 +4,7 @@ using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.UnitConversion.Conversion.DrillingEngineering;
 using OSDC.UnitConversion.Conversion;
 using System;
+using System.Collections.Generic;
 
 namespace NORCE.Drilling.Cluster.Model
 {
@@ -82,6 +83,11 @@ namespace NORCE.Drilling.Cluster.Model
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyMean, "relative_east_position_cluster#01")]
         [DefaultStandardDeviation(1.6e-9)] // rad (1 cm at equator)
         public GaussianDrillingProperty? Longitude { get; set; } = null;
+
+        /// <summary>
+        /// the selected slot feature assignments associated with the slot
+        /// </summary>
+        public List<SlotFeatureAssignment>? SlotFeatureAssignments { get; set; }
 
         /// <summary>
         /// default constructor required for JSON serialization

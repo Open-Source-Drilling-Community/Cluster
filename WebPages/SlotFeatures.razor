@@ -1,0 +1,395 @@
+@page "/SlotFeatures"
+@inject ILogger<SlotFeatures> logger
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IClusterAPIUtils Api
+
+@if (categories == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MudText Class="mt-4 mb-4" Typo="Typo.h6">Slot Features</MudText>
+    <MudContainer Class="d-flex flex-row pa-0 mb-3">
+        <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="AddCategory">Add Category</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(!_selectedCategoryIds.Any())" OnClick="DeleteSelectedCategoriesAsync">Delete</MudButton>
+    </MudContainer>
+
+    <MudGrid Class="mt-2">
+        <MudItem xs="2" md="1" Class="d-flex align-center">
+            <MudCheckBox T="bool" Value="@AreAllCategoriesSelected()" ValueChanged="@SetAllCategoriesSelected" />
+        </MudItem>
+        <MudItem xs="10" md="3" Class="d-flex align-center">
+            <MudText Typo="Typo.subtitle2">Category</MudText>
+        </MudItem>
+        <MudItem xs="6" md="1" Class="d-flex align-center">
+            <MudText Typo="Typo.subtitle2">Exclusive</MudText>
+        </MudItem>
+        <MudItem xs="6" md="1" Class="d-flex align-center">
+            <MudText Typo="Typo.subtitle2">Dated</MudText>
+        </MudItem>
+        <MudItem xs="10" md="5" Class="d-flex align-center">
+            <MudText Typo="Typo.subtitle2">Options</MudText>
+        </MudItem>
+        <MudItem xs="2" md="1" />
+    </MudGrid>
+
+    @foreach (SlotFeatureCategory category in categories)
+    {
+        <MudGrid Class="mt-2" @key="category.MetaInfo?.ID">
+            <MudItem xs="2" md="1" Class="d-flex align-center">
+                <MudCheckBox T="bool" Value="@IsCategorySelected(category)" ValueChanged="@((bool selected) => SetCategorySelected(category, selected))" />
+            </MudItem>
+            <MudItem xs="10" md="3">
+                <MudTextField @bind-Value="category.Name" Required="true" />
+            </MudItem>
+            <MudItem xs="6" md="1" Class="d-flex align-center">
+                <MudCheckBox T="bool" @bind-Value="category.IsExclusive" />
+            </MudItem>
+            <MudItem xs="6" md="1" Class="d-flex align-center">
+                <MudCheckBox T="bool" @bind-Value="category.HasValidityPeriod" />
+            </MudItem>
+            <MudItem xs="10" md="5">
+                <MudContainer Class="d-flex flex-row align-center pa-0 mb-1">
+                    <MudCheckBox T="bool" Value="@AreAllOptionsSelected(category)" ValueChanged="@((bool selected) => SetAllOptionsSelected(category, selected))" />
+                    <MudButton Class="ms-1 me-1" Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small" OnClick="@(() => AddOption(category))">Add Option</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" Disabled="@(!HasSelectedOptions(category))" OnClick="@(() => DeleteSelectedOptions(category))">Delete</MudButton>
+                </MudContainer>
+                @foreach (SlotFeatureOption option in category.Options ?? [])
+                {
+                    <MudGrid Class="mb-1" @key="option.ID">
+                        <MudItem xs="1" Class="d-flex align-center">
+                            <MudCheckBox T="bool" Value="@IsOptionSelected(option)" ValueChanged="@((bool selected) => SetOptionSelected(option, selected))" />
+                        </MudItem>
+                        <MudItem xs="11">
+                            <MudTextField @bind-Value="option.Name" Required="true" />
+                        </MudItem>
+                    </MudGrid>
+                }
+            </MudItem>
+            <MudItem xs="2" md="1" Class="d-flex align-center justify-end">
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => DeleteCategoryAsync(category))" />
+            </MudItem>
+        </MudGrid>
+    }
+
+    <MudContainer Class="d-flex flex-row pa-0 mt-4">
+        <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveAsync">Save</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadDataAsync">Reload</MudButton>
+    </MudContainer>
+}
+
+@code {
+    private List<SlotFeatureCategory>? categories;
+    private readonly HashSet<Guid> _selectedCategoryIds = [];
+    private readonly HashSet<Guid> _selectedOptionIds = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            categories = (List<SlotFeatureCategory>)await Api.ClientCluster.GetAllSlotFeatureCategoryAsync();
+            categories = categories
+                .Where(category => category?.MetaInfo?.ID != null)
+                .OrderBy(category => category.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            _selectedCategoryIds.Clear();
+            _selectedOptionIds.Clear();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to load slot feature categories");
+            Snackbar.Add("Impossible to load slot feature categories", Severity.Error);
+            categories = [];
+        }
+    }
+
+    private void AddCategory()
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        categories ??= [];
+        categories.Add(new SlotFeatureCategory
+        {
+            MetaInfo = new MetaInfo { ID = Guid.NewGuid(), HttpHostName = Api.HostNameCluster, HttpHostBasePath = Api.HostBasePathCluster, HttpEndPoint = "SlotFeatureCategory/" },
+            Name = "new slot feature category",
+            Options = [new SlotFeatureOption { ID = Guid.NewGuid(), Name = "new option" }],
+            CreationDate = now,
+            LastModificationDate = now
+        });
+    }
+
+    private void AddOption(SlotFeatureCategory category)
+    {
+        category.Options ??= [];
+        category.Options.Add(new SlotFeatureOption { ID = Guid.NewGuid(), Name = "new option" });
+    }
+
+    private void DeleteSelectedOptions(SlotFeatureCategory category)
+    {
+        if (category.Options == null)
+        {
+            return;
+        }
+
+        category.Options = category.Options
+            .Where(option => option.ID == Guid.Empty || !_selectedOptionIds.Contains(option.ID))
+            .ToList();
+        TrimSelectedOptionIds();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (categories == null || !TryValidateCategories())
+        {
+            return;
+        }
+
+        try
+        {
+            List<Guid> existingIds = ((IEnumerable<Guid>)await Api.ClientCluster.GetAllSlotFeatureCategoryIdAsync()).ToList();
+            foreach (SlotFeatureCategory category in categories)
+            {
+                EnsureCategory(category);
+                if (existingIds.Contains(category.MetaInfo!.ID))
+                {
+                    await Api.ClientCluster.PutSlotFeatureCategoryByIdAsync(category.MetaInfo.ID, category);
+                }
+                else
+                {
+                    await Api.ClientCluster.PostSlotFeatureCategoryAsync(category);
+                }
+            }
+
+            Snackbar.Add("Saved slot features", Severity.Success);
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to save slot features");
+            Snackbar.Add("Impossible to save slot features", Severity.Error);
+        }
+    }
+
+    private async Task DeleteSelectedCategoriesAsync()
+    {
+        if (categories == null)
+        {
+            return;
+        }
+
+        foreach (SlotFeatureCategory category in categories.Where(IsCategorySelected).ToList())
+        {
+            await DeleteCategoryAsync(category);
+        }
+    }
+
+    private async Task DeleteCategoryAsync(SlotFeatureCategory category)
+    {
+        Guid? id = category.MetaInfo?.ID;
+        if (categories == null || id == null || id == Guid.Empty)
+        {
+            return;
+        }
+
+        try
+        {
+            if (await ConfirmDeletionAsync(category))
+            {
+                try
+                {
+                    await Api.ClientCluster.DeleteSlotFeatureCategoryByIdAsync(id.Value);
+                }
+                catch (ApiException ex) when (ex.StatusCode == 404)
+                {
+                    // Locally added unsaved item.
+                }
+                categories.Remove(category);
+                _selectedCategoryIds.Remove(id.Value);
+                TrimSelectedOptionIds();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to delete slot feature category");
+            Snackbar.Add("Impossible to delete slot feature category", Severity.Error);
+        }
+    }
+
+    private async Task<bool> ConfirmDeletionAsync(SlotFeatureCategory category)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Delete",
+            $"Delete slot feature category '{category.Name ?? category.MetaInfo?.ID.ToString()}'?",
+            yesText: "Delete",
+            cancelText: "Cancel",
+            options: new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall });
+        return result == true;
+    }
+
+    private bool TryValidateCategories()
+    {
+        if (categories == null)
+        {
+            return false;
+        }
+        if (categories.Any(category => string.IsNullOrWhiteSpace(category.Name)))
+        {
+            Snackbar.Add("Slot feature category names cannot be empty", Severity.Warning);
+            return false;
+        }
+        if (categories.GroupBy(category => category.Name!.Trim(), StringComparer.OrdinalIgnoreCase).Any(group => group.Count() > 1))
+        {
+            Snackbar.Add("Slot feature category names must be unique", Severity.Warning);
+            return false;
+        }
+        foreach (SlotFeatureCategory category in categories)
+        {
+            if (category.Options == null || category.Options.Count == 0)
+            {
+                Snackbar.Add($"Slot feature category '{category.Name}' must have at least one option", Severity.Warning);
+                return false;
+            }
+            if (category.Options.Any(option => string.IsNullOrWhiteSpace(option.Name)))
+            {
+                Snackbar.Add($"Slot feature category '{category.Name}' has an empty option name", Severity.Warning);
+                return false;
+            }
+            if (category.Options.GroupBy(option => option.Name!.Trim(), StringComparer.OrdinalIgnoreCase).Any(group => group.Count() > 1))
+            {
+                Snackbar.Add($"Slot feature category '{category.Name}' has duplicate option names", Severity.Warning);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void EnsureCategory(SlotFeatureCategory category)
+    {
+        if (category.MetaInfo == null || category.MetaInfo.ID == Guid.Empty)
+        {
+            category.MetaInfo = new MetaInfo { ID = Guid.NewGuid() };
+        }
+        category.Options ??= [];
+        foreach (SlotFeatureOption option in category.Options)
+        {
+            if (option.ID == Guid.Empty)
+            {
+                option.ID = Guid.NewGuid();
+            }
+        }
+    }
+
+    private bool IsCategorySelected(SlotFeatureCategory category)
+    {
+        return category.MetaInfo?.ID is Guid id && _selectedCategoryIds.Contains(id);
+    }
+
+    private void SetCategorySelected(SlotFeatureCategory category, bool selected)
+    {
+        if (category.MetaInfo?.ID is not Guid id || id == Guid.Empty)
+        {
+            return;
+        }
+
+        if (selected)
+        {
+            _selectedCategoryIds.Add(id);
+        }
+        else
+        {
+            _selectedCategoryIds.Remove(id);
+        }
+    }
+
+    private bool AreAllCategoriesSelected()
+    {
+        return categories?.Count > 0 && categories.All(IsCategorySelected);
+    }
+
+    private void SetAllCategoriesSelected(bool selected)
+    {
+        _selectedCategoryIds.Clear();
+        if (selected && categories != null)
+        {
+            foreach (SlotFeatureCategory category in categories)
+            {
+                if (category.MetaInfo?.ID is Guid id && id != Guid.Empty)
+                {
+                    _selectedCategoryIds.Add(id);
+                }
+            }
+        }
+    }
+
+    private static void EnsureOption(SlotFeatureOption option)
+    {
+        if (option.ID == Guid.Empty)
+        {
+            option.ID = Guid.NewGuid();
+        }
+    }
+
+    private bool IsOptionSelected(SlotFeatureOption option)
+    {
+        return option.ID != Guid.Empty && _selectedOptionIds.Contains(option.ID);
+    }
+
+    private void SetOptionSelected(SlotFeatureOption option, bool selected)
+    {
+        EnsureOption(option);
+        if (selected)
+        {
+            _selectedOptionIds.Add(option.ID);
+        }
+        else
+        {
+            _selectedOptionIds.Remove(option.ID);
+        }
+    }
+
+    private bool HasSelectedOptions(SlotFeatureCategory category)
+    {
+        return category.Options?.Any(IsOptionSelected) == true;
+    }
+
+    private bool AreAllOptionsSelected(SlotFeatureCategory category)
+    {
+        return category.Options?.Count > 0 && category.Options.All(IsOptionSelected);
+    }
+
+    private void SetAllOptionsSelected(SlotFeatureCategory category, bool selected)
+    {
+        if (category.Options == null)
+        {
+            return;
+        }
+
+        foreach (SlotFeatureOption option in category.Options)
+        {
+            SetOptionSelected(option, selected);
+        }
+    }
+
+    private void TrimSelectedOptionIds()
+    {
+        if (categories == null)
+        {
+            _selectedOptionIds.Clear();
+            return;
+        }
+
+        HashSet<Guid> existingOptionIds = categories
+            .SelectMany(category => category.Options ?? [])
+            .Where(option => option.ID != Guid.Empty)
+            .Select(option => option.ID)
+            .ToHashSet();
+        _selectedOptionIds.RemoveWhere(id => !existingOptionIds.Contains(id));
+    }
+}
+

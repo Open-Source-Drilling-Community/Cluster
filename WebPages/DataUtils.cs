@@ -14,13 +14,18 @@ public static class DataUtils
     {
         public static string? UnitSystemName { get; set; } = "Metric";
         public static string? DepthReferenceName { get; set; } = "WGS84";
-        public static string? PositionReferenceName { get; set; }
+        public static string? PositionReferenceName { get; set; } = "WGS84";
+        public static string? GeodeticReferenceName { get; set; } = "WGS84";
         public static string? AzimuthReferenceName { get; set; }
         public static string? PressureReferenceName { get; set; }
         public static string? DateReferenceName { get; set; }
         public static GroundMudLineDepthReferenceSource GroundMudLineDepthReferenceSource { get; set; } = new();
         public static SeaWaterLevelDepthReferenceSource SeaWaterLevelDepthReferenceSource { get; set; } = new();
         public static MeanSeaLevelDepthReferenceSource MeanSeaLevelDepthReferenceSource { get; set; } = new();
+        public static FieldPositionReferenceSource FieldPositionReferenceSource { get; set; } = new();
+        public static ClusterPositionReferenceSource ClusterPositionReferenceSource { get; set; } = new();
+        public static CartographicGridPositionReferenceSource CartographicGridPositionReferenceSource { get; set; } = new();
+        public static CartographicProjectionDatumGeodeticReferenceSource CartographicProjectionDatumGeodeticReferenceSource { get; set; } = new();
     }
 
     public static void ApplyClusterReferenceValues(NORCE.Drilling.Cluster.ModelShared.Cluster? cluster)
@@ -28,6 +33,25 @@ public static class DataUtils
         UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = 0;
         UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = 0;
         UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = null;
+        UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterNorthPositionReference = -cluster?.ReferencePoint?.RiemannianNorth;
+        UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterEastPositionReference = -cluster?.ReferencePoint?.RiemannianEast;
+        if (cluster?.GroundMudLineDepth?.GaussianValue?.Mean != null)
+        {
+            ApplyGroundMudLineDepthWGS84(cluster.GroundMudLineDepth.GaussianValue.Mean);
+        }
+        if (cluster?.TopWaterDepth?.GaussianValue?.Mean != null)
+        {
+            ApplyTopWaterDepthWGS84(cluster.TopWaterDepth.GaussianValue.Mean);
+        }
+    }
+
+    public static void ApplyClusterReferenceValues(NORCE.Drilling.Cluster.ModelShared.ClusterLight? cluster)
+    {
+        UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = 0;
+        UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = 0;
+        UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = null;
+        UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterNorthPositionReference = -cluster?.ReferencePoint?.RiemannianNorth;
+        UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterEastPositionReference = -cluster?.ReferencePoint?.RiemannianEast;
         if (cluster?.GroundMudLineDepth?.GaussianValue?.Mean != null)
         {
             ApplyGroundMudLineDepthWGS84(cluster.GroundMudLineDepth.GaussianValue.Mean);
@@ -56,6 +80,8 @@ public static class DataUtils
 
     public static void UpdateUnitSystemName(string value) => UnitAndReferenceParameters.UnitSystemName = value;
     public static void UpdateDepthReferenceName(string value) => UnitAndReferenceParameters.DepthReferenceName = value;
+    public static void UpdatePositionReferenceName(string value) => UnitAndReferenceParameters.PositionReferenceName = value;
+    public static void UpdateGeodeticReferenceName(string value) => UnitAndReferenceParameters.GeodeticReferenceName = value;
 
     public static readonly string ClusterSlotListLabel = "SlotList";
     public static readonly string ClusterOutputParamLabel = "ClusterOutputParam";
@@ -87,5 +113,29 @@ public static class DataUtils
     public class MeanSeaLevelDepthReferenceSource : IMeanSeaLevelDepthReferenceSource
     {
         public double? MeanSeaLevelDepthReference { get; set; }
+    }
+
+    public class FieldPositionReferenceSource : IFieldPositionReferenceSource
+    {
+        public double? FieldNorthPositionReference { get; set; }
+        public double? FieldEastPositionReference { get; set; }
+    }
+
+    public class ClusterPositionReferenceSource : IClusterPositionReferenceSource
+    {
+        public double? ClusterNorthPositionReference { get; set; }
+        public double? ClusterEastPositionReference { get; set; }
+    }
+
+    public class CartographicGridPositionReferenceSource : ICartographicGridPositionReferenceSource
+    {
+        public double? CartographicGridNorthPositionReference { get; set; }
+        public double? CartographicGridEastPositionReference { get; set; }
+    }
+
+    public class CartographicProjectionDatumGeodeticReferenceSource : ICartographicProjectionDatumGeodeticReferenceSource
+    {
+        public double? CartographicProjectionDatumLatitudeReference { get; set; }
+        public double? CartographicProjectionDatumLongitudeReference { get; set; }
     }
 }

@@ -3,77 +3,60 @@
 @inject ISnackbar Snackbar
 @inject IClusterAPIUtils Api
 
-<MudUnitAndReferenceChoiceTag HttpHost=@Api.HostNameUnitConversion
-                              HttpBasePath=@Api.HostBasePathUnitConversion
-                              HttpController="UnitSystem/"
-                              UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
-                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
-                              PositionReferenceName="WGS84"
-                              CartographicGridPositionReferenceSource="_cartographicReference"
-                              ClusterPositionReferenceSource="_clusterReference"
-                              DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
-                              DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
-                              GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
-                              SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource"
-                              MeanSeaLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource">
-    @if (clusterList == null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <div hidden="@isHiddenMainPanel">
-            <MudDataGrid T="Cluster" MultiSelection="true" Items="@clusterList" SelectedItemsChanged="@SelectedItemsChanged"
-                         EditMode="DataGridEditMode.Cell"
-                         Hover="true" RowClick="@RowClicked"
-                         SortMode="SortMode.Multiple" QuickFilter="@_clusterFilter" Filterable="false"
-                         ReadOnly="false" ColumnResizeMode="ResizeMode.Column" Elevation="0">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Cluster</MudText>
-                    <MudButton OnClick="@AddCluster" Color="@Color.Success" Class="add-item-btn">Add</MudButton>
-                    <MudButton OnClick="@DeleteSelectedCluster" Color="@Color.Error" Class="add-item-btn">Delete</MudButton>
-                    <MudSpacer />
-                    <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                </ToolBarContent>
-                <Columns>
-                    <SelectColumn T="Cluster" />
-                    <PropertyColumn Property="x => x.Name" Title="@DataUtils.ClusterNameLabel" CellStyle="width: 30%;" Sortable="true" Editable="false" />
-                    <PropertyColumn Property="x => x.Description" Title="@DataUtils.ClusterDescrLabel" CellStyle="width: 60%;" Sortable="true" Editable="false" />
-                    <TemplateColumn CellStyle="width: 5%;">
-                        <EditTemplate>
-                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="(() => DeleteCluster(context.Item.MetaInfo.ID))" />
-                        </EditTemplate>
-                    </TemplateColumn>
-                </Columns>
-                <PagerContent>
-                    <MudDataGridPager T="Cluster" />
-                </PagerContent>
-            </MudDataGrid>
-        </div>
-    }
-    @if (isHiddenMainPanel && currentCluster != null)
-    {
-        <ClusterEdit CurrentCluster="@currentCluster" Fields="@fieldList" OnUpdate="@ShowMainPanel" CartographicReference="@_cartographicReference" ClusterReference="@_clusterReference" />
-    }
-</MudUnitAndReferenceChoiceTag>
+@if (clusterList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div hidden="@isHiddenMainPanel">
+        <MudDataGrid T="ClusterLight" MultiSelection="true" Items="@clusterList" SelectedItemsChanged="@SelectedItemsChanged"
+                     EditMode="DataGridEditMode.Cell"
+                     Hover="true" RowClick="@RowClicked"
+                     SortMode="SortMode.Multiple" QuickFilter="@_clusterFilter" Filterable="false"
+                     ReadOnly="false" ColumnResizeMode="ResizeMode.Column" Elevation="0">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Cluster</MudText>
+                <MudButton OnClick="@AddCluster" Color="@Color.Success" Class="add-item-btn">Add</MudButton>
+                <MudButton OnClick="@DeleteSelectedCluster" Color="@Color.Error" Class="add-item-btn">Delete</MudButton>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <Columns>
+                <SelectColumn T="ClusterLight" />
+                <PropertyColumn Property="x => x.Name" Title="@DataUtils.ClusterNameLabel" CellStyle="width: 30%;" Sortable="true" Editable="false" />
+                <PropertyColumn Property="x => x.Description" Title="@DataUtils.ClusterDescrLabel" CellStyle="width: 60%;" Sortable="true" Editable="false" />
+                <TemplateColumn CellStyle="width: 5%;">
+                    <EditTemplate>
+                        <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="(() => DeleteCluster(context.Item.MetaInfo.ID))" />
+                    </EditTemplate>
+                </TemplateColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="ClusterLight" />
+            </PagerContent>
+        </MudDataGrid>
+    </div>
+}
+@if (isHiddenMainPanel && currentCluster != null)
+{
+    <ClusterEdit CurrentCluster="@currentCluster" Fields="@fieldList" OnUpdate="@ShowMainPanel" />
+}
 
 @code {
     // Cluster related variables
-    private List<Cluster> clusterList = new();
-    private List<Cluster> selectedClusterList = new();
+    private List<ClusterLight> clusterList = new();
+    private List<ClusterLight> selectedClusterList = new();
     private Cluster? currentCluster;
 
-    private List<Field> fieldList = new();
+    private List<FieldLight> fieldList = new();
 
     // Slot related variables
     // UI related variables
     public bool isHiddenMainPanel;
     public bool isHiddenEditPanel;
     private string? _searchString;
-
-    private CartographicReference _cartographicReference = new CartographicReference() { CartographicGridNorthPositionReference = 0, CartographicGridEastPositionReference = 0 };
-    private ClusterReference _clusterReference = new ClusterReference() { ClusterNorthPositionReference = 0, ClusterEastPositionReference = 0 };
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,8 +69,8 @@
 
             // Starting all loading tasks asynchronously
             logger.LogInformation("Trying to load list of Cluster from client: " + Api.HostNameCluster);
-            var clusterTask = Api.ClientCluster.GetAllClusterAsync();
-            var fieldTask = Api.ClientField.GetAllFieldAsync();
+            var clusterTask = Api.ClientCluster.GetAllClusterLightAsync();
+            var fieldTask = Api.ClientField.GetAllFieldLightAsync();
 
             List<Task> loadingTaskList = new List<Task> { clusterTask, fieldTask };
 
@@ -99,11 +82,11 @@
                 {
                     try
                     {
-                        var clusters = (List<Cluster>)await clusterTask; // awaiting the finished task allows to retrieve its result and throw exception if needed
+                        var clusters = ((IEnumerable<ClusterLight>)await clusterTask).ToList(); // awaiting the finished task allows to retrieve its result and throw exception if needed
                         // remove the single wells
-                        clusterList ??= new List<Cluster>();
+                        clusterList ??= new List<ClusterLight>();
                         clusterList.Clear();
-                        foreach (Cluster cluster in clusters)
+                        foreach (ClusterLight cluster in clusters)
                         {
                             if (!cluster.IsSingleWell)
                             {
@@ -129,7 +112,7 @@
                 {
                     try
                     {
-                        fieldList = (List<Field>)await fieldTask; // awaiting the finished task allows to retrieve its result and throw exception if needed
+                        fieldList = ((IEnumerable<FieldLight>)await fieldTask).ToList(); // awaiting the finished task allows to retrieve its result and throw exception if needed
                         if (fieldList != null)
                         {
                             fieldList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
@@ -155,10 +138,6 @@
         await InvokeAsync(() => { StateHasChanged(); });
     }
 
-    private void UpdatePositionReference(string newPositionReference)
-    {
-    }
-
     private async Task AddCluster()
     {
         try
@@ -174,7 +153,6 @@
                 LastModificationDate = creationDate,
 
             };
-            await UpdateSelectedClusterDepthReferenceSourceAsync();
             await Api.ClientCluster.PostClusterAsync(currentCluster);
             await OnInitializedAsync();
             // Find the newly created datum in the refreshed list
@@ -183,7 +161,7 @@
             {
                 logger.LogInformation("Cluster posted successfully");
                 Snackbar.Add("Cluster posted successfully", Severity.Success);
-                await RowClicked(new DataGridRowClickEventArgs<Cluster>(new MouseEventArgs(), addedCluster, -1));
+                await EditCluster(addedCluster.MetaInfo!.ID);
             }
             else
             {
@@ -199,7 +177,7 @@
         }
     }
 
-    private async Task RowClicked(DataGridRowClickEventArgs<Cluster> args)
+    private async Task RowClicked(DataGridRowClickEventArgs<ClusterLight> args)
     {
         await EditCluster(args.Item.MetaInfo.ID);
     }
@@ -209,7 +187,6 @@
         try
         {
             currentCluster = await Api.ClientCluster.GetClusterByIdAsync(id);
-            await UpdateSelectedClusterDepthReferenceSourceAsync();
             if (currentCluster != null)
             {
                 isHiddenMainPanel = true;
@@ -233,7 +210,6 @@
         try
         {
             await Api.ClientCluster.DeleteClusterByIdAsync(id);
-            await UpdateSelectedClusterDepthReferenceSourceAsync();
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -246,11 +222,10 @@
     {
         try
         {
-            foreach (Cluster cluster in selectedClusterList)
+            foreach (ClusterLight cluster in selectedClusterList)
             {
                 await Api.ClientCluster.DeleteClusterByIdAsync(cluster.MetaInfo.ID);
             }
-            await UpdateSelectedClusterDepthReferenceSourceAsync();
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -260,7 +235,7 @@
     }
 
     //Quick filter - filter gobally across multiple columns with the same input
-    private Func<Cluster, bool>
+    private Func<ClusterLight, bool>
     _clusterFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(_searchString))
@@ -272,22 +247,22 @@
     };
 
     //Events
-    private void StartedEditingItem(Cluster item)
+    private void StartedEditingItem(ClusterLight item)
     {
         //Activating Edit event capture with parameter StartedEditingItem="@StartedEditingItem" in MudDataGrid; arguments are specified in OnClick="@context.Actions.StartedEditingItem(...)"
     }
 
-    private void CancelledEditingItem(Cluster item)
+    private void CancelledEditingItem(ClusterLight item)
     {
         //Activating Cancel event capture with parameter CancelledEditingItem = "@CancelledEditingItem" in MudDataGrid; arguments are specified in OnClick="@context.Actions.CancelledEditingItem(...)"
     }
 
-    private void CommittedItemChanges(Cluster item)
+    private void CommittedItemChanges(ClusterLight item)
     {
         //Activating Commit event capture with parameter CommittedItemChanges = "@CommittedItemChanges" in MudDataGrid; arguments are specified in OnClick="@context.Actions.CommittedEditingItem(...)"
     }
 
-    void SelectedItemsChanged(HashSet<Cluster>
+    void SelectedItemsChanged(HashSet<ClusterLight>
         items)
     {
         selectedClusterList.Clear();
@@ -301,11 +276,5 @@
         await OnInitializedAsync();
     }
 
-    private async Task UpdateSelectedClusterDepthReferenceSourceAsync()
-    {
-        DataUtils.ApplyClusterReferenceValues(currentCluster);
-        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
-            await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, currentCluster);
-    }
 }
 

@@ -26,6 +26,59 @@ internal static class McpToolArgumentHelpers
         };
     }
 
+    public static JsonObject CreateObjectSchema(string key, bool includeId = false)
+    {
+        var properties = new JsonObject
+        {
+            [key] = new JsonObject
+            {
+                ["type"] = "object"
+            }
+        };
+        var required = new JsonArray
+        {
+            key
+        };
+
+        if (includeId)
+        {
+            properties["id"] = new JsonObject
+            {
+                ["type"] = "string",
+                ["format"] = "uuid"
+            };
+            required.Add("id");
+        }
+
+        return new JsonObject
+        {
+            ["type"] = "object",
+            ["properties"] = properties,
+            ["required"] = required,
+            ["additionalProperties"] = false
+        };
+    }
+
+    public static JsonObject CreateBooleanSchema(string key)
+    {
+        return new JsonObject
+        {
+            ["type"] = "object",
+            ["properties"] = new JsonObject
+            {
+                [key] = new JsonObject
+                {
+                    ["type"] = "boolean"
+                }
+            },
+            ["required"] = new JsonArray
+            {
+                key
+            },
+            ["additionalProperties"] = false
+        };
+    }
+
     public static bool TryParseGuid(JsonObject? arguments, string key, out Guid value, out JsonNode? error)
     {
         value = Guid.Empty;
@@ -45,6 +98,30 @@ internal static class McpToolArgumentHelpers
         }
 
         return true;
+    }
+
+    public static bool TryParseBool(JsonObject? arguments, string key, out bool value, out JsonNode? error)
+    {
+        value = false;
+        error = null;
+
+        var node = arguments?[key];
+        if (node is null)
+        {
+            error = McpToolResponses.CreateValidationError($"Argument '{key}' is required.");
+            return false;
+        }
+
+        try
+        {
+            value = node.GetValue<bool>();
+            return true;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or FormatException)
+        {
+            error = McpToolResponses.CreateValidationError($"Argument '{key}' must be a boolean.");
+            return false;
+        }
     }
 
     public static bool TryParseDouble(JsonObject? arguments, string key, out double value, out JsonNode? error)

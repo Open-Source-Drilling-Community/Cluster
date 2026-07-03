@@ -9,8 +9,12 @@ The Model project provides the domain types used by the Cluster microservice and
 
 The library defines plain data models with semantic annotations for drilling applications:
 
-- `Cluster`: A logical group (or single well) with identity, metadata (`MetaInfo`), geospatial reference and depth-related properties, and a set of `Slot`s.
-- `Slot`: A location within a cluster with identity and position properties.
+- `Cluster`: A logical group (or single well) with identity, metadata (`MetaInfo`), geospatial reference and depth-related properties, selected identity assignments, selected feature assignments, and a set of `Slot`s.
+- `ClusterLight`: A lighter representation used when full cluster payloads are not required.
+- `Slot`: A location within a cluster with identity, position properties, and optional slot feature assignments.
+- `ClusterIdentity` and `ClusterIdentityAssignment`: user-defined identity definitions and cluster-specific assigned values.
+- `ClusterFeatureCategory`, `ClusterFeatureOption`, and `ClusterFeatureAssignment`: user-defined cluster feature definitions and assignments. Categories may be exclusive and may require validity periods.
+- `SlotFeatureCategory`, `SlotFeatureOption`, and `SlotFeatureAssignment`: user-defined slot feature definitions and assignments. Categories follow the same exclusivity and validity-period model as cluster features.
 - `UsageStatisticsCluster`: Lightweight telemetry tracking of REST endpoint usage counts, with simple JSON file backup.
 
 Key files:
@@ -45,7 +49,16 @@ cluster.Slots[slotId] = new Slot
 {
     ID = slotId,
     Name = "Slot-A",
-    Description = "North-east slot"
+    Description = "North-east slot",
+    SlotFeatureAssignments =
+    [
+        new SlotFeatureAssignment
+        {
+            ID = Guid.NewGuid(),
+            FeatureCategoryID = Guid.NewGuid(),
+            FeatureOptionID = Guid.NewGuid()
+        }
+    ]
 };
 
 // Serialize (for API calls or persistence)
@@ -64,6 +77,8 @@ UsageStatisticsCluster.Instance.IncrementPostClusterPerDay();
 
 Notes:
 - Coordinate and depth properties use `GaussianDrillingProperty` from OSDC libraries and are decorated with semantic attributes (DWIS vocabulary). They can be assigned as needed, or left `null` if not applicable.
+- Feature assignments use category and option GUIDs. Validation of whether the referenced category/option exists, whether dates are required, and whether exclusive categories overlap is performed by the web/editor workflows before saving.
+- Slot position values are persisted as WGS84 latitude/longitude drilling properties; the web editor uses unit/reference components to also display and edit north/east values.
 
 ## Dependencies
 

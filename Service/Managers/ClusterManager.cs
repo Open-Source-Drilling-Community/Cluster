@@ -279,6 +279,62 @@ namespace NORCE.Drilling.Cluster.Service.Managers
             }
             return null;
         }
+
+        /// <summary>
+        /// Returns the list of all ClusterLight present in the microservice database
+        /// </summary>
+        /// <returns>the list of all ClusterLight present in the microservice database</returns>
+        public List<Model.ClusterLight>? GetAllClusterLight()
+        {
+            List<Model.ClusterLight> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Cluster FROM ClusterTable";
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.Cluster? cluster = JsonSerializer.Deserialize<Model.Cluster>(data, JsonSettings.Options);
+                        if (cluster != null)
+                        {
+                            vals.Add(ToClusterLight(cluster));
+                        }
+                    }
+                    _logger.LogInformation("Returning the list of existing ClusterLight from ClusterTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get light data from ClusterTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
+
+        private static Model.ClusterLight ToClusterLight(Model.Cluster cluster) =>
+            new()
+            {
+                MetaInfo = cluster.MetaInfo,
+                Name = cluster.Name,
+                Description = cluster.Description,
+                CreationDate = cluster.CreationDate,
+                LastModificationDate = cluster.LastModificationDate,
+                FieldID = cluster.FieldID,
+                IsSingleWell = cluster.IsSingleWell,
+                RigID = cluster.RigID,
+                IsFixedPlatform = cluster.IsFixedPlatform,
+                ReferencePoint = cluster.ReferencePoint,
+                GroundMudLineDepth = cluster.GroundMudLineDepth,
+                TopWaterDepth = cluster.TopWaterDepth
+            };
         
         
         /// <summary>

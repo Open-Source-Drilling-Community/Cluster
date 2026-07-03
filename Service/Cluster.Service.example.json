@@ -1,0 +1,12 @@
+{
+  "McpHub": {
+    "Enabled": true,
+    "HubBaseUrl": "https://mcp-hub.example.com/api",
+    "RegistrationEndpoint": "McpMicroservice",
+    "RetryIntervalSeconds": 60,
+    "PublicBaseUrl": "https://dev.digiwells.no",
+    "ServiceName": "Cluster",
+    "InstanceId": "",
+    "UnregisterOnShutdown": true
+  }
+}

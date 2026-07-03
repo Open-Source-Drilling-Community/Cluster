@@ -2,6 +2,7 @@
 using DWIS.Vocabulary.Schemas;
 using OSDC.DotnetLibraries.Drilling.DrillingProperties;
 using OSDC.DotnetLibraries.General.DataManagement;
+using OSDC.DotnetLibraries.General.Math;
 using OSDC.UnitConversion.Conversion;
 using OSDC.UnitConversion.Conversion.DrillingEngineering;
 using System;
@@ -53,74 +54,21 @@ namespace NORCE.Drilling.Cluster.Model
         /// true if the cluster is associated with a fixed platform, false if it is a floating or moveable rig
         /// </summary>
         public bool IsFixedPlatform { get; set; } = false;
-        /// <summary>
-        /// the latitude of the reference point for the cluster in the WGS84 datum
-        /// </summary>
-        [AccessToVariable(CommonProperty.VariableAccessType.Assignable)]
-        [Mandatory(CommonProperty.MandatoryType.General)]
-        [SemanticGaussianVariable("reference_latitude_cluster", "sigma_reference_latitude_cluster")]
-        [SemanticFact("reference_latitude_cluster", Nouns.Enum.DrillingSignal)]
-        [SemanticFact("reference_latitude_cluster#01", Nouns.Enum.PhysicalData)]
-        [SemanticFact("reference_latitude_cluster#01", Nouns.Enum.ContinuousDataType)]
-        [SemanticFact("reference_latitude_cluster#01", Verbs.Enum.HasDynamicValue, "reference_latitude_cluster")]
-        [SemanticFact("reference_latitude_cluster#01", Verbs.Enum.IsOfMeasurableQuantity, BasePhysicalQuantity.QuantityEnum.PlaneAngleGeodesic)]
-        [SemanticFact("MovingAverage", Nouns.Enum.MovingAverage)]
-        [SemanticFact("reference_latitude_cluster#01", Verbs.Enum.IsTransformationOutput, "MovingAverage")]
-        [SemanticFact("sigma_reference_latitude_cluster", Nouns.Enum.DrillingSignal)]
-        [SemanticFact("sigma_reference_latitude_cluster#01", Nouns.Enum.DrillingDataPoint)]
-        [SemanticFact("sigma_reference_latitude_cluster#01", Verbs.Enum.HasValue, "sigma_reference_latitude_cluster")]
-        [SemanticFact("GaussianUncertainty#01", Nouns.Enum.GaussianUncertainty)]
-        [SemanticFact("reference_latitude_cluster#01", Verbs.Enum.HasUncertainty, "GaussianUncertainty#01")]
-        [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyStandardDeviation, "sigma_reference_latitude_cluster#01")]
-        [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyMean, "reference_latitude_cluster#01")]
-        [DefaultStandardDeviation(1.6e-9)] // rad (1 cm at equator)
-        public GaussianDrillingProperty? ReferenceLatitude { get; set; } = null;
 
         /// <summary>
-        /// the longitude of the reference point for the cluster in the WGS84 datum
+        /// the selected identities associated with the cluster
         /// </summary>
-        [AccessToVariable(CommonProperty.VariableAccessType.Assignable)]
-        [Mandatory(CommonProperty.MandatoryType.General)]
-        [SemanticGaussianVariable("reference_longitude_cluster", "sigma_reference_longitude_cluster")]
-        [SemanticFact("reference_longitude_cluster", Nouns.Enum.DrillingSignal)]
-        [SemanticFact("reference_longitude_cluster#01", Nouns.Enum.PhysicalData)]
-        [SemanticFact("reference_longitude_cluster#01", Nouns.Enum.ContinuousDataType)]
-        [SemanticFact("reference_longitude_cluster#01", Verbs.Enum.HasDynamicValue, "reference_longitude_cluster")]
-        [SemanticFact("reference_longitude_cluster#01", Verbs.Enum.IsOfMeasurableQuantity, BasePhysicalQuantity.QuantityEnum.PlaneAngleGeodesic)]
-        [SemanticFact("MovingAverage", Nouns.Enum.MovingAverage)]
-        [SemanticFact("reference_longitude_cluster#01", Verbs.Enum.IsTransformationOutput, "MovingAverage")]
-        [SemanticFact("sigma_reference_longitude_cluster", Nouns.Enum.DrillingSignal)]
-        [SemanticFact("sigma_reference_longitude_cluster#01", Nouns.Enum.DrillingDataPoint)]
-        [SemanticFact("sigma_reference_longitude_cluster#01", Verbs.Enum.HasValue, "sigma_reference_longitude_cluster")]
-        [SemanticFact("GaussianUncertainty#01", Nouns.Enum.GaussianUncertainty)]
-        [SemanticFact("reference_longitude_cluster#01", Verbs.Enum.HasUncertainty, "GaussianUncertainty#01")]
-        [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyStandardDeviation, "sigma_reference_longitude_cluster#01")]
-        [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyMean, "reference_longitude_cluster#01")]
-        [DefaultStandardDeviation(1.6e-9)] // rad (1 cm at equator)
-        public GaussianDrillingProperty? ReferenceLongitude { get; set; } = null;
+        public List<ClusterIdentityAssignment>? ClusterIdentityAssignments { get; set; }
 
         /// <summary>
-        /// the TVD of the reference point for the cluster in the WGS84 datum
+        /// the selected cluster feature assignments associated with the cluster
         /// </summary>
-        [AccessToVariable(CommonProperty.VariableAccessType.Assignable)]
-        [Mandatory(CommonProperty.MandatoryType.General)]
-        [SemanticGaussianVariable("reference_depth_cluster", "sigma_reference_depth_cluster")]
-        [SemanticFact("reference_depth_cluster", Nouns.Enum.DrillingSignal)]
-        [SemanticFact("reference_depth_cluster#01", Nouns.Enum.PhysicalData)]
-        [SemanticFact("reference_depth_cluster#01", Nouns.Enum.ContinuousDataType)]
-        [SemanticFact("reference_depth_cluster#01", Verbs.Enum.HasDynamicValue, "reference_depth_cluster")]
-        [SemanticFact("reference_depth_cluster#01", Verbs.Enum.IsOfMeasurableQuantity, DrillingPhysicalQuantity.QuantityEnum.DepthDrilling)]
-        [SemanticFact("MovingAverage", Nouns.Enum.MovingAverage)]
-        [SemanticFact("reference_depth_cluster#01", Verbs.Enum.IsTransformationOutput, "MovingAverage")]
-        [SemanticFact("sigma_reference_depth_cluster", Nouns.Enum.DrillingSignal)]
-        [SemanticFact("sigma_reference_depth_cluster#01", Nouns.Enum.DrillingDataPoint)]
-        [SemanticFact("sigma_reference_depth_cluster#01", Verbs.Enum.HasValue, "sigma_reference_depth_cluster")]
-        [SemanticFact("GaussianUncertainty#01", Nouns.Enum.GaussianUncertainty)]
-        [SemanticFact("reference_depth_cluster#01", Verbs.Enum.HasUncertainty, "GaussianUncertainty#01")]
-        [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyStandardDeviation, "sigma_reference_depth_cluster#01")]
-        [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyMean, "reference_depth_cluster#01")]
-        [DefaultStandardDeviation(0.01)] // m (1 cm)
-        public GaussianDrillingProperty? ReferenceDepth { get; set; } = null;
+        public List<ClusterFeatureAssignment>? ClusterFeatureAssignments { get; set; }
+
+        /// <summary>
+        /// optional reference point for the cluster in SI and WGS84 references
+        /// </summary>
+        public Point3DGlobalCoordinates? ReferencePoint { get; set; } = null;
 
         /// <summary>
         /// the vertical depth the ground level or the mud line for the cluster in the WGS84 datum
