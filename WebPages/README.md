@@ -11,15 +11,18 @@
 - `SlotFeatures`
 - `ClusterSurveyRuns`
 - `ClusterTrajectories`
+- `ClusterBackupRestore`
 - `StatisticsMain`
 - `ScatterPlot`
 - `Scatter3DPlot`
 - Cluster page support classes such as API access helpers and unit/reference helpers
 
-Calculator pages used by the Cluster web application are supplied by external Razor packages rather than this library:
+Calculator pages used by the Cluster web application are supplied by current OSDC Razor packages rather than this library:
 
-- `NORCE.Drilling.Field.WebPages.FieldCartographicConverter` at `/FieldCartographicConverter`
-- `NORCE.Drilling.VerticalDatum.WebPage.VerticalDatumConversionMain` at `/VerticalDatumConversion`
+- `OSDC.Drilling.Field.WebPages.FieldCartographicConverter` at `/FieldCartographicConverter`
+- EarthVerticalDatum, EarthGravity, and EarthMagneticField components hosted by wrapper routes in `WebApp/Pages`
+
+Cluster coordinate and mean-sea-level conversions call the Field and EarthVerticalDatum synchronous APIs directly. The library does not create, poll, or delete persisted calculation orders.
 
 ## Cluster Editing
 
@@ -33,6 +36,10 @@ Calculator pages used by the Cluster web application are supplied by external Ra
 - Cluster feature assignment with exclusive/non-exclusive categories and optional date validity periods.
 - Slot editing with row selection, north/east and latitude/longitude columns, shared coordinate accuracy values, and deletion of selected rows.
 - Slot feature assignment driven by selected slot rows. Assigned slot features are summarized in the slot table.
+
+## Batch Backup and Restore
+
+`ClusterBackupRestore` exports all clusters or an ordered selection to one JSON document. It restores with fail-on-collision or replace behavior and lets the user either map existing local catalog definitions or create missing definitions/options. Field and Rig references are included by UUID and verified name and are validated live during restore; ambiguous or missing matches reject the complete operation.
 
 ## Feature and Identity Management
 
@@ -71,7 +78,7 @@ The consuming web app is expected to:
 2. Provide an implementation of `IClusterWebPagesConfiguration`.
 3. Register that configuration and `IClusterAPIUtils` in dependency injection.
 4. Include the library assembly in Blazor routing via `AdditionalAssemblies`.
-5. If hosting the same calculator menu as the Cluster web app, also reference and register the Field and VerticalDatum web page packages and include their assemblies in `AdditionalAssemblies`.
+5. If hosting the same contextual-data and calculator menus as the Cluster web app, reference and register the Field and Earth service web page packages and provide wrapper routes where required.
 
 Example registration:
 
@@ -93,4 +100,4 @@ Example routing:
         AdditionalAssemblies="new[] { typeof(NORCE.Drilling.Cluster.WebPages.ClusterMain).Assembly }">
 ```
 
-The Cluster web app additionally registers external assemblies for Field, CartographicProjection, GeodeticDatum, and VerticalDatum pages so routes such as `/Cluster/webapp/FieldCartographicConverter` and `/Cluster/webapp/VerticalDatumConversion` are available from its left-side menu.
+The Cluster web app registers the Field assembly and provides wrapper pages for EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, and EarthMagneticField components. This keeps all user-facing routes under `/Cluster/webapp`.

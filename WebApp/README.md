@@ -5,7 +5,7 @@ The WebApp project is a Blazor Server application that provides a user interface
 ## Purpose In The Solution
 - Frontend UI hosted under the base path `/Cluster/webapp` (see `WebApp/Program.cs`).
 - Calls the Cluster microservice at `/Cluster/api` using generated clients from `ModelSharedOut`.
-- Also integrates with Field, Trajectory, Rig, VerticalDatum, CartographicProjection, GeodeticDatum, and UnitConversion services for auxiliary data, displays, and unit/reference handling.
+- Also integrates with Field, Trajectory, Rig, EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, EarthMagneticField, and UnitConversion services for auxiliary data, displays, calculations, and unit/reference handling.
 
 ## Prerequisites
 - .NET SDK 8.0+
@@ -17,9 +17,11 @@ The WebApp project is a Blazor Server application that provides a user interface
   - `FieldHostURL`: base URL of the Field Service.
   - `TrajectoryHostURL`: base URL of the Trajectory Service.
   - `RigHostURL`: base URL of the Rig Service.
-  - `CartographicProjectionHostURL`: base URL of the Cartographic Projection Service.
-  - `GeodeticDatumHostURL`: base URL of the Geodetic Datum Service.
-  - `VerticalDatumHostURL`: base URL of the Vertical Datum Service.
+  - `EarthCartographicProjectionHostURL`: base URL of EarthCartographicProjection.
+  - `EarthGeodesyHostURL`: base URL of EarthGeodesy.
+  - `EarthVerticalDatumHostURL`: base URL of EarthVerticalDatum.
+  - `EarthGravityHostURL`: base URL of EarthGravity.
+  - `EarthMagneticFieldHostURL`: base URL of EarthMagneticField.
   - `UnitConversionHostURL`: base URL of the UnitConversion Service.
 - Defaults for local development:
   - WebApp URLs: `https://localhost:5011; http://localhost:5012` (see `WebApp/Properties/launchSettings.json`).
@@ -38,11 +40,14 @@ The WebApp project is a Blazor Server application that provides a user interface
 - Main page: Cluster list with search, selection, add, and delete actions.
 - Detail page: edit cluster metadata, field association, reference coordinates, identities, features, environment depths, slots, and slot features.
 - Admin pages: manage cluster identities, cluster feature categories/options, and slot feature categories/options.
+- Backup and restore: `/Cluster/webapp/ClusterBackupRestore` exports multiple clusters with their referenced local definitions and reconnects Field/Rig references during atomic restore.
 - Display pages: show cluster trajectories and survey runs in 3D and horizontal projection.
 - Field delineation overlays: cluster trajectory and survey-run displays load delineation lines from the selected field and draw original lines plus calculated boundaries. Boundaries are dashed in the horizontal projection. In 3D, delineation lines are placed on the north/east plane at the top or bottom of the survey/trajectory bounding box without changing the plot bounds.
 - Calculators menu:
-  - `Cartographic Conversions` opens the Field cartographic conversion page at `/Cluster/webapp/FieldCartographicConverter`.
-  - `Vertical Datum Conversions` opens the VerticalDatum single-conversion page at `/Cluster/webapp/VerticalDatumConversion`.
+  - `Cartographic Conversion` opens the Field cartographic conversion page at `/Cluster/webapp/FieldCartographicConverter`.
+  - `Vertical Datum Conversion` opens the EarthVerticalDatum calculator at `/Cluster/webapp/EarthVerticalDatumCalculation`.
+  - `Earth Gravity Evaluation` opens the EarthGravity calculator at `/Cluster/webapp/EarthGravityCalculation`.
+  - `Earth Magnetic Field Evaluation` opens the EarthMagneticField calculator at `/Cluster/webapp/EarthMagneticFieldCalculation`.
 - The UI uses the generated `Client` from `ModelSharedOut` to call endpoints like:
   - `GET /Cluster/api/Cluster`, `GET /Cluster/api/Cluster/{id}`
   - `POST /Cluster/api/Cluster`, `PUT /Cluster/api/Cluster/{id}`, `DELETE /Cluster/api/Cluster/{id}`
@@ -64,9 +69,10 @@ The WebApp project is a Blazor Server application that provides a user interface
   - `OSDC.DotnetLibraries.General.DataManagement` — general utilities.
   - `OSDC.UnitConversion.DrillingRazorMudComponents` — UI components for unit systems (brings MudBlazor transitively).
   - `Plotly.Blazor` — charting components.
-  - `NORCE.Drilling.Field.WebPages` — field pages, including the cartographic conversion calculator.
-  - `NORCE.Drilling.VerticalDatum.WebPage` — vertical datum single-conversion calculator.
-  - `NORCE.Drilling.CartographicProjection.WebPages` and `NORCE.Drilling.GeodeticDatum.WebPages` — contextual reference data pages.
+  - `OSDC.Drilling.Field.WebPages` — field pages, including the cartographic conversion calculator.
+  - `OSDC.Drilling.EarthCartographicProjection.WebPages` — projection-definition pages.
+  - `OSDC.Drilling.EarthGeodesy.WebPages` — geodetic-datum and spheroid pages.
+  - `OSDC.Drilling.EarthVerticalDatum.WebPages`, `OSDC.Drilling.EarthGravity.WebPages`, and `OSDC.Drilling.EarthMagneticField.WebPages` — synchronous calculator pages.
 - UI framework:
   - MudBlazor services are added in `WebApp/Program.cs`.
 
@@ -74,7 +80,7 @@ The WebApp project is a Blazor Server application that provides a user interface
 - Service: backend API provider; configure `ClusterHostURL` to point to it. The Service publishes Swagger UI at `/Cluster/api/swagger` and serves the merged schema consumed by clients.
 - ModelSharedOut: generates `ClusterMergedModel.cs` and merged OpenAPI used by WebApp for strongly-typed calls and by the Service for Swagger UI.
 - ServiceTest: shares the same generated models for end-to-end and integration tests.
-- External Razor pages: `WebApp/ExternalRazorAssemblies.cs` and `WebApp/ExternalWebPagesServiceCollectionExtensions.cs` register reusable pages from Field, CartographicProjection, GeodeticDatum, and VerticalDatum so they can be reached under the Cluster web app path base.
+- External Razor pages: `WebApp/ExternalRazorAssemblies.cs` registers the Field page assembly. Local wrapper pages host the EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, and EarthMagneticField components under the Cluster web app path base; service registration is centralized in `WebApp/ExternalWebPagesServiceCollectionExtensions.cs`.
 - Helm chart: `WebApp/charts/norcedrillingclusterwebappclient/values.yaml` configures ingress at `/Cluster/webapp` for various hosts.
 
 ## Notes
@@ -83,4 +89,4 @@ The WebApp project is a Blazor Server application that provides a user interface
 
 ## Shared-page package versions
 
-The host currently references Field WebPages 1.0.19 and Vertical Datum WebPage 1.0.3. Keep the external Razor assembly registration synchronized with these package references when adding or upgrading embedded pages.
+The exact shared-page versions are declared in `WebApp.csproj`. Keep package references, dependency injection registrations, route wrappers, configuration keys, and generated dependency schemas synchronized when an upstream service contract changes.

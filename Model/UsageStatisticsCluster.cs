@@ -78,6 +78,8 @@ namespace NORCE.Drilling.Cluster.Model
         public History PostClusterPerDay { get; set; } = new History();
         public History PutClusterByIdPerDay { get; set; } = new History();
         public History DeleteClusterByIdPerDay { get; set; } = new History();
+        public History BatchExportClustersPerDay { get; set; } = new History();
+        public History BatchRestoreClustersPerDay { get; set; } = new History();
 
         public History GetAllClusterIdentityIdPerDay { get; set; } = new History();
         public History GetAllClusterIdentityMetaInfoPerDay { get; set; } = new History();
@@ -161,6 +163,8 @@ namespace NORCE.Drilling.Cluster.Model
             PostClusterPerDay ??= new History();
             PutClusterByIdPerDay ??= new History();
             DeleteClusterByIdPerDay ??= new History();
+            BatchExportClustersPerDay ??= new History();
+            BatchRestoreClustersPerDay ??= new History();
 
             GetAllClusterIdentityIdPerDay ??= new History();
             GetAllClusterIdentityMetaInfoPerDay ??= new History();
@@ -333,6 +337,8 @@ namespace NORCE.Drilling.Cluster.Model
                 ManageBackup();
             }
         }
+        public void IncrementBatchExportClustersPerDay() => IncrementHistory(() => BatchExportClustersPerDay, value => BatchExportClustersPerDay = value);
+        public void IncrementBatchRestoreClustersPerDay() => IncrementHistory(() => BatchRestoreClustersPerDay, value => BatchRestoreClustersPerDay = value);
 
         public void IncrementGetAllClusterIdentityIdPerDay() => IncrementHistory(() => GetAllClusterIdentityIdPerDay, value => GetAllClusterIdentityIdPerDay = value);
         public void IncrementGetAllClusterIdentityMetaInfoPerDay() => IncrementHistory(() => GetAllClusterIdentityMetaInfoPerDay, value => GetAllClusterIdentityMetaInfoPerDay = value);

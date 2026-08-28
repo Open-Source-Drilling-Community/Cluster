@@ -9,5 +9,5 @@ public interface IClusterWebPagesConfiguration :
     ITrajectoryHostURL,
     IUnitConversionHostURL
 {
-    string? VerticalDatumHostURL { get; set; }
+    string? EarthVerticalDatumHostURL { get; set; }
 }

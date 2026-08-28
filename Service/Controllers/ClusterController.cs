@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,11 +19,14 @@ namespace NORCE.Drilling.Cluster.Service.Controllers
     {
         private readonly ILogger<ClusterManager> _logger;
         private readonly ClusterManager _clusterManager;
+        private readonly IClusterExternalReferenceResolver _externalReferenceResolver;
 
-        public ClusterController(ILogger<ClusterManager> logger, SqlConnectionManager connectionManager)
+        public ClusterController(ILogger<ClusterManager> logger, SqlConnectionManager connectionManager,
+            IClusterExternalReferenceResolver externalReferenceResolver)
         {
             _logger = logger;
             _clusterManager = ClusterManager.GetInstance(_logger, connectionManager);
+            _externalReferenceResolver = externalReferenceResolver;
         }
 
         /// <summary>
@@ -107,6 +113,105 @@ namespace NORCE.Drilling.Cluster.Service.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
+        /// <summary>Exports all clusters or an ordered selection with referenced local catalog definitions.</summary>
+        [HttpPost("BatchExport", Name = "BatchExportClusters")]
+        [ProducesResponseType<ClusterBatchExportDocument>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ClusterBatchErrorEnvelope>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ClusterBatchErrorEnvelope>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ClusterBatchErrorEnvelope>(StatusCodes.Status409Conflict)]
+        [ProducesResponseType<ClusterBatchErrorEnvelope>(StatusCodes.Status502BadGateway)]
+        [ProducesResponseType<ClusterBatchErrorEnvelope>(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ClusterBatchExportDocument>> BatchExportClusters(
+            [FromBody] ClusterBatchExportRequest? request, CancellationToken cancellationToken)
+        {
+            UsageStatisticsCluster.Instance.IncrementBatchExportClustersPerDay();
+            ClusterBatchExportOutcome outcome = _clusterManager.ExportBatch(request);
+            if (outcome.IsSuccess)
+            {
+                try
+                {
+                    List<ClusterBatchError> referenceErrors = await _externalReferenceResolver
+                        .PopulateExportManifestAsync(outcome.Document!, cancellationToken);
+                    if (referenceErrors.Count != 0)
+                        return Conflict(new ClusterBatchErrorEnvelope
+                        {
+                            Error = "external_reference_invalid",
+                            Message = "One or more Field or Rig references could not be represented in the portable backup.",
+                            Errors = referenceErrors
+                        });
+                    return Ok(outcome.Document);
+                }
+                catch (HttpRequestException ex)
+                {
+                    _logger.LogError(ex, "Unable to resolve Field or Rig names during cluster export");
+                    return StatusCode(StatusCodes.Status502BadGateway, ExternalServiceError(ex.Message));
+                }
+            }
+            return outcome.FailureKind switch
+            {
+                ClusterBatchExportFailureKind.InvalidRequest => BadRequest(outcome.Error),
+                ClusterBatchExportFailureKind.ClusterNotFound => NotFound(outcome.Error),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, outcome.Error)
+            };
+        }
+
+        /// <summary>Validates and atomically restores clusters and their local catalog dependencies.</summary>
+        [HttpPost("BatchRestore", Name = "BatchRestoreClusters")]
+        [ProducesResponseType<ClusterBatchRestoreResponse>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ClusterBatchErrorEnvelope>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ClusterBatchErrorEnvelope>(StatusCodes.Status409Conflict)]
+        [ProducesResponseType<ClusterBatchErrorEnvelope>(StatusCodes.Status502BadGateway)]
+        [ProducesResponseType<ClusterBatchErrorEnvelope>(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ClusterBatchRestoreResponse>> BatchRestoreClusters(
+            [FromBody] ClusterBatchRestoreRequest? request, CancellationToken cancellationToken)
+        {
+            UsageStatisticsCluster.Instance.IncrementBatchRestoreClustersPerDay();
+            List<ClusterBatchError> requestErrors = ClusterBatchRestorer.ValidateRequest(request);
+            if (requestErrors.Count != 0)
+            {
+                return BadRequest(new ClusterBatchErrorEnvelope
+                {
+                    Error = "invalid_batch_restore_request",
+                    Message = "The cluster batch-restore request is invalid. No changes were made.",
+                    Errors = requestErrors
+                });
+            }
+
+            ClusterExternalReferenceResolutionOutcome external;
+            try
+            {
+                external = await _externalReferenceResolver.ResolveRestoreManifestAsync(request!.Document!, cancellationToken);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Unable to resolve destination Field or Rig references during cluster restore");
+                return StatusCode(StatusCodes.Status502BadGateway, ExternalServiceError(ex.Message));
+            }
+            if (!external.IsSuccess)
+                return Conflict(new ClusterBatchErrorEnvelope
+                {
+                    Error = "external_reference_mapping_failed",
+                    Message = "Field or Rig references could not be resolved uniquely on the destination. No changes were made.",
+                    Errors = external.Errors
+                });
+
+            ClusterBatchRestoreOutcome outcome = _clusterManager.RestoreBatch(request, external.Mappings);
+            if (outcome.IsSuccess) return Ok(outcome.Response);
+            return outcome.FailureKind switch
+            {
+                ClusterBatchRestoreFailureKind.InvalidRequest => BadRequest(outcome.Error),
+                ClusterBatchRestoreFailureKind.Conflict => Conflict(outcome.Error),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, outcome.Error)
+            };
+        }
+
+        private static ClusterBatchErrorEnvelope ExternalServiceError(string message) => new()
+        {
+            Error = "external_reference_service_unavailable",
+            Message = "Field or Rig reference validation could not be completed. No changes were made.",
+            Errors = [new ClusterBatchError { Property = "ExternalReferences", Code = "dependency_unavailable", Message = message }]
+        };
 
         /// <summary>
         /// Returns the list of all ClusterLight present in the microservice database, at endpoint Cluster/api/Cluster/LightData

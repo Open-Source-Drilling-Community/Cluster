@@ -6,536 +6,6 @@
     "version": "1.0"
   },
   "paths": {
-    "/CartographicConversionSet": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "PostCartographicConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "PutCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "DeleteCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "PostCartographicProjection",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicProjection/MetaInfo": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection/{id}": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicProjection"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "PutCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "DeleteCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicProjection/LightData": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjectionLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjection",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjection"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetAllCartographicProjectionTypeId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType/{id}": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetCartographicProjectionTypeById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicProjectionType"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetAllCartographicProjectionType",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjectionType"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionUsageStatistics": {
-      "get": {
-        "tags": [
-          "CartographicProjectionUsageStatistics"
-        ],
-        "operationId": "GetCartographicProjectionUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsCartographicProjection"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Cluster": {
       "get": {
         "tags": [
@@ -723,6 +193,174 @@
                   "items": {
                     "$ref": "#/components/schemas/Cluster"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cluster/BatchExport": {
+      "post": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "BatchExportClusters",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClusterBatchExportRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClusterBatchExportRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClusterBatchExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchExportDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cluster/BatchRestore": {
+      "post": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "BatchRestoreClusters",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClusterBatchRestoreRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClusterBatchRestoreRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClusterBatchRestoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchRestoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterBatchErrorEnvelope"
                 }
               }
             }
@@ -1485,6 +1123,172 @@
         }
       }
     },
+    "/EarthVerticalDatum": {
+      "get": {
+        "tags": [
+          "EarthVerticalDatum"
+        ],
+        "summary": "Returns the loaded EGM84-30 geoid-model information for service discovery.",
+        "description": "This is the microservice entry endpoint. It returns the same model identity and provenance as the ModelInfo endpoint.",
+        "operationId": "GetEarthVerticalDatumEntry",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/EarthVerticalDatum/ConvertMeanSeaLevelToWgs84": {
+      "post": {
+        "tags": [
+          "EarthVerticalDatum"
+        ],
+        "summary": "Synchronously converts EGM84 mean-sea-level depths to WGS84 ellipsoidal depths.",
+        "description": "This operation is stateless. Latitude and longitude are WGS84 radians. Input and output depths are SI metres, positive downward from their explicitly named reference surfaces. The complete request is rejected if any position is invalid.",
+        "operationId": "ConvertMeanSeaLevelToWgs84",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeanSeaLevelToWgs84Request"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeanSeaLevelToWgs84Request"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeanSeaLevelToWgs84Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeanSeaLevelToWgs84Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EarthVerticalDatumValidationProblem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/EarthVerticalDatum/ConvertWgs84ToMeanSeaLevel": {
+      "post": {
+        "tags": [
+          "EarthVerticalDatum"
+        ],
+        "summary": "Synchronously converts WGS84 ellipsoidal depths to EGM84 mean-sea-level depths.",
+        "description": "This inverse operation is stateless. Latitude and longitude are WGS84 radians. Input and output depths are SI metres, positive downward from their explicitly named reference surfaces. The complete request is rejected if any position is invalid.",
+        "operationId": "ConvertWgs84ToMeanSeaLevel",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EarthVerticalDatumValidationProblem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/EarthVerticalDatum/ModelInfo": {
+      "get": {
+        "tags": [
+          "EarthVerticalDatum"
+        ],
+        "summary": "Returns the loaded EGM84-30 geoid model identity, resolution, interpolation accuracy, runtime version, and coefficient hash.",
+        "operationId": "GetEarthVerticalDatumModelInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/EarthVerticalDatumUsageStatistics": {
+      "get": {
+        "tags": [
+          "EarthVerticalDatumUsageStatistics"
+        ],
+        "summary": "Returns in-memory usage counters for this service replica. This operation is intentionally not exposed as an MCP tool.",
+        "operationId": "GetEarthVerticalDatumUsageStatistics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageStatisticsEarthVerticalDatum"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Field": {
       "get": {
         "tags": [
@@ -1534,7 +1338,44 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Field"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -1606,6 +1447,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -1629,7 +1479,54 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Field"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       },
@@ -1679,6 +1576,144 @@
         }
       }
     },
+    "/Field/BatchExport": {
+      "post": {
+        "tags": [
+          "Field"
+        ],
+        "operationId": "BatchExportFields",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldBatchExportRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldBatchExportRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldBatchExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldBatchExportDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Field/BatchRestore": {
+      "post": {
+        "tags": [
+          "Field"
+        ],
+        "operationId": "BatchRestoreFields",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldBatchRestoreRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldBatchRestoreRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldBatchRestoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldBatchRestoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Field/LightData": {
       "get": {
         "tags": [
@@ -1702,76 +1737,78 @@
         }
       }
     },
-    "/FieldCartographicConversionSet": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
+    "/FieldCoordinateConversion/Forward": {
       "post": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "FieldCoordinateConversion"
         ],
-        "operationId": "PostFieldCartographicConversionSet",
+        "operationId": "ForwardFieldCoordinates",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/FieldForwardConversionRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/FieldForwardConversionRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/FieldForwardConversionRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetMetaInfo",
-        "responses": {
-          "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
+                  "$ref": "#/components/schemas/FieldCoordinateConversionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldConversionErrorEnvelope"
                 }
               }
             }
@@ -1779,169 +1816,78 @@
         }
       }
     },
-    "/FieldCartographicConversionSet/{id}": {
-      "get": {
+    "/FieldCoordinateConversion/Inverse": {
+      "post": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "FieldCoordinateConversion"
         ],
-        "operationId": "GetFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FieldCartographicConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "PutFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
+        "operationId": "InverseFieldCoordinates",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/FieldInverseConversionRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/FieldInverseConversionRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/FieldInverseConversionRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "DeleteFieldCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/FieldID": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetByFieldId",
-        "parameters": [
-          {
-            "name": "fieldId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                  "$ref": "#/components/schemas/FieldCoordinateConversionResponse"
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSetLight"
-                  }
+                  "$ref": "#/components/schemas/FieldConversionErrorEnvelope"
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/FieldCartographicConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "FieldCartographicConversionSet"
-        ],
-        "operationId": "GetAllFieldCartographicConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSet"
-                  }
+                  "$ref": "#/components/schemas/FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldConversionErrorEnvelope"
                 }
               }
             }
@@ -1998,7 +1944,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDelineationLineType"
+                }
+              }
+            }
           }
         }
       }
@@ -2070,6 +2023,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -2093,7 +2055,24 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDelineationLineType"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       },
@@ -2192,7 +2171,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldFeatureCategory"
+                }
+              }
+            }
           }
         }
       }
@@ -2264,6 +2250,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -2287,7 +2282,24 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldFeatureCategory"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       },
@@ -2386,7 +2398,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldIdentity"
+                }
+              }
+            }
           }
         }
       }
@@ -2458,6 +2477,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -2481,7 +2509,24 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldIdentity"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       },
@@ -2580,7 +2625,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMembershipCategory"
+                }
+              }
+            }
           }
         }
       }
@@ -2652,6 +2704,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -2675,7 +2736,24 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMembershipCategory"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       },
@@ -2738,654 +2816,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UsageStatisticsField"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "PostGeodeticConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeodeticConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "PutGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "DeleteGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "PostGeodeticDatum",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/MetaInfo": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/{id}": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeodeticDatum"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "PutGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "DeleteGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/LightData": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticDatumLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/HeavyData": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatum",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatumUsageStatistics": {
-      "get": {
-        "tags": [
-          "GeodeticDatumUsageStatistics"
-        ],
-        "operationId": "GetGeodeticDatumUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsGeodeticDatum"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Spheroid": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroidId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "PostSpheroid",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Spheroid/MetaInfo": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroidMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Spheroid/{id}": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Spheroid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "PutSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "DeleteSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Spheroid/HeavyData": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroid",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Spheroid"
-                  }
                 }
               }
             }
@@ -6989,1131 +6419,10 @@
           }
         }
       }
-    },
-    "/VerticalDatum": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllVerticalDatumId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "PostVerticalDatum",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatum/MetaInfo": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllVerticalDatumMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatum/{id}": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetVerticalDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerticalDatum"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "PutVerticalDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "DeleteVerticalDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatum/HeavyData": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllVerticalDatum",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatum/CompletedVerticalDatum": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllCompletedVerticalDatum",
-        "parameters": [
-          {
-            "name": "isCompleted",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrderId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "PostVerticalDatumOrder",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/MetaInfo": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrderMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/{id}": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetVerticalDatumOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerticalDatumOrder"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "PutVerticalDatumOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "DeleteVerticalDatumOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/LightData": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrderLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatumOrderLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/HeavyData": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrder",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatumOrder"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
-      "CountPerDay": {
-        "type": "object",
-        "properties": {
-          "Date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "Count": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "History": {
-        "type": "object",
-        "properties": {
-          "Data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CountPerDay"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "UsageStatisticsCartographicProjection": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllCartographicProjectionTypeIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicProjectionTypeByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionTypePerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostCartographicProjectionPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "AreaNormalizationTransformType": {
-        "enum": [
-          "None",
-          "Linear",
-          "Quadratic",
-          "Tangent"
-        ],
-        "type": "string"
-      },
-      "AxisType": {
-        "enum": [
-          "None",
-          "x",
-          "y"
-        ],
-        "type": "string"
-      },
-      "CartographicConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "CartographicCoordinateList": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CartographicCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "CartographicConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionName": {
-            "type": "string",
-            "nullable": true
-          },
-          "CartographicProjectionDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "CartographicCoordinate": {
-        "type": "object",
-        "properties": {
-          "Northing": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Easting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GeodeticCoordinate": {
-            "$ref": "#/components/schemas/GeodeticCoordinate"
-          },
-          "GridConvergenceDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "CartographicProjection": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "ProjectionType": {
-            "$ref": "#/components/schemas/ProjectionType"
-          },
-          "GeodeticDatumID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "LatitudeOrigin": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude1": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude2": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LatitudeTrueScale": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeOrigin": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Scaling": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "FalseEasting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "FalseNorthing": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Zone": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "IsSouth": {
-            "type": "boolean"
-          },
-          "IsHyperbolic": {
-            "type": "boolean"
-          },
-          "ProjectionHeight": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "HeightViewPoint": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Sweep": {
-            "$ref": "#/components/schemas/AxisType"
-          },
-          "AzimuthCentralLine": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Weight": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Landsat": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "Path": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "Alpha": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Gamma": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude1": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude2": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeCentralPoint": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "NoOffset": {
-            "type": "boolean"
-          },
-          "NoRotation": {
-            "type": "boolean"
-          },
-          "AreaNormalizationTransform": {
-            "$ref": "#/components/schemas/AreaNormalizationTransformType"
-          },
-          "PegLatitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "PegLongitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "PegHeading": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "N": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Q": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "CartographicProjectionLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          }
-        }
-      },
-      "CartographicProjectionType": {
-        "type": "object",
-        "properties": {
-          "Projection": {
-            "$ref": "#/components/schemas/ProjectionType"
-          },
-          "UseLatitudeOrigin": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitude1": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitude2": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitudeTrueScale": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitudeOrigin": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseScaling": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseFalseEastingNorthing": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseZone": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseSouth": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseHyperbolic": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseProjectionHeight": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseHeightViewPoint": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseSweep": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAzimuthCentralLine": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseWeight": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLandsat": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePath": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAlpha": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseGamma": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitude1": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitude2": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitudeCentralPoint": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseNoOffset": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseNoRotation": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAreaNormalizationTransform": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegLatitude": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegLongitude": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegHeading": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseN": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseQ": {
-            "type": "boolean",
-            "readOnly": true
-          }
-        }
-      },
-      "ProjectionType": {
-        "enum": [
-          "Unknown",
-          "UTM",
-          "LambertConformalConic",
-          "LambertConformalConicAlternative",
-          "LambertEqualAreaConic",
-          "TransverseMercator",
-          "Mercator",
-          "Polyconic",
-          "ModifiedStereographicAlaska",
-          "AlbersEqualArea",
-          "AzimuthalEquidistant",
-          "Aitoff",
-          "Bonne",
-          "CalCoopOceanFish",
-          "Cassini",
-          "CentralCylinder",
-          "EqualAreaCylindrical",
-          "EquidistantCylindrical",
-          "EquidistantConic",
-          "GeostationarySatelliteView",
-          "GeneralSinusoidalSeries",
-          "ModifiedStereographic48US",
-          "ModifiedStereographic50US",
-          "InternationalMapWorldPolyconic",
-          "Laborde",
-          "LambertAzimuthalEqualArea",
-          "Lagrange",
-          "LeeOblatedStereographic",
-          "SpaceObliqueLandsat",
-          "McBrydeThomasFlatPolarSinusoidal",
-          "MillerOblatedStereographic",
-          "SpaceObliqueMISR",
-          "NewZealandMapGrid",
-          "ObliqueMercator",
-          "Orthographic",
-          "QuadrilateralizedSphericalCube",
-          "RoussilheStereographic",
-          "S2",
-          "SphericalCrossTrackHeight",
-          "Sinusoidal",
-          "SwissObliqueMercator",
-          "Stereographic",
-          "ObliqueStereographicAlternative",
-          "UniversalPolarStereographic",
-          "UrmaevV",
-          "WebMercator"
-        ],
-        "type": "string"
-      },
-      "GeodeticCoordinate": {
-        "type": "object",
-        "properties": {
-          "LatitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LatitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "OctreeDepth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "OctreeCode": {
-            "$ref": "#/components/schemas/OctreeCodeLong"
-          }
-        },
-        "additionalProperties": { }
-      },
-      "OctreeCodeLong": {
-        "type": "object",
-        "properties": {
-          "Depth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "CodeHigh": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "CodeLow": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": { }
-      },
-      "MetaInfo": {
-        "type": "object",
-        "properties": {
-          "ID": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "HttpHostName": {
-            "type": "string",
-            "nullable": true
-          },
-          "HttpHostBasePath": {
-            "type": "string",
-            "nullable": true
-          },
-          "HttpEndPoint": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
       "Cluster": {
         "type": "object",
         "properties": {
@@ -8181,6 +6490,287 @@
             "type": "object",
             "additionalProperties": {
               "$ref": "#/components/schemas/Slot"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchCatalogDependencies": {
+        "type": "object",
+        "properties": {
+          "Identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterIdentity"
+            },
+            "nullable": true
+          },
+          "ClusterFeatureCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterFeatureCategory"
+            },
+            "nullable": true
+          },
+          "SlotFeatureCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SlotFeatureCategory"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchCatalogMapping": {
+        "type": "object",
+        "properties": {
+          "Catalog": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "SourceID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LocalID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Resolution": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchCatalogRestorePolicy": {
+        "enum": [
+          "Unspecified",
+          "MapExisting",
+          "MapOrCreateMissing"
+        ],
+        "type": "string"
+      },
+      "ClusterBatchError": {
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterBatchError"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchExportDocument": {
+        "type": "object",
+        "properties": {
+          "FormatIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "SchemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ExportedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CatalogDependencies": {
+            "$ref": "#/components/schemas/ClusterBatchCatalogDependencies"
+          },
+          "ExternalReferences": {
+            "$ref": "#/components/schemas/ClusterBatchExternalReferences"
+          },
+          "Clusters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cluster"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchExportRequest": {
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/ClusterBatchExportScope"
+          },
+          "ClusterIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchExportScope": {
+        "enum": [
+          "Unspecified",
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "ClusterBatchExternalReference": {
+        "type": "object",
+        "properties": {
+          "SourceID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchExternalReferenceMapping": {
+        "type": "object",
+        "properties": {
+          "Resource": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "SourceID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LocalID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Resolution": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchExternalReferences": {
+        "type": "object",
+        "properties": {
+          "Fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterBatchExternalReference"
+            },
+            "nullable": true
+          },
+          "Rigs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterBatchExternalReference"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "ClusterBatchRestoreConflictPolicy": {
+        "enum": [
+          "Unspecified",
+          "FailIfExists",
+          "ReplaceExisting"
+        ],
+        "type": "string"
+      },
+      "ClusterBatchRestoreRequest": {
+        "type": "object",
+        "properties": {
+          "ConflictPolicy": {
+            "$ref": "#/components/schemas/ClusterBatchRestoreConflictPolicy"
+          },
+          "CatalogPolicy": {
+            "$ref": "#/components/schemas/ClusterBatchCatalogRestorePolicy"
+          },
+          "Document": {
+            "$ref": "#/components/schemas/ClusterBatchExportDocument"
+          }
+        }
+      },
+      "ClusterBatchRestoreResponse": {
+        "type": "object",
+        "properties": {
+          "RestoredAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CreatedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ReplacedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogDefinitionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogOptionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CatalogMappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterBatchCatalogMapping"
+            },
+            "nullable": true
+          },
+          "ExternalReferenceMappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterBatchExternalReferenceMapping"
+            },
+            "nullable": true
+          },
+          "ClusterIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
             },
             "nullable": true
           }
@@ -8354,6 +6944,31 @@
           }
         }
       },
+      "CountPerDay": {
+        "type": "object",
+        "properties": {
+          "Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "History": {
+        "type": "object",
+        "properties": {
+          "Data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountPerDay"
+            },
+            "nullable": true
+          }
+        }
+      },
       "Slot": {
         "type": "object",
         "properties": {
@@ -8518,6 +7133,12 @@
           "DeleteClusterByIdPerDay": {
             "$ref": "#/components/schemas/History"
           },
+          "BatchExportClustersPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "BatchRestoreClustersPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
           "GetAllClusterIdentityIdPerDay": {
             "$ref": "#/components/schemas/History"
           },
@@ -8594,6 +7215,27 @@
           }
         }
       },
+      "MetaInfo": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "HttpHostName": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpHostBasePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpEndPoint": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "Point3DGlobalCoordinates": {
         "type": "object",
         "properties": {
@@ -8662,6 +7304,320 @@
           }
         }
       },
+      "EarthVerticalDatumModelInfo": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ID": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "DataDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "GridResolutionMinutes": {
+            "type": "number",
+            "format": "double"
+          },
+          "Interpolation": {
+            "type": "string",
+            "nullable": true
+          },
+          "MaximumInterpolationError": {
+            "type": "number",
+            "format": "double"
+          },
+          "RMSInterpolationError": {
+            "type": "number",
+            "format": "double"
+          },
+          "GeographicLibVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "ReferenceEllipsoid": {
+            "type": "string",
+            "nullable": true
+          },
+          "SupportedVerticalDatums": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "SupportedConversionDirections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "DepthPositiveDirection": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsThreadSafe": {
+            "type": "boolean"
+          },
+          "CoefficientSHA256": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "description": "Identity, accuracy, and provenance of the geoid model used for conversion."
+      },
+      "EarthVerticalDatumPosition": {
+        "type": "object",
+        "properties": {
+          "Latitude": {
+            "maximum": 1.5707963267948966,
+            "minimum": -1.5707963267948966,
+            "type": "number",
+            "description": "WGS84 geodetic latitude in SI radians, between -π/2 and π/2.",
+            "format": "double"
+          },
+          "Longitude": {
+            "maximum": 3.141592653589793,
+            "minimum": -3.141592653589793,
+            "type": "number",
+            "description": "WGS84 geodetic longitude in SI radians, between -π and π.",
+            "format": "double"
+          },
+          "MeanSeaLevelDepth": {
+            "type": "number",
+            "description": "Depth in SI metres, positive downward from the EGM84 mean-sea-level geoid. A negative value is above that surface.",
+            "format": "double"
+          }
+        },
+        "description": "A WGS84 horizontal position and a mean-sea-level depth expressed using OSDC SI conventions."
+      },
+      "EarthVerticalDatumSample": {
+        "type": "object",
+        "properties": {
+          "Position": {
+            "$ref": "#/components/schemas/EarthVerticalDatumPosition"
+          },
+          "Wgs84EllipsoidalDepth": {
+            "type": "number",
+            "description": "Depth in SI metres, positive downward from the WGS84 reference ellipsoid.",
+            "format": "double"
+          },
+          "GeoidUndulation": {
+            "type": "number",
+            "description": "EGM84 geoid undulation in SI metres, positive upward from the WGS84 ellipsoid to the geoid.",
+            "format": "double"
+          }
+        },
+        "description": "An input position and its corresponding WGS84 ellipsoidal-depth conversion."
+      },
+      "EarthVerticalDatumValidationError": {
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "EarthVerticalDatumValidationProblem": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EarthVerticalDatumValidationError"
+            },
+            "nullable": true
+          }
+        },
+        "description": "Details returned when a conversion request is rejected atomically."
+      },
+      "MeanSeaLevelToWgs84Request": {
+        "required": [
+          "Positions"
+        ],
+        "type": "object",
+        "properties": {
+          "Positions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EarthVerticalDatumPosition"
+            },
+            "description": "Positions and mean-sea-level depths to convert. The entire request is rejected when any item is invalid."
+          }
+        },
+        "description": "A stateless synchronous request to convert mean-sea-level depths to WGS84 ellipsoidal depths."
+      },
+      "MeanSeaLevelToWgs84Response": {
+        "type": "object",
+        "properties": {
+          "Model": {
+            "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
+          },
+          "Samples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EarthVerticalDatumSample"
+            },
+            "nullable": true
+          }
+        },
+        "description": "EGM84-30 conversion results in the same order as the request positions."
+      },
+      "UsageStatisticsEarthVerticalDatum": {
+        "type": "object",
+        "properties": {
+          "StartedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "Scope": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "RestConversions": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "MCPConversions": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "FailedConversions": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "PositionsConverted": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "ModelInfoRequests": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "StatisticsRequests": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          }
+        }
+      },
+      "Wgs84ToMeanSeaLevelPosition": {
+        "type": "object",
+        "properties": {
+          "Latitude": {
+            "maximum": 1.5707963267948966,
+            "minimum": -1.5707963267948966,
+            "type": "number",
+            "description": "WGS84 geodetic latitude in SI radians, between -π/2 and π/2.",
+            "format": "double"
+          },
+          "Longitude": {
+            "maximum": 3.141592653589793,
+            "minimum": -3.141592653589793,
+            "type": "number",
+            "description": "WGS84 geodetic longitude in SI radians, between -π and π.",
+            "format": "double"
+          },
+          "Wgs84EllipsoidalDepth": {
+            "type": "number",
+            "description": "Depth in SI metres, positive downward from the WGS84 reference ellipsoid. A negative value is above it.",
+            "format": "double"
+          }
+        },
+        "description": "A WGS84 horizontal position and ellipsoidal depth expressed using OSDC SI conventions."
+      },
+      "Wgs84ToMeanSeaLevelRequest": {
+        "required": [
+          "Positions"
+        ],
+        "type": "object",
+        "properties": {
+          "Positions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelPosition"
+            },
+            "description": "Positions and WGS84 ellipsoidal depths to convert. Any invalid item rejects the entire request."
+          }
+        },
+        "description": "A stateless synchronous request to convert WGS84 ellipsoidal depths to mean-sea-level depths."
+      },
+      "Wgs84ToMeanSeaLevelResponse": {
+        "type": "object",
+        "properties": {
+          "Model": {
+            "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
+          },
+          "Samples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelSample"
+            },
+            "nullable": true
+          }
+        },
+        "description": "EGM84-30 inverse-conversion results in the same order as the request positions."
+      },
+      "Wgs84ToMeanSeaLevelSample": {
+        "type": "object",
+        "properties": {
+          "Position": {
+            "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelPosition"
+          },
+          "MeanSeaLevelDepth": {
+            "type": "number",
+            "description": "Depth in SI metres, positive downward from the EGM84 mean-sea-level geoid.",
+            "format": "double"
+          },
+          "GeoidUndulation": {
+            "type": "number",
+            "description": "EGM84 geoid undulation in SI metres, positive upward from the WGS84 ellipsoid to the geoid.",
+            "format": "double"
+          }
+        },
+        "description": "An input WGS84 position and its corresponding EGM84 mean-sea-level depth."
+      },
       "Field": {
         "type": "object",
         "properties": {
@@ -8686,7 +7642,7 @@
             "format": "date-time",
             "nullable": true
           },
-          "CartographicProjectionID": {
+          "ProjectionDefinitionID": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -8724,87 +7680,402 @@
           }
         }
       },
-      "FieldCartographicConversionSet": {
+      "FieldApplicabilityPolicy": {
+        "enum": [
+          "RequireApplicable",
+          "AllowUnknown"
+        ],
+        "type": "string"
+      },
+      "FieldBatchCatalogDependencies": {
         "type": "object",
         "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "FieldName": {
-            "type": "string",
-            "nullable": true
-          },
-          "FieldDescription": {
-            "type": "string",
-            "nullable": true
-          },
-          "CartographicCoordinateList": {
+          "FeatureCategories": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CartographicCoordinate"
+              "$ref": "#/components/schemas/FieldFeatureCategory"
+            },
+            "nullable": true
+          },
+          "MembershipCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldMembershipCategory"
+            },
+            "nullable": true
+          },
+          "Identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldIdentity"
+            },
+            "nullable": true
+          },
+          "DelineationLineTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldDelineationLineType"
             },
             "nullable": true
           }
         }
       },
-      "FieldCartographicConversionSetLight": {
+      "FieldBatchCatalogMapping": {
         "type": "object",
         "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
+          "Catalog": {
+            "type": "string",
+            "nullable": true
           },
           "Name": {
             "type": "string",
             "nullable": true
           },
-          "Description": {
+          "SourceID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LocalID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Resolution": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "FieldBatchCatalogRestorePolicy": {
+        "enum": [
+          "Unspecified",
+          "MapExisting",
+          "MapOrCreateMissing"
+        ],
+        "type": "string"
+      },
+      "FieldBatchError": {
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
             "type": "string",
             "nullable": true
           },
-          "CreationDate": {
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "FieldBatchErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldBatchError"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "FieldBatchExportDocument": {
+        "type": "object",
+        "properties": {
+          "FormatIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "SchemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ExportedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CatalogDependencies": {
+            "$ref": "#/components/schemas/FieldBatchCatalogDependencies"
+          },
+          "Fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "FieldBatchExportRequest": {
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/FieldBatchExportScope"
+          },
+          "FieldIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "FieldBatchExportScope": {
+        "enum": [
+          "Unspecified",
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "FieldBatchRestoreConflictPolicy": {
+        "enum": [
+          "Unspecified",
+          "FailIfExists",
+          "ReplaceExisting"
+        ],
+        "type": "string"
+      },
+      "FieldBatchRestoreRequest": {
+        "type": "object",
+        "properties": {
+          "ConflictPolicy": {
+            "$ref": "#/components/schemas/FieldBatchRestoreConflictPolicy"
+          },
+          "CatalogPolicy": {
+            "$ref": "#/components/schemas/FieldBatchCatalogRestorePolicy"
+          },
+          "Document": {
+            "$ref": "#/components/schemas/FieldBatchExportDocument"
+          }
+        }
+      },
+      "FieldBatchRestoreResponse": {
+        "type": "object",
+        "properties": {
+          "RestoredAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CreatedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ReplacedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogDefinitionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogOptionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CatalogMappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldBatchCatalogMapping"
+            },
+            "nullable": true
+          },
+          "FieldIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "FieldCatalogReference": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Authority": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "FieldConversionErrorEnvelope": {
+        "required": [
+          "Error",
+          "Message"
+        ],
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldConversionValidationError"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "FieldConversionValidationError": {
+        "required": [
+          "Code",
+          "Message",
+          "Property"
+        ],
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "FieldConversionWarning": {
+        "required": [
+          "Code",
+          "Message"
+        ],
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "FieldCoordinateConversionPositionResult": {
+        "required": [
+          "ProjectedCoordinate",
+          "ProjectionDatumGeographicCoordinate"
+        ],
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ProjectionDatumGeographicCoordinate": {
+            "$ref": "#/components/schemas/FieldGeographicCoordinate"
+          },
+          "Wgs84GeographicCoordinate": {
+            "$ref": "#/components/schemas/FieldGeographicCoordinate"
+          },
+          "ProjectedCoordinate": {
+            "$ref": "#/components/schemas/FieldProjectedCoordinate"
+          },
+          "ProjectionDatumVerticalDepth": {
+            "type": "number",
+            "format": "double"
+          },
+          "Wgs84VerticalDepth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "CoordinateEpochUtc": {
             "type": "string",
             "format": "date-time",
             "nullable": true
           },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
+          "GridConvergence": {
+            "type": "number",
+            "format": "double",
             "nullable": true
-          },
+          }
+        }
+      },
+      "FieldCoordinateConversionResponse": {
+        "required": [
+          "ApiAxisConvention",
+          "ProjectionDatum",
+          "ProjectionDefinition",
+          "Wgs84Datum"
+        ],
+        "type": "object",
+        "properties": {
           "FieldID": {
             "type": "string",
-            "format": "uuid",
-            "nullable": true
+            "format": "uuid"
           },
-          "FieldName": {
+          "ProjectionDefinition": {
+            "$ref": "#/components/schemas/FieldCatalogReference"
+          },
+          "ProjectionDatum": {
+            "$ref": "#/components/schemas/FieldCatalogReference"
+          },
+          "Wgs84Datum": {
+            "$ref": "#/components/schemas/FieldCatalogReference"
+          },
+          "ApiAxisConvention": {
             "type": "string",
             "nullable": true
           },
-          "FieldDescription": {
-            "type": "string",
+          "Positions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldCoordinateConversionPositionResult"
+            },
+            "nullable": true
+          },
+          "Warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldConversionWarning"
+            },
             "nullable": true
           }
         }
@@ -8841,10 +8112,6 @@
           "DelineationLineTypeID": {
             "type": "string",
             "format": "uuid",
-            "nullable": true
-          },
-          "LineType": {
-            "type": "string",
             "nullable": true
           },
           "Name": {
@@ -8907,6 +8174,13 @@
             "nullable": true
           }
         }
+      },
+      "FieldDepthTransformationPolicy": {
+        "enum": [
+          "PreservePhysicalPoint",
+          "AllowUntransformedDepthFor2D"
+        ],
+        "type": "string"
       },
       "FieldFeatureAssignment": {
         "type": "object",
@@ -8985,6 +8259,76 @@
           }
         }
       },
+      "FieldForwardConversionPosition": {
+        "type": "object",
+        "properties": {
+          "Latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "VerticalDepth": {
+            "type": "number",
+            "format": "double"
+          },
+          "CoordinateEpochUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "FieldForwardConversionRequest": {
+        "required": [
+          "Positions"
+        ],
+        "type": "object",
+        "properties": {
+          "FieldID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "SourceGeographicReference": {
+            "$ref": "#/components/schemas/FieldGeographicReference"
+          },
+          "ProjectionApplicabilityPolicy": {
+            "$ref": "#/components/schemas/FieldApplicabilityPolicy"
+          },
+          "Transformation": {
+            "$ref": "#/components/schemas/FieldTransformationOptions"
+          },
+          "Positions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldForwardConversionPosition"
+            }
+          }
+        }
+      },
+      "FieldGeographicCoordinate": {
+        "type": "object",
+        "properties": {
+          "Latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "FieldGeographicReference": {
+        "enum": [
+          "ProjectionDatum",
+          "Wgs84"
+        ],
+        "type": "string"
+      },
       "FieldIdentity": {
         "type": "object",
         "properties": {
@@ -9022,6 +8366,53 @@
           "Value": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "FieldInverseConversionPosition": {
+        "type": "object",
+        "properties": {
+          "Easting": {
+            "type": "number",
+            "format": "double"
+          },
+          "Northing": {
+            "type": "number",
+            "format": "double"
+          },
+          "VerticalDepth": {
+            "type": "number",
+            "format": "double"
+          },
+          "CoordinateEpochUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "FieldInverseConversionRequest": {
+        "required": [
+          "Positions"
+        ],
+        "type": "object",
+        "properties": {
+          "FieldID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ProjectionApplicabilityPolicy": {
+            "$ref": "#/components/schemas/FieldApplicabilityPolicy"
+          },
+          "Transformation": {
+            "$ref": "#/components/schemas/FieldTransformationOptions"
+          },
+          "Positions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldInverseConversionPosition"
+            }
           }
         }
       },
@@ -9128,6 +8519,98 @@
           }
         }
       },
+      "FieldMutationError": {
+        "type": "object",
+        "properties": {
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "ReferencingFieldIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "FieldMutationErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldMutationError"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "FieldProjectedCoordinate": {
+        "type": "object",
+        "properties": {
+          "Easting": {
+            "type": "number",
+            "format": "double"
+          },
+          "Northing": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "FieldTransformationOptions": {
+        "type": "object",
+        "properties": {
+          "SelectionPolicy": {
+            "$ref": "#/components/schemas/FieldTransformationSelectionPolicy"
+          },
+          "TransformationPathIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "SelectionToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "ApplicabilityPolicy": {
+            "$ref": "#/components/schemas/FieldApplicabilityPolicy"
+          },
+          "DepthPolicy": {
+            "$ref": "#/components/schemas/FieldDepthTransformationPolicy"
+          }
+        }
+      },
+      "FieldTransformationSelectionPolicy": {
+        "enum": [
+          "RequireUnambiguous",
+          "FirstAvailable",
+          "ExplicitPath"
+        ],
+        "type": "string"
+      },
       "UsageStatisticsField": {
         "type": "object",
         "properties": {
@@ -9154,6 +8637,12 @@
           "GetAllFieldPerDay": {
             "$ref": "#/components/schemas/History"
           },
+          "BatchExportFieldsPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "BatchRestoreFieldsPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
           "PostFieldPerDay": {
             "$ref": "#/components/schemas/History"
           },
@@ -9161,33 +8650,6 @@
             "$ref": "#/components/schemas/History"
           },
           "DeleteFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetByFieldIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteFieldCartographicConversionSetByIdPerDay": {
             "$ref": "#/components/schemas/History"
           },
           "GetAllFieldDelineationLineTypeIdPerDay": {
@@ -9276,428 +8738,6 @@
           },
           "GetFieldUsageStatisticsPerDay": {
             "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "UsageStatisticsGeodeticDatum": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllSpheroidIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSpheroidMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSpheroidPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostSpheroidPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostGeodeticDatumPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostGeodeticConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "GeodeticConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "GeodeticDatum": {
-            "$ref": "#/components/schemas/GeodeticDatum"
-          },
-          "OctreeBounds": {
-            "$ref": "#/components/schemas/Bounds"
-          },
-          "GeodeticCoordinates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GeodeticCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "GeodeticConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "GeodeticDatumName": {
-            "type": "string",
-            "nullable": true
-          },
-          "GeodeticDatumDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "GeodeticDatum": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          },
-          "Spheroid": {
-            "$ref": "#/components/schemas/Spheroid"
-          },
-          "DeltaX": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "DeltaY": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "DeltaZ": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationX": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationY": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationZ": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "ScaleFactor": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          }
-        }
-      },
-      "GeodeticDatumLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          }
-        }
-      },
-      "Spheroid": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          },
-          "SemiMajorAxis": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSemiMajorAxisSet": {
-            "type": "boolean"
-          },
-          "SemiMinorAxis": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSemiMinorAxisSet": {
-            "type": "boolean"
-          },
-          "Eccentricity": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsEccentricitySet": {
-            "type": "boolean"
-          },
-          "SquaredEccentricity": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSquaredEccentricitySet": {
-            "type": "boolean"
-          },
-          "Flattening": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsFlatteningSet": {
-            "type": "boolean"
-          },
-          "InverseFlattening": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsInverseFlatteningSet": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ScalarDrillingProperty": {
-        "type": "object",
-        "properties": {
-          "DiracDistributionValue": {
-            "$ref": "#/components/schemas/DiracDistribution"
-          }
-        }
-      },
-      "Point3D": {
-        "type": "object",
-        "properties": {
-          "X": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Y": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Z": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "Bounds": {
-        "type": "object",
-        "properties": {
-          "MinX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MinY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MinZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MiddleX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "MiddleY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "MiddleZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "Center": {
-            "$ref": "#/components/schemas/Point3D"
-          }
-        }
-      },
-      "DiracDistribution": {
-        "type": "object",
-        "properties": {
-          "MinValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "MaxValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "Value": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
           }
         }
       },
@@ -16914,140 +15954,22 @@
           }
         }
       },
-      "VerticalDatum": {
+      "OctreeCodeLong": {
         "type": "object",
         "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
+          "Depth": {
+            "type": "integer",
+            "format": "int32"
           },
-          "Name": {
-            "type": "string",
-            "nullable": true
+          "CodeHigh": {
+            "type": "integer",
+            "format": "int64"
           },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "DatumSet": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VerticalDatumSet"
-            },
-            "nullable": true
-          },
-          "ConversionFrom": {
-            "$ref": "#/components/schemas/VerticalDatumConversion"
-          },
-          "Type": {
-            "$ref": "#/components/schemas/VerticalDatumType"
+          "CodeLow": {
+            "type": "integer",
+            "format": "int64"
           }
         }
-      },
-      "VerticalDatumConversion": {
-        "enum": [
-          "FromMeanSeaLevel",
-          "FromMeanHighWater",
-          "FromMeanLowWater",
-          "LowestAstronimalTide",
-          "HighestAstronimalTide",
-          "MeanHigherHighWater",
-          "MeanLowerLowWater"
-        ],
-        "type": "string"
-      },
-      "VerticalDatumOrder": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "VerticalDatum": {
-            "$ref": "#/components/schemas/VerticalDatum"
-          }
-        }
-      },
-      "VerticalDatumOrderLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "VerticalDatumSet": {
-        "type": "object",
-        "properties": {
-          "Latitude": {
-            "type": "number",
-            "format": "double"
-          },
-          "Longitude": {
-            "type": "number",
-            "format": "double"
-          },
-          "VerticalDatumWGS64": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GenericVerticalDatum": {
-            "type": "number",
-            "format": "double"
-          }
-        }
-      },
-      "VerticalDatumType": {
-        "enum": [
-          "Raw",
-          "Completed"
-        ],
-        "type": "string"
       }
     }
   }

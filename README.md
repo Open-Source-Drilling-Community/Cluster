@@ -47,18 +47,18 @@ The Service exposes a Model Context Protocol endpoint alongside the REST API:
 - Streamable HTTP: `/Cluster/api/mcp`
 - WebSocket: `/Cluster/api/mcp/ws`
 
-MCP tools mirror the REST API for clusters, cluster identities, cluster feature categories, slot feature categories, and usage statistics. The main tool groups are:
+MCP tools expose cluster and locally owned catalog CRUD plus atomic batch backup/restore. Usage statistics remain available through REST and are not exposed as an MCP tool. The main tool groups are:
 
 - `cluster_...`
 - `cluster_identity_...`
 - `cluster_feature_category_...`
 - `slot_feature_category_...`
-- `cluster_usage_statistics_get`
 
 The Docker image reads optional service configuration from `/home/Cluster.Service.json`, or from the path specified by `CLUSTER_EXTERNAL_CONFIG`. This file can enable MCP hub registration through the `McpHub` section.
 
 ## Main Capabilities
 - Cluster management: create, edit, import, export, and delete clusters.
+- Portable batch transfer: export or atomically restore several clusters together with referenced local identity/feature definitions and verified Field/Rig UUID-name manifests.
 - Field association: clusters can be linked to a field and displayed using field, cluster, cartographic, geodetic, and depth reference systems.
 - Cluster identities: user-defined identity definitions can be managed separately and assigned to clusters with cluster-specific values.
 - Cluster features: user-defined feature categories/options can be managed separately and assigned to clusters with exclusivity and optional validity periods.
@@ -66,7 +66,7 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 - Slot editing: slots can be edited with north/east and latitude/longitude coordinates through the unit/reference system; the slot table summarizes assigned features.
 - Survey/trajectory displays: cluster survey runs and trajectories are shown in 3D and in horizontal projection, with optional uncertainty ellipses.
 - Field delineation overlays: when a cluster belongs to a field with delineation lines, those lines and their calculated boundaries are displayed together with cluster survey runs and trajectories. In 3D, delineation lines are placed on the north/east plane at the top or bottom of the displayed survey/trajectory bounding box. The bounding box itself is based on survey/trajectory data, not on delineation extents.
-- Calculators: the web app exposes cartographic conversions from the Field web pages and vertical datum single conversions from the VerticalDatum web page under the `Calculators` menu.
+- Calculators: the web app exposes synchronous cartographic conversion, vertical datum conversion, Earth gravity evaluation, and Earth magnetic-field evaluation pages under the `Calculators` menu. Calculation requests and results are not persisted by the Earth services.
 
 ## Docker (Optional)
 - Build images from repo root:
@@ -80,7 +80,7 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 - Runtime packages (high level):
   - Service: `Microsoft.Data.Sqlite`, `Swashbuckle.AspNetCore.*`, `Microsoft.OpenApi*`.
   - Model: `OSDC.DotnetLibraries.*` (Common, DataManagement, Statistics, DrillingProperties).
-  - WebApp: `OSDC.UnitConversion.DrillingRazorMudComponents`, `Plotly.Blazor`, `OSDC.DotnetLibraries.General.DataManagement`, and reusable Field, CartographicProjection, GeodeticDatum, and VerticalDatum web page packages.
+  - WebApp: `MudBlazor`, `OSDC.DotnetLibraries.General.DataManagement`, the current `OSDC.Drilling.Field.WebPages` package, and reusable EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, and EarthMagneticField web page packages.
   - ModelSharedOut: `Microsoft.OpenApi.Readers`, `NSwag.CodeGeneration.CSharp`.
 - Project references:
   - Service → Model
@@ -88,7 +88,7 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
   - ServiceTest → Service, ModelSharedOut
   - ModelTest → Model
 - External services (optional but supported):
-  - Field, Trajectory, Rig, VerticalDatum, CartographicProjection, GeodeticDatum, and UnitConversion service URLs are configurable in `WebApp/appsettings.*.json`.
+  - Field, Trajectory, Rig, EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, EarthMagneticField, and UnitConversion service URLs are configurable in `WebApp/appsettings.*.json`.
 
 ## Notes
 - Path bases: Service uses `/Cluster/api`; WebApp uses `/Cluster/webapp`. Ensure reverse proxies/ingress match these paths.
@@ -105,4 +105,4 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 
 ## Current WebApp dependencies
 
-The Cluster WebApp now consumes `NORCE.Drilling.Field.WebPages` 1.0.19 and `NORCE.Drilling.VerticalDatum.WebPage` 1.0.3. These packages provide the embedded Field and Vertical Datum pages registered by the host.
+The Cluster WebApp consumes `OSDC.Drilling.Field.WebPages` 2.0.0, `OSDC.Drilling.EarthCartographicProjection.WebPages` 1.1.0, `OSDC.Drilling.EarthGeodesy.WebPages` 1.1.0, `OSDC.Drilling.EarthVerticalDatum.WebPages` 1.1.0, `OSDC.Drilling.EarthGravity.WebPages` 1.0.1, and `OSDC.Drilling.EarthMagneticField.WebPages` 1.0.1. The Earth contextual and calculator pages are hosted through local route wrappers so their routes remain under `/Cluster/webapp`.

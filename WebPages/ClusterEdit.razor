@@ -562,7 +562,6 @@
     List<List<object>> yValuesDepthList = new List<List<object>>(); // list of y values for the list of curves to plot
 
     // Labels
-    private string? inputParamUnitLabel = null;
 
     // UI related variables
     private string? _slotSearchString;
@@ -787,7 +786,7 @@
         }
 
         ReferencePositionSample referenceSample = sample.Value;
-        CartographicCoordinate? coordinate = await ConvertReferenceSampleToCartographicAsync(_field.MetaInfo.ID, referenceSample);
+        FieldCoordinateConversionPositionResult? coordinate = await ConvertReferenceSampleToCartographicAsync(_field.MetaInfo.ID, referenceSample);
         if (coordinate == null)
         {
             ClearCartographicAndGeodeticReferenceSources();
@@ -795,63 +794,44 @@
         }
 
         DataUtils.UnitAndReferenceParameters.CartographicProjectionDatumGeodeticReferenceSource.CartographicProjectionDatumLatitudeReference =
-            coordinate.GeodeticCoordinate?.LatitudeDatum == null ? null : coordinate.GeodeticCoordinate.LatitudeDatum.Value - referenceSample.Latitude!.Value;
+            coordinate.ProjectionDatumGeographicCoordinate.Latitude - referenceSample.Latitude!.Value;
         DataUtils.UnitAndReferenceParameters.CartographicProjectionDatumGeodeticReferenceSource.CartographicProjectionDatumLongitudeReference =
-            coordinate.GeodeticCoordinate?.LongitudeDatum == null ? null : coordinate.GeodeticCoordinate.LongitudeDatum.Value - referenceSample.Longitude!.Value;
+            coordinate.ProjectionDatumGeographicCoordinate.Longitude - referenceSample.Longitude!.Value;
 
         DataUtils.UnitAndReferenceParameters.CartographicGridPositionReferenceSource.CartographicGridNorthPositionReference =
-            coordinate.Northing == null || referenceSample.RiemannianNorth == null ? null : coordinate.Northing.Value - referenceSample.RiemannianNorth.Value;
+            referenceSample.RiemannianNorth == null ? null : coordinate.ProjectedCoordinate.Northing - referenceSample.RiemannianNorth.Value;
         DataUtils.UnitAndReferenceParameters.CartographicGridPositionReferenceSource.CartographicGridEastPositionReference =
-            coordinate.Easting == null || referenceSample.RiemannianEast == null ? null : coordinate.Easting.Value - referenceSample.RiemannianEast.Value;
+            referenceSample.RiemannianEast == null ? null : coordinate.ProjectedCoordinate.Easting - referenceSample.RiemannianEast.Value;
     }
 
-    private async Task<CartographicCoordinate?> ConvertReferenceSampleToCartographicAsync(Guid fieldId, ReferencePositionSample sample)
+    private async Task<FieldCoordinateConversionPositionResult?> ConvertReferenceSampleToCartographicAsync(Guid fieldId, ReferencePositionSample sample)
     {
-        Guid conversionId = Guid.NewGuid();
-        FieldCartographicConversionSet conversionSet = new()
+        FieldForwardConversionRequest request = new()
         {
-            MetaInfo = new MetaInfo { ID = conversionId },
-            Name = "Calculate Cluster Reference Sources",
-            Description = "Temporary conversion for cluster unit and reference sources.",
-            CreationDate = DateTimeOffset.UtcNow,
-            LastModificationDate = DateTimeOffset.UtcNow,
             FieldID = fieldId,
-            CartographicCoordinateList =
+            SourceGeographicReference = FieldGeographicReference.Wgs84,
+            ProjectionApplicabilityPolicy = FieldApplicabilityPolicy.AllowUnknown,
+            Transformation = CreateTransformationOptions(),
+            Positions =
             [
-                new CartographicCoordinate
+                new FieldForwardConversionPosition
                 {
-                    GeodeticCoordinate = new GeodeticCoordinate
-                    {
-                        LatitudeWGS84 = sample.Latitude,
-                        LongitudeWGS84 = sample.Longitude,
-                        VerticalDepthWGS84 = referenceDepthWGS84 ?? 0
-                    }
+                    Latitude = sample.Latitude!.Value,
+                    Longitude = sample.Longitude!.Value,
+                    VerticalDepth = referenceDepthWGS84 ?? 0
                 }
             ]
         };
-
-        bool posted = false;
-        try
-        {
-            await Api.ClientField.PostFieldCartographicConversionSetAsync(conversionSet);
-            posted = true;
-            FieldCartographicConversionSet calculated = await Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionId);
-            return calculated.CartographicCoordinateList?.FirstOrDefault();
-        }
-        finally
-        {
-            if (posted)
-            {
-                try
-                {
-                    await Api.ClientField.DeleteFieldCartographicConversionSetByIdAsync(conversionId);
-                }
-                catch
-                {
-                }
-            }
-        }
+        FieldCoordinateConversionResponse response = await Api.ClientField.ForwardFieldCoordinatesAsync(request);
+        return response.Positions?.FirstOrDefault();
     }
+
+    private static FieldTransformationOptions CreateTransformationOptions() => new()
+    {
+        SelectionPolicy = FieldTransformationSelectionPolicy.FirstAvailable,
+        ApplicabilityPolicy = FieldApplicabilityPolicy.AllowUnknown,
+        DepthPolicy = FieldDepthTransformationPolicy.AllowUntransformedDepthFor2D
+    };
 
     private static void ClearCartographicAndGeodeticReferenceSources()
     {
@@ -1385,7 +1365,7 @@
 
     private async Task<bool> ConfirmCloseWithoutSavingAsync()
     {
-        bool? result = await DialogService.ShowMessageBox(
+        bool? result = await DialogService.ShowMessageBoxAsync(
             "Unsaved changes",
             "Some changes have not been saved. Close without saving?",
             yesText: "Close without saving",
@@ -2231,7 +2211,7 @@
         _ = RefreshReferenceSourcesAsync();
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
         {
-            CalculateReferenceWGS84();
+            _ = CalculateReferenceWgs84Async();
         }
     }
     private void ChangeReferenceLongitudeWGS84(double? val)
@@ -2240,7 +2220,7 @@
         _ = RefreshReferenceSourcesAsync();
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
         {
-            CalculateReferenceWGS84();
+            _ = CalculateReferenceWgs84Async();
         }
     }
     private void ChangeReferenceLatitudeDatum(double? val)
@@ -2248,7 +2228,7 @@
         referenceLatitudeDatum = val;
         if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && referenceDepthDatum != null)
         {
-            CalculateReferenceDatum();
+            _ = CalculateReferenceDatumAsync();
         }
     }
     private void ChangeReferenceLongitudeDatum(double? val)
@@ -2256,7 +2236,7 @@
         referenceLongitudeDatum = val;
         if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && referenceDepthDatum != null)
         {
-            CalculateReferenceDatum();
+            _ = CalculateReferenceDatumAsync();
         }
     }
     private void ChangeReferenceNorthing(double? val)
@@ -2265,7 +2245,7 @@
         _ = RefreshReferenceSourcesAsync();
         if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null)
         {
-            CalculateReferenceCartography();
+            _ = CalculateReferenceCartographyAsync();
         }
     }
     private void ChangeReferenceEasting(double? val)
@@ -2274,7 +2254,7 @@
         _ = RefreshReferenceSourcesAsync();
         if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null)
         {
-            CalculateReferenceCartography();
+            _ = CalculateReferenceCartographyAsync();
         }
     }
     private void ChangeReferenceDepthWGS84(double? val)
@@ -2283,7 +2263,7 @@
         _ = RefreshReferenceSourcesAsync();
         if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null)
         {
-            CalculateReferenceWGS84();
+            _ = CalculateReferenceWgs84Async();
             UpdateDepthPlot();
         }
     }
@@ -2292,171 +2272,133 @@
         referenceDepthDatum = val;
         if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && referenceDepthDatum != null)
         {
-            CalculateReferenceDatum();
+            _ = CalculateReferenceDatumAsync();
             UpdateDepthPlot();
         }
         else if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null)
         {
-            CalculateReferenceCartography();
+            _ = CalculateReferenceCartographyAsync();
             UpdateDepthPlot();
         }
     }
 
-    private FieldCartographicConversionSet CalculateFieldCartographicConversionSet(FieldCartographicConversionSet conversionSet)
+    private async Task CalculateReferenceWgs84Async()
     {
-        bool posted = false;
+        if (referenceLatitudeWGS84 == null || referenceLongitudeWGS84 == null || referenceDepthWGS84 == null ||
+            _field?.MetaInfo?.ID is not Guid fieldId || fieldId == Guid.Empty)
+        {
+            return;
+        }
+
         try
         {
-            Api.ClientField!.PostFieldCartographicConversionSetAsync(conversionSet).Wait();
-            posted = true;
-            return Api.ClientField.GetFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).GetAwaiter().GetResult();
+            FieldCoordinateConversionPositionResult? result = await ForwardFieldCoordinateAsync(
+                fieldId, FieldGeographicReference.Wgs84,
+                referenceLatitudeWGS84.Value, referenceLongitudeWGS84.Value, referenceDepthWGS84.Value);
+            if (result == null) return;
+            referenceLatitudeDatum = result.ProjectionDatumGeographicCoordinate.Latitude;
+            referenceLongitudeDatum = result.ProjectionDatumGeographicCoordinate.Longitude;
+            referenceDepthDatum = result.ProjectionDatumVerticalDepth;
+            referenceNorthing = result.ProjectedCoordinate.Northing;
+            referenceEasting = result.ProjectedCoordinate.Easting;
+            await InvokeAsync(StateHasChanged);
         }
-        finally
+        catch (Exception ex)
         {
-            if (posted)
-            {
-                try
-                {
-                    Api.ClientField!.DeleteFieldCartographicConversionSetByIdAsync(conversionSet.MetaInfo.ID).Wait();
-                }
-                catch
-                {
-                }
-            }
+            logger.LogWarning(ex, "Unable to convert the Cluster reference from WGS 84");
         }
     }
 
-    private void CalculateReferenceWGS84()
+    private async Task CalculateReferenceDatumAsync()
     {
-        if (referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && referenceDepthWGS84 != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        if (referenceLatitudeDatum == null || referenceLongitudeDatum == null || referenceDepthDatum == null ||
+            _field?.MetaInfo?.ID is not Guid fieldId || fieldId == Guid.Empty)
         {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Cluster Reference",
-                        Description = "Calculate Cluster Reference",
-                        FieldID = _field.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeWGS84 = referenceLatitudeWGS84 ,
-                                    LongitudeWGS84 = referenceLongitudeWGS84,
-                                    VerticalDepthWGS84 = referenceDepthWGS84
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        referenceLatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
-                        referenceLongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
-                        referenceDepthDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthDatum;
-                        referenceNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
-                        referenceEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
+            return;
+        }
 
-            }
+        try
+        {
+            FieldCoordinateConversionPositionResult? result = await ForwardFieldCoordinateAsync(
+                fieldId, FieldGeographicReference.ProjectionDatum,
+                referenceLatitudeDatum.Value, referenceLongitudeDatum.Value, referenceDepthDatum.Value);
+            if (result == null) return;
+            referenceLatitudeWGS84 = result.Wgs84GeographicCoordinate?.Latitude;
+            referenceLongitudeWGS84 = result.Wgs84GeographicCoordinate?.Longitude;
+            referenceDepthWGS84 = result.Wgs84VerticalDepth;
+            referenceNorthing = result.ProjectedCoordinate.Northing;
+            referenceEasting = result.ProjectedCoordinate.Easting;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to convert the Cluster reference from the projection datum");
         }
     }
-    private void CalculateReferenceDatum()
+
+    private async Task CalculateReferenceCartographyAsync()
     {
-        if (referenceLatitudeDatum != null && referenceLongitudeDatum != null && referenceDepthDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        if (referenceNorthing == null || referenceEasting == null || referenceDepthDatum == null ||
+            _field?.MetaInfo?.ID is not Guid fieldId || fieldId == Guid.Empty)
         {
-            try
+            return;
+        }
+
+        try
+        {
+            FieldInverseConversionRequest request = new()
             {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
+                FieldID = fieldId,
+                ProjectionApplicabilityPolicy = FieldApplicabilityPolicy.AllowUnknown,
+                Transformation = CreateTransformationOptions(),
+                Positions =
+                [
+                    new FieldInverseConversionPosition
                     {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Cluster Reference",
-                        Description = "Calculate Cluster Reference",
-                        FieldID = _field.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeDatum = referenceLatitudeDatum,
-                                    LongitudeDatum = referenceLongitudeDatum,
-                                    VerticalDepthDatum = referenceDepthDatum
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        referenceLatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
-                        referenceLongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
-                        referenceDepthWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
-                        referenceNorthing = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Northing;
-                        referenceEasting = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).Easting;
+                        Northing = referenceNorthing.Value,
+                        Easting = referenceEasting.Value,
+                        VerticalDepth = referenceDepthDatum.Value
                     }
-
-                }
-            }
-            catch (Exception e)
-            {
-
-            }
+                ]
+            };
+            FieldCoordinateConversionResponse response = await Api.ClientField.InverseFieldCoordinatesAsync(request);
+            FieldCoordinateConversionPositionResult? result = response.Positions?.FirstOrDefault();
+            if (result == null) return;
+            referenceLatitudeDatum = result.ProjectionDatumGeographicCoordinate.Latitude;
+            referenceLongitudeDatum = result.ProjectionDatumGeographicCoordinate.Longitude;
+            referenceDepthDatum = result.ProjectionDatumVerticalDepth;
+            referenceLatitudeWGS84 = result.Wgs84GeographicCoordinate?.Latitude;
+            referenceLongitudeWGS84 = result.Wgs84GeographicCoordinate?.Longitude;
+            referenceDepthWGS84 = result.Wgs84VerticalDepth;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to convert the Cluster reference from projected coordinates");
         }
     }
-    private void CalculateReferenceCartography()
+
+    private async Task<FieldCoordinateConversionPositionResult?> ForwardFieldCoordinateAsync(
+        Guid fieldId, FieldGeographicReference source, double latitude, double longitude, double verticalDepth)
     {
-        if (referenceNorthing != null && referenceEasting != null && referenceDepthDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
+        FieldForwardConversionRequest request = new()
         {
-            try
-            {
-                if (Api.ClientField != null)
+            FieldID = fieldId,
+            SourceGeographicReference = source,
+            ProjectionApplicabilityPolicy = FieldApplicabilityPolicy.AllowUnknown,
+            Transformation = CreateTransformationOptions(),
+            Positions =
+            [
+                new FieldForwardConversionPosition
                 {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Cluster Reference",
-                        Description = "Calculate Cluster Reference",
-                        FieldID = _field.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                Northing = referenceNorthing,
-                                Easting = referenceEasting,
-                                VerticalDepth = referenceDepthDatum,
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        referenceLatitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeWGS84;
-                        referenceLongitudeWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeWGS84;
-                        referenceDepthWGS84 = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
-                        referenceLatitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LatitudeDatum;
-                        referenceLongitudeDatum = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.LongitudeDatum;
-                    }
-
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    VerticalDepth = verticalDepth
                 }
-            }
-            catch (Exception e)
-            {
-
-            }
-        }
+            ]
+        };
+        FieldCoordinateConversionResponse response = await Api.ClientField.ForwardFieldCoordinatesAsync(request);
+        return response.Positions?.FirstOrDefault();
     }
     private void ChangeGroundMudLineDepthWGS84(double? val)
     {
@@ -2479,86 +2421,6 @@
             UpdateDepthPlot();
         }
         InvokeAsync(StateHasChanged);
-    }
-    private void CalculateDepthWGS84(double? depthInput, out double? depthOutput)
-    {
-        depthOutput = null;
-        if (depthInput != null && referenceLatitudeWGS84 != null && referenceLongitudeWGS84 != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
-        {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Depth",
-                        Description = "Calculate Depth",
-                        FieldID = _field.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeWGS84 = referenceLatitudeWGS84 ,
-                                    LongitudeWGS84 = referenceLongitudeWGS84,
-                                    VerticalDepthWGS84 = depthInput
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthDatum;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
-        }
-    }
-    private void CalculateDepthDatum(double? depthInput, out double? depthOutput)
-    {
-        depthOutput = null;
-        if (depthInput != null && referenceLatitudeDatum != null && referenceLongitudeDatum != null && _field != null && _field.MetaInfo != null && _field.MetaInfo.ID != Guid.Empty)
-        {
-            try
-            {
-                if (Api.ClientField != null)
-                {
-                    FieldCartographicConversionSet conversionSet = new FieldCartographicConversionSet()
-                    {
-                        MetaInfo = new MetaInfo() { ID = Guid.NewGuid() },
-                        Name = "Calculate Depth",
-                        Description = "Calculate Depth",
-                        FieldID = _field.MetaInfo.ID,
-                        CartographicCoordinateList = new List<CartographicCoordinate>() {
-                            new CartographicCoordinate() {
-                                GeodeticCoordinate = new GeodeticCoordinate() {
-                                    LatitudeDatum = referenceLatitudeDatum ,
-                                    LongitudeDatum = referenceLongitudeDatum,
-                                    VerticalDepthDatum = depthInput
-                                }
-                            }
-                        }
-                    };
-                    FieldCartographicConversionSet calculatedConversionSet = CalculateFieldCartographicConversionSet(conversionSet);
-                    if (calculatedConversionSet?.MetaInfo?.ID == conversionSet.MetaInfo.ID &&
-                        calculatedConversionSet.CartographicCoordinateList != null &&
-                        calculatedConversionSet.CartographicCoordinateList.Count > 0 &&
-                        calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate != null)
-                    {
-                        depthOutput = calculatedConversionSet.CartographicCoordinateList.ElementAt(0).GeodeticCoordinate.VerticalDepthWGS84;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
-        }
     }
     private void AddSlot()
     {

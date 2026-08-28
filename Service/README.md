@@ -5,6 +5,7 @@ The Service project is an ASP.NET Core Web API that exposes REST endpoints to cr
 ## Purpose In The Solution
 - Provides the backend API for Cluster operations at the base path `/Cluster/api`.
 - Provides CRUD APIs for cluster identity definitions, cluster feature categories, and slot feature categories.
+- Provides versioned batch backup and atomic restore of clusters and their dependency closure.
 - Exposes an MCP endpoint with tools mirroring the REST API, plus optional MCP hub registration.
 - Persists Cluster data to SQLite in `home/Cluster.db` with automatic schema checks and backup on mismatch.
 - Serves a merged OpenAPI document and Swagger UI for client tooling and manual testing.
@@ -24,7 +25,7 @@ The Service project is an ASP.NET Core Web API that exposes REST endpoints to cr
    - Default URLs (from `Service/Properties/launchSettings.json`): `https://localhost:5001`, `http://localhost:5002`
    - Base API path: `https://localhost:5001/Cluster/api`
 3. Configure (optional):
-   - `Service/appsettings.*.json` supports `WellHostURL` to point to an external Well service.
+   - `Service/appsettings.*.json` configures `FieldHostURL` and `RigHostURL` for live backup/restore reference validation, and supports `WellHostURL`.
    - Logging and detailed errors configured per environment.
    - Optional external service configuration is loaded from `home/Cluster.Service.json`, or from the path specified by `CLUSTER_EXTERNAL_CONFIG`.
    - In Docker, the image reads optional external configuration from `/home/Cluster.Service.json`.
@@ -54,6 +55,8 @@ External MCP hub configuration example:
   - `GET /Cluster/api/Cluster/MetaInfo` → list of `MetaInfo`
   - `GET /Cluster/api/Cluster/{id}` → single Cluster by ID
   - `GET /Cluster/api/Cluster/HeavyData` → full list of Clusters
+  - `POST /Cluster/api/Cluster/BatchExport` → export all clusters or an ordered selection with dependency manifests
+  - `POST /Cluster/api/Cluster/BatchRestore` → validate, reconnect references, and atomically restore a document
   - `POST /Cluster/api/Cluster` → add new Cluster
   - `PUT /Cluster/api/Cluster/{id}` → update existing Cluster
   - `DELETE /Cluster/api/Cluster/{id}` → delete Cluster
@@ -87,16 +90,18 @@ The service exposes a Model Context Protocol endpoint alongside the REST API:
 - Streamable HTTP transport: `/Cluster/api/mcp`
 - WebSocket transport: `/Cluster/api/mcp/ws`
 
-The MCP tool surface mirrors the REST API:
+The MCP tool surface exposes the domain CRUD and batch-transfer subset of the REST API:
 
 - `ping`
-- Cluster: `cluster_get_all_ids`, `cluster_get_all_meta_info`, `cluster_get_by_id`, `cluster_get_all`, `cluster_get_all_light`, `cluster_get_all_by_field_id`, `cluster_get_all_by_rig_id`, `cluster_get_all_single_well`, `cluster_get_all_fixed_platform`, `cluster_create`, `cluster_update_by_id`, `cluster_delete_by_id`
+- Cluster: `cluster_get_all_ids`, `cluster_get_all_meta_info`, `cluster_get_by_id`, `cluster_get_all`, `cluster_get_all_light`, `cluster_get_all_by_field_id`, `cluster_get_all_by_rig_id`, `cluster_get_all_single_well`, `cluster_get_all_fixed_platform`, `cluster_create`, `cluster_update_by_id`, `cluster_delete_by_id`, `cluster_batch_export`, `cluster_batch_restore`
 - ClusterIdentity: `cluster_identity_...`
 - ClusterFeatureCategory: `cluster_feature_category_...`
 - SlotFeatureCategory: `slot_feature_category_...`
-- Usage statistics: `cluster_usage_statistics_get`
+- Usage statistics remain available through REST and are intentionally not exposed through MCP.
 
-The `create` and `update_by_id` tools expect the same JSON object body as the corresponding REST endpoints, wrapped in an argument named after the entity, for example `cluster`, `clusterIdentity`, `clusterFeatureCategory`, or `slotFeatureCategory`. Every REST-backed tool publishes an explicit JSON input schema with descriptions for identifiers, filters, metadata, associations, feature and identity assignments, nested slots, Gaussian uncertainty, and update identity matching. Cluster coordinates use SI values and WGS84 references: angular values are radians and linear/depth values are meters.
+The `create` and `update_by_id` tools expect the same JSON object body as the corresponding REST endpoints, wrapped in an argument named after the entity, for example `cluster`, `clusterIdentity`, `clusterFeatureCategory`, or `slotFeatureCategory`. Every tool publishes explicit input and success-output JSON Schemas plus a human-readable title and read-only, destructive, idempotent, and open-world behavior annotations. Successful calls return schema-conforming structured content and a JSON text fallback. Failures return `isError=true` with a stable JSON text envelope and no success-shaped structured content. Cluster coordinates use SI values and WGS84 references: angular values are radians and linear/depth values are metres.
+
+The batch document uses `OSDC.Drilling.Cluster.BatchExport`, schema version 1. It contains complete clusters, only referenced local identity and cluster/slot feature definitions/options, and Field/Rig source UUID-to-name manifests. Restore resolves local catalogs by compatible UUID or unique normalized name and can create missing local definitions/options. Field and Rig resources are never created: an existing UUID is retained even if its display name changed; when that UUID is absent, the stored name must have one unique normalized-name match. All local catalog creation, reference rewriting, and cluster writes share one SQLite transaction.
 
 When `McpHub:Enabled` is true, the service registers itself on the configured MCP hub with a fixed service type id, a configured or persisted instance id, and MCP endpoint URLs derived from `PublicBaseUrl`:
 

@@ -9,7 +9,12 @@ internal static class McpToolResponses
         return new JsonObject
         {
             ["status"] = 400,
-            ["error"] = message
+            ["data"] = new JsonObject
+            {
+                ["error"] = "validation_failed",
+                ["message"] = message,
+                ["errors"] = new JsonArray()
+            }
         };
     }
 

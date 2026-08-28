@@ -36,14 +36,161 @@ internal static class McpToolArgumentHelpers
     public static JsonObject CreateClusterSchema(bool includeId = false) =>
         WrapBody("cluster", CreateClusterObjectSchema(), includeId, "cluster.MetaInfo.ID");
 
+    public static JsonObject CreateClusterResourceSchema() => CreateClusterObjectSchema();
+
+    public static JsonObject CreateClusterLightResourceSchema() => CreateClusterLightObjectSchema();
+
     public static JsonObject CreateClusterFeatureCategorySchema(bool includeId = false) =>
         WrapBody("clusterFeatureCategory", CreateFeatureCategoryObjectSchema("cluster"), includeId, "clusterFeatureCategory.MetaInfo.ID");
+
+    public static JsonObject CreateClusterFeatureCategoryResourceSchema() => CreateFeatureCategoryObjectSchema("cluster");
 
     public static JsonObject CreateClusterIdentitySchema(bool includeId = false) =>
         WrapBody("clusterIdentity", CreateClusterIdentityObjectSchema(), includeId, "clusterIdentity.MetaInfo.ID");
 
+    public static JsonObject CreateClusterIdentityResourceSchema() => CreateClusterIdentityObjectSchema();
+
     public static JsonObject CreateSlotFeatureCategorySchema(bool includeId = false) =>
         WrapBody("slotFeatureCategory", CreateFeatureCategoryObjectSchema("slot"), includeId, "slotFeatureCategory.MetaInfo.ID");
+
+    public static JsonObject CreateSlotFeatureCategoryResourceSchema() => CreateFeatureCategoryObjectSchema("slot");
+
+    public static JsonObject CreateStatusOnlyOutputSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject { ["status"] = SuccessStatus() },
+        ["required"] = new JsonArray("status"),
+        ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateIdsOutputSchema() => SuccessEnvelope(
+        ArraySchema("Stored resource UUIDs.", Uuid("Stored resource UUID.")));
+
+    public static JsonObject CreateMetaInfoListOutputSchema() => SuccessEnvelope(
+        ArraySchema("Stored resource metadata.", CreateMetaInfoSchema("stored resource")));
+
+    public static JsonObject CreateResourceOutputSchema(JsonObject resourceSchema) => SuccessEnvelope(resourceSchema);
+
+    public static JsonObject CreateResourceListOutputSchema(JsonObject resourceSchema) => SuccessEnvelope(
+        ArraySchema("Stored resources.", resourceSchema));
+
+    public static JsonObject CreateClusterBatchExportSchema() => WrapBody("request", new JsonObject
+    {
+        ["type"] = "object",
+        ["description"] = "Select all clusters or an explicitly ordered set. Selected requires unique ClusterIDs; All forbids a non-empty ClusterIDs array.",
+        ["properties"] = new JsonObject
+        {
+            ["Scope"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("All", "Selected") },
+            ["ClusterIDs"] = new JsonObject { ["type"] = new JsonArray("array", "null"), ["uniqueItems"] = true, ["items"] = Uuid("Cluster UUID to export.") }
+        },
+        ["required"] = new JsonArray("Scope"), ["additionalProperties"] = false
+    }, false, "request");
+
+    public static JsonObject CreateClusterBatchRestoreSchema() => WrapBody("request", new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["ConflictPolicy"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("FailIfExists", "ReplaceExisting") },
+            ["CatalogPolicy"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("MapExisting", "MapOrCreateMissing") },
+            ["Document"] = CreateBatchDocumentSchema(1)
+        },
+        ["required"] = new JsonArray("ConflictPolicy", "CatalogPolicy", "Document"), ["additionalProperties"] = false
+    }, false, "request");
+
+    public static JsonObject CreateClusterBatchExportOutputSchema() => SuccessEnvelope(CreateBatchDocumentSchema(0));
+
+    public static JsonObject CreateClusterBatchRestoreOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["RestoredAtUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
+            ["CreatedCount"] = NonNegativeInteger(), ["ReplacedCount"] = NonNegativeInteger(),
+            ["CreatedCatalogDefinitionCount"] = NonNegativeInteger(), ["CreatedCatalogOptionCount"] = NonNegativeInteger(),
+            ["CatalogMappings"] = new JsonObject { ["type"] = "array", ["items"] = CreateMappingSchema("Catalog") },
+            ["ExternalReferenceMappings"] = new JsonObject { ["type"] = "array", ["items"] = CreateMappingSchema("Resource") },
+            ["ClusterIDs"] = new JsonObject { ["type"] = "array", ["items"] = Uuid("Restored cluster UUID.") }
+        },
+        ["required"] = new JsonArray("RestoredAtUtc", "CreatedCount", "ReplacedCount", "CreatedCatalogDefinitionCount",
+            "CreatedCatalogOptionCount", "CatalogMappings", "ExternalReferenceMappings", "ClusterIDs"),
+        ["additionalProperties"] = false
+    });
+
+    private static JsonObject CreateBatchDocumentSchema(int minimumClusters) => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["FormatIdentifier"] = new JsonObject { ["type"] = "string", ["const"] = "OSDC.Drilling.Cluster.BatchExport" },
+            ["SchemaVersion"] = new JsonObject { ["type"] = "integer", ["const"] = 1 },
+            ["ExportedAtUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
+            ["CatalogDependencies"] = new JsonObject
+            {
+                ["type"] = "object", ["properties"] = new JsonObject
+                {
+                    ["Identities"] = new JsonObject { ["type"] = "array", ["items"] = CreateClusterIdentityObjectSchema() },
+                    ["ClusterFeatureCategories"] = new JsonObject { ["type"] = "array", ["items"] = CreateFeatureCategoryObjectSchema("cluster") },
+                    ["SlotFeatureCategories"] = new JsonObject { ["type"] = "array", ["items"] = CreateFeatureCategoryObjectSchema("slot") }
+                },
+                ["required"] = new JsonArray("Identities", "ClusterFeatureCategories", "SlotFeatureCategories"), ["additionalProperties"] = false
+            },
+            ["ExternalReferences"] = new JsonObject
+            {
+                ["type"] = "object", ["properties"] = new JsonObject
+                {
+                    ["Fields"] = new JsonObject { ["type"] = "array", ["items"] = CreateExternalReferenceSchema() },
+                    ["Rigs"] = new JsonObject { ["type"] = "array", ["items"] = CreateExternalReferenceSchema() }
+                },
+                ["required"] = new JsonArray("Fields", "Rigs"), ["additionalProperties"] = false
+            },
+            ["Clusters"] = new JsonObject { ["type"] = "array", ["minItems"] = minimumClusters, ["items"] = CreateClusterObjectSchema() }
+        },
+        ["required"] = new JsonArray("FormatIdentifier", "SchemaVersion", "ExportedAtUtc", "CatalogDependencies", "ExternalReferences", "Clusters"),
+        ["additionalProperties"] = false
+    };
+
+    private static JsonObject CreateExternalReferenceSchema() => new()
+    {
+        ["type"] = "object", ["properties"] = new JsonObject
+        { ["SourceID"] = Uuid("Source service UUID."), ["Name"] = new JsonObject { ["type"] = "string", ["minLength"] = 1 } },
+        ["required"] = new JsonArray("SourceID", "Name"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject CreateMappingSchema(string discriminator) => new()
+    {
+        ["type"] = "object", ["properties"] = new JsonObject
+        {
+            [discriminator] = new JsonObject { ["type"] = "string" }, ["Name"] = new JsonObject { ["type"] = "string" },
+            ["SourceID"] = Uuid("Source UUID."), ["LocalID"] = Uuid("Resolved destination UUID."),
+            ["Resolution"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("ExactUUID", "NormalizedName", "Created") }
+        },
+        ["required"] = new JsonArray(discriminator, "Name", "SourceID", "LocalID", "Resolution"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject SuccessEnvelope(JsonObject data) => new()
+    {
+        ["type"] = "object", ["properties"] = new JsonObject
+        { ["status"] = SuccessStatus(), ["data"] = data },
+        ["required"] = new JsonArray("status", "data"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject SuccessStatus() => new()
+    { ["type"] = "integer", ["minimum"] = 200, ["maximum"] = 299 };
+
+    private static JsonObject ArraySchema(string description, JsonObject itemSchema, int? minimumItems = null)
+    {
+        JsonObject schema = new()
+        {
+            ["type"] = "array",
+            ["description"] = description,
+            ["items"] = itemSchema
+        };
+        if (minimumItems != null) schema["minItems"] = minimumItems.Value;
+        return schema;
+    }
+
+    private static JsonObject NonNegativeInteger() => new() { ["type"] = "integer", ["minimum"] = 0 };
 
     private static JsonObject WrapBody(string key, JsonObject bodySchema, bool includeId, string bodyIdPath)
     {
@@ -125,6 +272,29 @@ internal static class McpToolArgumentHelpers
             }
         },
         ["required"] = new JsonArray { "MetaInfo" },
+        ["additionalProperties"] = false
+    };
+
+    private static JsonObject CreateClusterLightObjectSchema() => new()
+    {
+        ["type"] = "object",
+        ["description"] = "Lightweight Cluster resource for discovery and selection without nested identities, feature assignments, or slots.",
+        ["properties"] = new JsonObject
+        {
+            ["MetaInfo"] = CreateMetaInfoSchema("cluster"),
+            ["Name"] = NullableString("Human-readable cluster name."),
+            ["Description"] = NullableString("Human-readable cluster description."),
+            ["CreationDate"] = NullableDateTime("UTC or offset timestamp at which the cluster was created."),
+            ["LastModificationDate"] = NullableDateTime("UTC or offset timestamp of the most recent modification."),
+            ["FieldID"] = NullableUuid("Identifier of the Field resource to which the cluster belongs."),
+            ["IsSingleWell"] = Boolean("True when this record represents a single well rather than a multi-well cluster.", false),
+            ["RigID"] = NullableUuid("Identifier of the associated Rig resource, or null when no rig is assigned."),
+            ["IsFixedPlatform"] = Boolean("True for a fixed platform; false for a floating or movable installation.", false),
+            ["ReferencePoint"] = CreateReferencePointSchema(),
+            ["GroundMudLineDepth"] = CreateDepthSchema("Vertical depth of ground level or mud line in metres (SI), referenced to the fixed WGS84 vertical datum."),
+            ["TopWaterDepth"] = CreateDepthSchema("Vertical depth of the top water level in metres (SI), referenced to the fixed WGS84 vertical datum.")
+        },
+        ["required"] = new JsonArray("MetaInfo"),
         ["additionalProperties"] = false
     };
 

@@ -33,6 +33,81 @@ public sealed class McpToolRegistrationTests
         Assert.That(names, Has.Length.EqualTo(_tools.Count));
         Assert.That(names, Is.Unique);
         Assert.That(names.All(name => !name.Contains('.')), Is.True);
+        Assert.That(names, Does.Not.Contain("cluster_usage_statistics_get"));
+    }
+
+    [Test]
+    public void Every_tool_publishes_a_precise_output_schema_and_behavior_metadata()
+    {
+        foreach (IMcpTool tool in _tools.Values)
+        {
+            JsonObject output = RequireObject(tool.OutputSchema);
+            Assert.That(output["type"]?.GetValue<string>(), Is.EqualTo("object"), tool.Name);
+            Assert.That(output["additionalProperties"]?.GetValue<bool>(), Is.False, tool.Name);
+            Assert.That(tool.Behavior.Title, Is.Not.Empty, tool.Name);
+
+            if (tool.Name == "ping") continue;
+            JsonObject properties = RequireObject(output["properties"]);
+            Assert.That(properties, Does.ContainKey("status"), tool.Name);
+            if (properties["data"] is JsonObject data)
+                Assert.That(data.Count, Is.GreaterThan(0), $"{tool.Name} has an unconstrained data schema");
+        }
+    }
+
+    [TestCase("cluster_get_by_id")]
+    [TestCase("cluster_get_all")]
+    [TestCase("cluster_identity_get_all")]
+    [TestCase("cluster_feature_category_get_by_id")]
+    public void Read_tools_are_read_only_idempotent_and_closed_world(string toolName)
+    {
+        McpToolBehavior behavior = _tools[toolName].Behavior;
+        Assert.Multiple(() =>
+        {
+            Assert.That(behavior.ReadOnlyHint, Is.True);
+            Assert.That(behavior.DestructiveHint, Is.False);
+            Assert.That(behavior.IdempotentHint, Is.True);
+            Assert.That(behavior.OpenWorldHint, Is.False);
+        });
+    }
+
+    [TestCase("cluster_update_by_id")]
+    [TestCase("cluster_delete_by_id")]
+    [TestCase("cluster_identity_update_by_id")]
+    [TestCase("slot_feature_category_delete_by_id")]
+    public void Update_and_delete_tools_are_destructive_idempotent_and_closed_world(string toolName)
+    {
+        McpToolBehavior behavior = _tools[toolName].Behavior;
+        Assert.Multiple(() =>
+        {
+            Assert.That(behavior.ReadOnlyHint, Is.False);
+            Assert.That(behavior.DestructiveHint, Is.True);
+            Assert.That(behavior.IdempotentHint, Is.True);
+            Assert.That(behavior.OpenWorldHint, Is.False);
+        });
+    }
+
+    [Test]
+    public void Batch_transfer_tools_publish_portable_contracts_and_annotations()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(_tools, Does.ContainKey("cluster_batch_export"));
+            Assert.That(_tools, Does.ContainKey("cluster_batch_restore"));
+            Assert.That(_tools["cluster_batch_export"].Behavior.ReadOnlyHint, Is.True);
+            Assert.That(_tools["cluster_batch_restore"].Behavior.DestructiveHint, Is.True);
+            Assert.That(_tools["cluster_batch_restore"].Behavior.OpenWorldHint, Is.True);
+            Assert.That(_tools["cluster_batch_export"].OutputSchema, Is.TypeOf<JsonObject>());
+            Assert.That(_tools["cluster_batch_restore"].OutputSchema, Is.TypeOf<JsonObject>());
+        });
+
+        JsonObject restoreRequest = Property(RequireObject(_tools["cluster_batch_restore"].InputSchema), "request");
+        JsonObject document = Property(restoreRequest, "Document");
+        Assert.Multiple(() =>
+        {
+            Assert.That(RequiredNames(restoreRequest), Is.EquivalentTo(new[] { "ConflictPolicy", "CatalogPolicy", "Document" }));
+            Assert.That(RequiredNames(document), Does.Contain("CatalogDependencies"));
+            Assert.That(RequiredNames(document), Does.Contain("ExternalReferences"));
+        });
     }
 
     [Test]
@@ -90,6 +165,33 @@ public sealed class McpToolRegistrationTests
         JsonObject slots = Property(cluster, "Slots");
         JsonObject slot = RequireObject(slots["additionalProperties"]);
         Assert.That(Property(slot, "Latitude")["description"]?.GetValue<string>(), Does.Contain("radians"));
+    }
+
+    [Test]
+    public void Cluster_read_outputs_distinguish_complete_and_lightweight_resources()
+    {
+        JsonObject completeData = Property(RequireObject(_tools["cluster_get_all"].OutputSchema), "data");
+        JsonObject completeItem = RequireObject(completeData["items"]);
+        JsonObject lightData = Property(RequireObject(_tools["cluster_get_all_light"].OutputSchema), "data");
+        JsonObject lightItem = RequireObject(lightData["items"]);
+        Assert.Multiple(() =>
+        {
+            Assert.That(PropertyNames(completeItem), Does.Contain("Slots"));
+            Assert.That(PropertyNames(completeItem), Does.Contain("ClusterIdentityAssignments"));
+            Assert.That(PropertyNames(lightItem), Does.Not.Contain("Slots"));
+            Assert.That(PropertyNames(lightItem), Does.Not.Contain("ClusterIdentityAssignments"));
+        });
+    }
+
+    [TestCase("cluster_create")]
+    [TestCase("cluster_update_by_id")]
+    [TestCase("cluster_delete_by_id")]
+    [TestCase("cluster_identity_create")]
+    public void Mutations_that_return_no_resource_publish_status_only_success_schema(string toolName)
+    {
+        JsonObject output = RequireObject(_tools[toolName].OutputSchema);
+        Assert.That(PropertyNames(output), Is.EquivalentTo(new[] { "status" }));
+        Assert.That(RequiredNames(output), Is.EquivalentTo(new[] { "status" }));
     }
 
     [TestCase("cluster_feature_category_create", "clusterFeatureCategory")]

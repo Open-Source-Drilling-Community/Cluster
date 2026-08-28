@@ -30,9 +30,13 @@ public static class McpServiceCollectionExtensions
         string name,
         string description,
         JsonNode? inputSchema,
+        JsonNode outputSchema,
+        McpToolBehavior behavior,
         Func<IServiceProvider, JsonObject?, CancellationToken, Task<JsonNode?>> invokeAsync)
     {
-        services.AddSingleton<IMcpTool>(sp => new DelegateMcpTool(name, description, inputSchema, arguments => invokeAsync(sp, arguments.Arguments, arguments.CancellationToken)));
+        services.AddSingleton<IMcpTool>(sp => new DelegateMcpTool(name, description,
+            inputSchema ?? EmptyInputSchema(), outputSchema, behavior,
+            arguments => invokeAsync(sp, arguments.Arguments, arguments.CancellationToken)));
         services.AddSingleton<McpServerTool>(sp =>
         {
             IMcpTool? tool = null;
@@ -57,12 +61,16 @@ public static class McpServiceCollectionExtensions
         public DelegateMcpTool(
             string name,
             string description,
-            JsonNode? inputSchema,
+            JsonNode inputSchema,
+            JsonNode outputSchema,
+            McpToolBehavior behavior,
             Func<(JsonObject? Arguments, CancellationToken CancellationToken), Task<JsonNode?>> invokeAsync)
         {
             Name = name;
             Description = description;
             InputSchema = inputSchema;
+            OutputSchema = outputSchema;
+            Behavior = behavior;
             _invokeAsync = invokeAsync;
         }
 
@@ -70,11 +78,18 @@ public static class McpServiceCollectionExtensions
 
         public string Description { get; }
 
-        public JsonNode? InputSchema { get; }
+        public JsonNode InputSchema { get; }
+
+        public JsonNode OutputSchema { get; }
+
+        public McpToolBehavior Behavior { get; }
 
         public Task<JsonNode?> InvokeAsync(JsonObject? arguments, CancellationToken cancellationToken)
         {
             return _invokeAsync((arguments, cancellationToken));
         }
     }
+
+    private static JsonNode EmptyInputSchema() => JsonNode.Parse("""{"type":"object","additionalProperties":false}""")!;
+
 }

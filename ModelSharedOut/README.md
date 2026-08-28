@@ -13,7 +13,7 @@ ModelSharedOut is a .NET 8 console tool that builds a distributed shared model f
 
 ## Project Layout
 
-- `json-schemas/`: source OpenAPI JSON files to merge, including the Cluster service schema and dependency schemas from Field, Rig, Trajectory, VerticalDatum, and related services.
+- `json-schemas/`: source OpenAPI JSON files to merge, including the Cluster service schema and the Field, Rig, Trajectory, and EarthVerticalDatum contracts used directly by Cluster clients.
 - `Program.cs`: merge pipeline and C# client/DTO generation via NSwag.
 - `OpenApiSchemaReferenceUpdater.cs`: utilities to normalize schema IDs and update `$ref`s during merge.
 - Outputs:
@@ -35,7 +35,7 @@ ModelSharedOut is a .NET 8 console tool that builds a distributed shared model f
    - `FieldModel.json` provides field references and field delineation line DTOs used by cluster display pages.
    - `TrajectoryModel.json` provides survey-run, trajectory, survey-station, and uncertainty-ellipse DTOs.
    - `RigModel.json` provides rig DTOs used by cluster editing.
-   - `VerticalDatumModel.json` provides DTOs used for MSL depth reference calculations.
+   - `EarthVerticalDatumModel.json` provides the synchronous DTOs used for MSL depth reference calculations.
 3. Run the generator:
    - `dotnet run --project ModelSharedOut`
 4. Verify outputs:
@@ -50,7 +50,7 @@ ModelSharedOut is a .NET 8 console tool that builds a distributed shared model f
 - Consume in WebApp:
   - WebApp already references this project (`WebApp/WebApp.csproj`).
   - Use DTOs in the `NORCE.Drilling.Cluster.ModelShared` namespace.
-  - The cluster web pages use generated DTOs for cluster data, field light/full data, field delineation lines, trajectories, survey runs, rig data, and vertical datum reference calls.
+  - The cluster web pages use generated DTOs for cluster data, field light/full data, field delineation lines, trajectories, survey runs, rig data, and synchronous EarthVerticalDatum calls.
 - Consume in tests:
   - `ServiceTest/ServiceTest.csproj` references this project for strongly typed fixtures and generated clients.
 

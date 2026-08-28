@@ -6,6 +6,9 @@ using Microsoft.Data.Sqlite;
 using System.Text.Json;
 using System.Collections;
 using System.Threading.Tasks;
+using System.Linq;
+using NORCE.Drilling.Cluster.Model;
+using NORCE.Drilling.Cluster.Service;
 
 namespace NORCE.Drilling.Cluster.Service.Managers
 {
@@ -669,6 +672,63 @@ namespace NORCE.Drilling.Cluster.Service.Managers
                 _logger.LogWarning("The Cluster ID is null or empty");
             }
             return false;
+        }
+
+        public ClusterBatchExportOutcome ExportBatch(ClusterBatchExportRequest? request)
+        {
+            using SqliteConnection? connection = _connectionManager.GetConnection();
+            if (connection == null)
+                return ClusterBatchExporter.StorageFailure("The cluster database is unavailable.");
+
+            using SqliteTransaction transaction = connection.BeginTransaction();
+            try
+            {
+                List<Model.Cluster?> clusters = ReadDocuments<Model.Cluster>(connection, transaction, "ClusterTable", "Cluster").Cast<Model.Cluster?>().ToList();
+                List<ClusterIdentity> identities = ReadDocuments<ClusterIdentity>(connection, transaction, "ClusterIdentityTable", "ClusterIdentity");
+                List<ClusterFeatureCategory> clusterFeatures = ReadDocuments<ClusterFeatureCategory>(connection, transaction, "ClusterFeatureCategoryTable", "ClusterFeatureCategory");
+                List<SlotFeatureCategory> slotFeatures = ReadDocuments<SlotFeatureCategory>(connection, transaction, "SlotFeatureCategoryTable", "SlotFeatureCategory");
+                ClusterBatchExportOutcome outcome = ClusterBatchExporter.Create(request, clusters, DateTimeOffset.UtcNow,
+                    identities, clusterFeatures, slotFeatures);
+                transaction.Commit();
+                return outcome;
+            }
+            catch (Exception ex) when (ex is SqliteException or JsonException)
+            {
+                try { transaction.Rollback(); } catch { }
+                _logger.LogError(ex, "Unable to create an atomic cluster export snapshot");
+                return ClusterBatchExporter.StorageFailure("The stored clusters or catalog dependencies could not be read.");
+            }
+        }
+
+        public ClusterBatchRestoreOutcome RestoreBatch(ClusterBatchRestoreRequest? request,
+            IReadOnlyList<ClusterBatchExternalReferenceMapping>? externalMappings = null)
+        {
+            try
+            {
+                using SqliteConnection? connection = _connectionManager.GetConnection();
+                return connection == null
+                    ? ClusterBatchRestorer.StorageFailure("The cluster database is unavailable.")
+                    : ClusterBatchRestorer.Restore(connection, request, DateTimeOffset.UtcNow, externalMappings);
+            }
+            catch (SqliteException ex)
+            {
+                _logger.LogError(ex, "Unable to open the cluster database for batch restore");
+                return ClusterBatchRestorer.StorageFailure("The cluster database is unavailable.");
+            }
+        }
+
+        private static List<T> ReadDocuments<T>(SqliteConnection connection, SqliteTransaction transaction,
+            string table, string column)
+        {
+            using SqliteCommand command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = $"SELECT {column} FROM {table}";
+            using SqliteDataReader reader = command.ExecuteReader();
+            List<T> result = [];
+            while (reader.Read())
+                result.Add(JsonSerializer.Deserialize<T>(reader.GetString(0), JsonSettings.Options)
+                    ?? throw new JsonException($"Invalid {table} document."));
+            return result;
         }
     }
 }

@@ -16,6 +16,7 @@ The library defines plain data models with semantic annotations for drilling app
 - `ClusterFeatureCategory`, `ClusterFeatureOption`, and `ClusterFeatureAssignment`: user-defined cluster feature definitions and assignments. Categories may be exclusive and may require validity periods.
 - `SlotFeatureCategory`, `SlotFeatureOption`, and `SlotFeatureAssignment`: user-defined slot feature definitions and assignments. Categories follow the same exclusivity and validity-period model as cluster features.
 - `UsageStatisticsCluster`: Lightweight telemetry tracking of REST endpoint usage counts, with simple JSON file backup.
+- `ClusterBatchExportDocument` and related request/response types: the portable backup contract for clusters, local catalog dependencies, and external Field/Rig UUID-name manifests.
 
 Key files:
 - `Model/Cluster.cs:1`

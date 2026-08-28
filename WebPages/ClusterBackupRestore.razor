@@ -1,0 +1,257 @@
+@page "/ClusterBackupRestore"
+@implements IAsyncDisposable
+@inject ILogger<ClusterBackupRestore> logger
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IClusterAPIUtils Api
+@inject IJSRuntime JSRuntime
+
+<MudText Typo="Typo.h4" Class="mt-4 mb-4">Cluster backup and restore</MudText>
+@if (_busy) { <MudProgressLinear Indeterminate="true" Class="mb-3" /> }
+
+<MudExpansionPanels MultiExpansion="true">
+    <MudExpansionPanel Text="Backup clusters" Expanded="true">
+        <MudText Typo="Typo.body2" Class="mb-3">
+            Export complete clusters together with their referenced identities and cluster/slot feature definitions.
+            Field and Rig UUIDs are accompanied by verified names so they can be reconnected on another server.
+        </MudText>
+        @if (_clusters == null)
+        {
+            <MudProgressLinear Indeterminate="true" />
+        }
+        else
+        {
+            <MudDataGrid T="ClusterLight" @key="_gridKey" Items="@_clusters" MultiSelection="true"
+                         SelectedItems="@_selected" SelectedItemsChanged="SelectedChanged"
+                         QuickFilter="@ClusterFilter" Hover="true" SortMode="SortMode.Multiple"
+                         Filterable="false" ReadOnly="true" Elevation="0">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Available clusters</MudText><MudSpacer />
+                    <MudTextField @bind-Value="_search" Placeholder="Search" Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" Class="mt-0" />
+                </ToolBarContent>
+                <Columns>
+                    <SelectColumn T="ClusterLight" />
+                    <PropertyColumn Property="value => value.Name" Title="Name" Sortable="true" />
+                    <PropertyColumn Property="value => value.Description" Title="Description" Sortable="true" />
+                    <TemplateColumn Title="UUID"><CellTemplate>@(context.Item.MetaInfo?.ID.ToString() ?? "—")</CellTemplate></TemplateColumn>
+                </Columns>
+                <PagerContent><MudDataGridPager T="ClusterLight" /></PagerContent>
+            </MudDataGrid>
+            <MudContainer Class="d-flex flex-row align-center pa-0 mt-4">
+                <MudButton Class="me-2" Variant="Variant.Filled" Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Download" Disabled="@(_busy || _clusters.Count == 0)"
+                           OnClick="ExportAllAsync">Backup all (@_clusters.Count)</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Download" Disabled="@(_busy || _selected.Count == 0)"
+                           OnClick="ExportSelectedAsync">Backup selected (@_selected.Count)</MudButton>
+            </MudContainer>
+            <ErrorList Values="_backupErrors" />
+        }
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="Restore clusters">
+        <MudAlert Severity="Severity.Info" Dense="true" Class="mb-3">
+            The complete document is validated before any database change. Field and Rig references are checked live;
+            local identity and feature references are mapped or created according to the selected policy.
+        </MudAlert>
+        <label class="mud-button-root mud-button mud-button-filled mud-button-filled-primary mud-button-filled-size-medium">
+            Choose backup file
+            <InputFile OnChange="LoadFileAsync" accept=".json,application/json" style="display:none" />
+        </label>
+        @if (!string.IsNullOrWhiteSpace(_fileName))
+        { <MudText Typo="Typo.body2" Class="mt-2">Selected file: @_fileName</MudText> }
+
+        @if (_document != null)
+        {
+            <MudGrid Class="mt-3">
+                <MudItem xs="12" md="4"><MudText Typo="Typo.subtitle2">Format</MudText><MudText Typo="Typo.body2">@_document.FormatIdentifier</MudText></MudItem>
+                <MudItem xs="12" md="2"><MudText Typo="Typo.subtitle2">Schema</MudText><MudText Typo="Typo.body2">@_document.SchemaVersion</MudText></MudItem>
+                <MudItem xs="12" md="3"><MudText Typo="Typo.subtitle2">Exported UTC</MudText><MudText Typo="Typo.body2">@_document.ExportedAtUtc.ToString("u")</MudText></MudItem>
+                <MudItem xs="12" md="3"><MudText Typo="Typo.subtitle2">Clusters</MudText><MudText Typo="Typo.body2">@(_document.Clusters?.Count ?? 0)</MudText></MudItem>
+            </MudGrid>
+            <ErrorList Values="_validationErrors" />
+            @if (_validationErrors.Count == 0)
+            {
+                <MudDataGrid T="NORCE.Drilling.Cluster.ModelShared.Cluster" Items="@_document.Clusters"
+                             QuickFilter="@RestoreFilter" Hover="true" ReadOnly="true" Elevation="0" Class="mt-3">
+                    <ToolBarContent><MudText Typo="Typo.h6">Backup contents</MudText><MudSpacer />
+                        <MudTextField @bind-Value="_restoreSearch" Placeholder="Search" Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" /></ToolBarContent>
+                    <Columns>
+                        <PropertyColumn Property="value => value.Name" Title="Name" Sortable="true" />
+                        <PropertyColumn Property="value => value.Description" Title="Description" Sortable="true" />
+                        <TemplateColumn Title="UUID"><CellTemplate>@(context.Item.MetaInfo?.ID.ToString() ?? "—")</CellTemplate></TemplateColumn>
+                    </Columns>
+                    <PagerContent><MudDataGridPager T="NORCE.Drilling.Cluster.ModelShared.Cluster" /></PagerContent>
+                </MudDataGrid>
+
+                <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">Local identities and feature definitions</MudText>
+                <MudRadioGroup T="ClusterBatchCatalogRestorePolicy" @bind-Value="_catalogPolicy">
+                    <MudRadio T="ClusterBatchCatalogRestorePolicy" Value="ClusterBatchCatalogRestorePolicy.MapExisting" Color="Color.Primary">Map compatible definitions already present</MudRadio>
+                    <MudRadio T="ClusterBatchCatalogRestorePolicy" Value="ClusterBatchCatalogRestorePolicy.MapOrCreateMissing" Color="Color.Primary">Map compatible definitions and create missing definitions/options</MudRadio>
+                </MudRadioGroup>
+                <MudAlert Severity="Severity.Info" Dense="true" Class="mt-2">
+                    Names use case, whitespace, and Unicode normalization. Missing Fields or Rigs are never created;
+                    they must have a unique name match on the destination server.
+                </MudAlert>
+
+                <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">If a cluster UUID already exists</MudText>
+                <MudRadioGroup T="ClusterBatchRestoreConflictPolicy" @bind-Value="_conflictPolicy">
+                    <MudRadio T="ClusterBatchRestoreConflictPolicy" Value="ClusterBatchRestoreConflictPolicy.FailIfExists" Color="Color.Primary">Stop without changing anything</MudRadio>
+                    <MudRadio T="ClusterBatchRestoreConflictPolicy" Value="ClusterBatchRestoreConflictPolicy.ReplaceExisting" Color="Color.Error">Replace existing clusters</MudRadio>
+                </MudRadioGroup>
+                @if (_conflictPolicy == ClusterBatchRestoreConflictPolicy.ReplaceExisting)
+                { <MudAlert Severity="Severity.Warning" Dense="true" Class="mt-2">Existing clusters with matching UUIDs will be replaced.</MudAlert> }
+                <MudButton Variant="Variant.Filled" Color="@(_conflictPolicy == ClusterBatchRestoreConflictPolicy.ReplaceExisting ? Color.Error : Color.Primary)"
+                           StartIcon="@Icons.Material.Filled.Restore" Disabled="@(_busy || !CanRestore)"
+                           OnClick="RestoreAsync" Class="mt-3">Restore @(_document.Clusters?.Count ?? 0) cluster(s)</MudButton>
+            }
+        }
+        <ErrorList Values="_serverErrors" />
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+    private const long MaximumFileBytes = 256L * 1024L * 1024L;
+    private const string ExpectedFormat = "OSDC.Drilling.Cluster.BatchExport";
+    private const int ExpectedSchema = 1;
+    private List<ClusterLight>? _clusters;
+    private HashSet<ClusterLight> _selected = [];
+    private string? _search;
+    private string? _restoreSearch;
+    private int _gridKey;
+    private bool _busy;
+    private string? _fileName;
+    private ClusterBatchExportDocument? _document;
+    private ClusterBatchRestoreConflictPolicy _conflictPolicy = ClusterBatchRestoreConflictPolicy.FailIfExists;
+    private ClusterBatchCatalogRestorePolicy _catalogPolicy = ClusterBatchCatalogRestorePolicy.MapExisting;
+    private readonly List<string> _backupErrors = [];
+    private readonly List<string> _validationErrors = [];
+    private readonly List<string> _serverErrors = [];
+    private IJSObjectReference? _downloadModule;
+    private bool CanRestore => _document?.Clusters is { Count: > 0 } && _validationErrors.Count == 0;
+
+    protected override Task OnInitializedAsync() => LoadClustersAsync();
+
+    private async Task LoadClustersAsync()
+    {
+        try
+        {
+            _clusters = ((await Api.ClientCluster.GetAllClusterLightAsync()) ?? [])
+                .Where(value => value.MetaInfo?.ID is Guid id && id != Guid.Empty)
+                .OrderBy(value => value.Name, StringComparer.OrdinalIgnoreCase).ToList();
+            _selected = []; _gridKey++;
+        }
+        catch (Exception ex)
+        { logger.LogError(ex, "Unable to load clusters for backup"); _clusters = []; Snackbar.Add("Unable to load clusters for backup.", Severity.Error); }
+    }
+
+    private void SelectedChanged(HashSet<ClusterLight> values) => _selected = values;
+    private Task ExportAllAsync() => ExportAsync(ClusterBatchExportScope.All, null);
+    private Task ExportSelectedAsync() => ExportAsync(ClusterBatchExportScope.Selected,
+        _selected.Where(value => value.MetaInfo?.ID is Guid id && id != Guid.Empty)
+            .OrderBy(value => value.Name, StringComparer.OrdinalIgnoreCase).ThenBy(value => value.MetaInfo!.ID)
+            .Select(value => value.MetaInfo!.ID).ToList());
+
+    private async Task ExportAsync(ClusterBatchExportScope scope, List<Guid>? ids)
+    {
+        try
+        {
+            _busy = true; _backupErrors.Clear();
+            ClusterBatchExportDocument document = await Api.ClientCluster.BatchExportClustersAsync(new ClusterBatchExportRequest { Scope = scope, ClusterIDs = ids });
+            string json = System.Text.Json.JsonSerializer.Serialize(document, JsonOptions(true));
+            _downloadModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/NORCE.Drilling.Cluster.WebPages/clusterBatchBackup.js?v=20260828");
+            await _downloadModule.InvokeVoidAsync("downloadJson", $"cluster-backup-{DateTime.UtcNow:yyyyMMddTHHmmssZ}.json", json);
+            Snackbar.Add($"Backed up {document.Clusters?.Count ?? 0} cluster(s).", Severity.Success);
+        }
+        catch (ApiException<ClusterBatchErrorEnvelope> ex) { ShowErrors(ex.Result, "Cluster backup was rejected.", _backupErrors); }
+        catch (Exception ex) { logger.LogError(ex, "Unable to back up clusters"); _backupErrors.Add("Unable to back up clusters or resolve Field/Rig references."); }
+        finally { _busy = false; }
+    }
+
+    private async Task LoadFileAsync(InputFileChangeEventArgs args)
+    {
+        _document = null; _validationErrors.Clear(); _serverErrors.Clear(); _fileName = args.File.Name;
+        try
+        {
+            await using System.IO.Stream stream = args.File.OpenReadStream(MaximumFileBytes);
+            _document = await System.Text.Json.JsonSerializer.DeserializeAsync<ClusterBatchExportDocument>(stream, JsonOptions(false));
+            ValidateDocument();
+            if (_validationErrors.Count == 0) Snackbar.Add($"Loaded {_document!.Clusters.Count} cluster(s).", Severity.Success);
+        }
+        catch (Exception ex) when (ex is System.Text.Json.JsonException or IOException or InvalidOperationException)
+        { logger.LogWarning(ex, "Unable to read cluster backup {File}", args.File.Name); _document = null; _validationErrors.Add("The file is not a readable Cluster batch-backup document."); }
+    }
+
+    private void ValidateDocument()
+    {
+        _validationErrors.Clear();
+        if (_document == null) { _validationErrors.Add("The document is empty."); return; }
+        if (_document.FormatIdentifier != ExpectedFormat) _validationErrors.Add($"FormatIdentifier must be '{ExpectedFormat}'.");
+        if (_document.SchemaVersion != ExpectedSchema) _validationErrors.Add($"SchemaVersion must be {ExpectedSchema}.");
+        if (_document.ExportedAtUtc == default || _document.ExportedAtUtc.Offset != TimeSpan.Zero) _validationErrors.Add("ExportedAtUtc must be UTC.");
+        if (_document.CatalogDependencies == null) _validationErrors.Add("CatalogDependencies is required.");
+        if (_document.ExternalReferences == null) _validationErrors.Add("ExternalReferences is required.");
+        if (_document.Clusters == null || _document.Clusters.Count == 0) { _validationErrors.Add("At least one cluster is required."); return; }
+        HashSet<Guid> ids = [];
+        for (int index = 0; index < _document.Clusters.Count; index++)
+        {
+            Guid? id = _document.Clusters.ElementAt(index)?.MetaInfo?.ID;
+            if (id == null || id == Guid.Empty) _validationErrors.Add($"Cluster at position {index} has no UUID.");
+            else if (!ids.Add(id.Value)) _validationErrors.Add($"Cluster UUID {id} occurs more than once.");
+        }
+    }
+
+    private async Task RestoreAsync()
+    {
+        if (!CanRestore || _document == null) return;
+        try
+        {
+            bool? confirmed = await DialogService.ShowMessageBoxAsync("Restore clusters",
+                _conflictPolicy == ClusterBatchRestoreConflictPolicy.ReplaceExisting
+                    ? $"Restore {_document.Clusters.Count} cluster(s) and replace UUID collisions?"
+                    : $"Restore {_document.Clusters.Count} cluster(s)? Any UUID collision stops the operation.",
+                yesText: _conflictPolicy == ClusterBatchRestoreConflictPolicy.ReplaceExisting ? "Restore and replace" : "Restore",
+                cancelText: "Cancel", options: new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+            if (confirmed != true) return;
+
+            _busy = true; _serverErrors.Clear();
+            ClusterBatchRestoreResponse response = await Api.ClientCluster.BatchRestoreClustersAsync(new ClusterBatchRestoreRequest
+            { ConflictPolicy = _conflictPolicy, CatalogPolicy = _catalogPolicy, Document = _document });
+            Snackbar.Add($"Restore completed: {response.CreatedCount} created, {response.ReplacedCount} replaced; " +
+                         $"{response.CreatedCatalogDefinitionCount} definitions and {response.CreatedCatalogOptionCount} options created.", Severity.Success);
+            await LoadClustersAsync();
+        }
+        catch (ApiException<ClusterBatchErrorEnvelope> ex) { ShowErrors(ex.Result, "Cluster restore was rejected.", _serverErrors); }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to restore clusters");
+            _serverErrors.Add("Unable to restore clusters or resolve Field/Rig references.");
+            Snackbar.Add("Unable to restore clusters.", Severity.Error);
+        }
+        finally { _busy = false; }
+    }
+
+    private void ShowErrors(ClusterBatchErrorEnvelope? envelope, string fallback, List<string> target)
+    {
+        target.Clear();
+        target.AddRange(envelope?.Errors?.Select(error => error.PositionIndex == null
+            ? $"{error.Property}: {error.Message}" : $"Position {error.PositionIndex}: {error.Property}: {error.Message}") ?? []);
+        if (target.Count == 0) target.Add(envelope?.Message ?? fallback);
+        Snackbar.Add(envelope?.Message ?? fallback, Severity.Error);
+    }
+
+    private static System.Text.Json.JsonSerializerOptions JsonOptions(bool indented)
+    {
+        System.Text.Json.JsonSerializerOptions options = new()
+        { PropertyNameCaseInsensitive = true, WriteIndented = indented, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+        options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()); return options;
+    }
+
+    private Func<ClusterLight, bool> ClusterFilter => value => string.IsNullOrWhiteSpace(_search) || $"{value.Name} {value.Description} {value.MetaInfo?.ID}".Contains(_search, StringComparison.OrdinalIgnoreCase);
+    private Func<NORCE.Drilling.Cluster.ModelShared.Cluster, bool> RestoreFilter => value => string.IsNullOrWhiteSpace(_restoreSearch) || $"{value.Name} {value.Description} {value.MetaInfo?.ID}".Contains(_restoreSearch, StringComparison.OrdinalIgnoreCase);
+
+    public async ValueTask DisposeAsync()
+    { if (_downloadModule != null) try { await _downloadModule.DisposeAsync(); } catch (JSDisconnectedException) { } }
+}

@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using NORCE.Drilling.Cluster.Service.Controllers;
 using NORCE.Drilling.Cluster.Service.Managers;
+using NORCE.Drilling.Cluster.Service;
+using NORCE.Drilling.Cluster.Model;
+using System.Threading;
 using OSDC.DotnetLibraries.General.DataManagement;
 
 namespace ServiceTest.Controllers
@@ -37,7 +40,7 @@ namespace ServiceTest.Controllers
                 _sqlLogger);
 
             // Instantiate controller normally; it will pick up the singleton ClusterManager
-            _controller = new ClusterController(_clusterLogger, _sqlConnectionManager);
+            _controller = new ClusterController(_clusterLogger, _sqlConnectionManager, new EmptyExternalReferenceResolver());
         }
 
         [OneTimeTearDown]
@@ -152,6 +155,12 @@ namespace ServiceTest.Controllers
             Assert.That(ok.Value, Is.InstanceOf<IEnumerable<NORCE.Drilling.Cluster.Model.Cluster?>>());
             var list = (IEnumerable<NORCE.Drilling.Cluster.Model.Cluster?>)ok.Value!;
             Assert.That(list, Is.Not.Null);
+        }
+
+        private sealed class EmptyExternalReferenceResolver : IClusterExternalReferenceResolver
+        {
+            public Task<List<ClusterBatchError>> PopulateExportManifestAsync(ClusterBatchExportDocument document, CancellationToken cancellationToken) => Task.FromResult(new List<ClusterBatchError>());
+            public Task<ClusterExternalReferenceResolutionOutcome> ResolveRestoreManifestAsync(ClusterBatchExportDocument document, CancellationToken cancellationToken) => Task.FromResult(new ClusterExternalReferenceResolutionOutcome());
         }
 
         [Test]

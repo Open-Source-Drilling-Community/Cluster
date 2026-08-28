@@ -4,6 +4,7 @@
         <MudNavLink Href="/Cluster/webapp/ClusterIdentities" Match="NavLinkMatch.All">Cluster Identities</MudNavLink>
         <MudNavLink Href="/Cluster/webapp/ClusterFeatures" Match="NavLinkMatch.All">Cluster Features</MudNavLink>
         <MudNavLink Href="/Cluster/webapp/SlotFeatures" Match="NavLinkMatch.All">Slot Features</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/ClusterBackupRestore" Match="NavLinkMatch.All">Cluster Backup and Restore</MudNavLink>
     </MudNavGroup>
 
     <MudNavGroup Title="Survey Display" Expanded="false">
@@ -13,14 +14,16 @@
 
     <MudNavGroup Title="Contextual Data" Expanded="false">
         <MudNavLink Href="/Cluster/webapp/Field" Match="NavLinkMatch.All">Field</MudNavLink>
-        <MudNavLink Href="/Cluster/webapp/CartographicProjection" Match="NavLinkMatch.All">Cartographic Projections</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/ProjectionDefinition" Match="NavLinkMatch.Prefix">Cartographic Projections</MudNavLink>
         <MudNavLink Href="/Cluster/webapp/GeodeticDatum" Match="NavLinkMatch.All">Geodetic Datum</MudNavLink>
         <MudNavLink Href="/Cluster/webapp/Spheroid" Match="NavLinkMatch.All">Spheroid</MudNavLink>
     </MudNavGroup>
 
     <MudNavGroup Title="Calculators" Expanded="false">
-        <MudNavLink Href="/Cluster/webapp/FieldCartographicConverter" Match="NavLinkMatch.All">Cartographic Conversions</MudNavLink>
-        <MudNavLink Href="/Cluster/webapp/VerticalDatumConversion" Match="NavLinkMatch.All">Vertical Datum Conversions</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/FieldCartographicConverter" Match="NavLinkMatch.All">Cartographic Conversion</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/EarthVerticalDatumCalculation" Match="NavLinkMatch.All">Vertical Datum Conversion</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/EarthGravityCalculation" Match="NavLinkMatch.All">Earth Gravity Evaluation</MudNavLink>
+        <MudNavLink Href="/Cluster/webapp/EarthMagneticFieldCalculation" Match="NavLinkMatch.All">Earth Magnetic Field Evaluation</MudNavLink>
     </MudNavGroup>
 
     <MudNavGroup Title="Diagnostics" Expanded="false">
