@@ -90,13 +90,13 @@ The service exposes a Model Context Protocol endpoint alongside the REST API:
 The MCP tool surface mirrors the REST API:
 
 - `ping`
-- Cluster: `cluster.get_all_ids`, `cluster.get_all_meta_info`, `cluster.get_by_id`, `cluster.get_all`, `cluster.get_all_light`, `cluster.get_all_by_field_id`, `cluster.get_all_by_rig_id`, `cluster.get_all_single_well`, `cluster.get_all_fixed_platform`, `cluster.create`, `cluster.update_by_id`, `cluster.delete_by_id`
-- ClusterIdentity: `cluster_identity.*`
-- ClusterFeatureCategory: `cluster_feature_category.*`
-- SlotFeatureCategory: `slot_feature_category.*`
-- Usage statistics: `cluster_usage_statistics.get`
+- Cluster: `cluster_get_all_ids`, `cluster_get_all_meta_info`, `cluster_get_by_id`, `cluster_get_all`, `cluster_get_all_light`, `cluster_get_all_by_field_id`, `cluster_get_all_by_rig_id`, `cluster_get_all_single_well`, `cluster_get_all_fixed_platform`, `cluster_create`, `cluster_update_by_id`, `cluster_delete_by_id`
+- ClusterIdentity: `cluster_identity_...`
+- ClusterFeatureCategory: `cluster_feature_category_...`
+- SlotFeatureCategory: `slot_feature_category_...`
+- Usage statistics: `cluster_usage_statistics_get`
 
-The `create` and `update_by_id` tools expect the same JSON object body as the corresponding REST endpoints, wrapped in an argument named after the entity, for example `cluster`, `clusterIdentity`, `clusterFeatureCategory`, or `slotFeatureCategory`.
+The `create` and `update_by_id` tools expect the same JSON object body as the corresponding REST endpoints, wrapped in an argument named after the entity, for example `cluster`, `clusterIdentity`, `clusterFeatureCategory`, or `slotFeatureCategory`. Every REST-backed tool publishes an explicit JSON input schema with descriptions for identifiers, filters, metadata, associations, feature and identity assignments, nested slots, Gaussian uncertainty, and update identity matching. Cluster coordinates use SI values and WGS84 references: angular values are radians and linear/depth values are meters.
 
 When `McpHub:Enabled` is true, the service registers itself on the configured MCP hub with a fixed service type id, a configured or persisted instance id, and MCP endpoint URLs derived from `PublicBaseUrl`:
 

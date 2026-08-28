@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NORCE.Drilling.Cluster.Service.Mcp;
 
-internal static class McpServiceCollectionExtensions
+public static class McpServiceCollectionExtensions
 {
     public static IServiceCollection AddLegacyMcpTool<TTool>(this IServiceCollection services)
         where TTool : class, IMcpTool

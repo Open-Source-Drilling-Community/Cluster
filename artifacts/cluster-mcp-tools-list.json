@@ -1,0 +1,2137 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "ping",
+        "description": "Returns a pong response so clients can verify MCP connectivity.",
+        "inputSchema": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "cluster_get_all_ids",
+        "description": "List the UUID of every stored cluster without transferring complete records. Use these identifiers with cluster_get_by_id or other services that reference a cluster.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_get_all_meta_info",
+        "description": "List identity and HTTP location metadata for every stored cluster without returning complete cluster data. Each result contains the cluster ID and may contain its host, base path, and endpoint.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_get_by_id",
+        "description": "Retrieve one complete cluster record by UUID, including field and rig associations, platform flags, identities, feature assignments, WGS84 reference data, depth uncertainty, and slots. Returns 404 when it does not exist and 400 for an empty UUID.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier of the cluster to retrieve."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_get_all",
+        "description": "Retrieve every stored cluster as a complete record, including nested slots and assignments. Use cluster_get_all_light, cluster_get_all_ids, or cluster_get_all_meta_info when full nested data is unnecessary.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_get_all_light",
+        "description": "Retrieve lightweight records for every cluster. Results retain identity, field and rig associations, platform flags, reference point, and WGS84 depths while omitting nested identities, feature assignments, and slots.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_get_all_by_field_id",
+        "description": "Retrieve complete records for all clusters whose FieldID equals the supplied field UUID. An empty result means no stored cluster currently references that field.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "fieldId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Identifier of the Field resource whose clusters should be returned."
+            }
+          },
+          "required": [
+            "fieldId"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_get_all_by_rig_id",
+        "description": "Retrieve complete records for all clusters whose RigID equals the supplied rig UUID. An empty result means no stored cluster currently references that rig.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "rigId": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Identifier of the Rig resource whose associated clusters should be returned."
+            }
+          },
+          "required": [
+            "rigId"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_get_all_single_well",
+        "description": "Retrieve complete cluster records filtered by IsSingleWell. Pass true for records representing one well rather than a true multi-well cluster; pass false for multi-well clusters.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "isSingleWell": {
+              "type": "boolean",
+              "description": "Required IsSingleWell value to match: true for single-well records, false for multi-well clusters."
+            }
+          },
+          "required": [
+            "isSingleWell"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_get_all_fixed_platform",
+        "description": "Retrieve complete cluster records filtered by IsFixedPlatform. Pass true for fixed installations and false for clusters associated with floating or movable installations.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "isFixedPlatform": {
+              "type": "boolean",
+              "description": "Required IsFixedPlatform value to match: true for fixed platforms, false for floating or movable installations."
+            }
+          },
+          "required": [
+            "isFixedPlatform"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_create",
+        "description": "Create and persist a complete cluster record. cluster.MetaInfo.ID must be a caller-generated, non-empty UUID that is not already stored. Coordinates use SI and WGS84 references; depth and coordinate uncertainty is represented by Gaussian values. Returns 200 on success, 400 for malformed data, and 409 for a duplicate ID.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "object",
+              "description": "Complete Cluster resource representing a drilling site, platform, or single-well location. MetaInfo.ID must be a caller-generated, non-empty UUID.",
+              "properties": {
+                "MetaInfo": {
+                  "type": "object",
+                  "description": "Identity and optional HTTP location metadata for the cluster.",
+                  "properties": {
+                    "ID": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Non-empty unique identifier of the cluster."
+                    },
+                    "HttpHostName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional host name from which the cluster can be retrieved."
+                    },
+                    "HttpHostBasePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional service base path from which the cluster can be retrieved."
+                    },
+                    "HttpEndPoint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional HTTP endpoint for this cluster resource."
+                    }
+                  },
+                  "required": [
+                    "ID"
+                  ],
+                  "additionalProperties": false
+                },
+                "Name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Human-readable cluster name."
+                },
+                "Description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Human-readable description of the cluster."
+                },
+                "CreationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp at which the cluster record was created."
+                },
+                "LastModificationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp of the most recent modification."
+                },
+                "FieldID": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uuid",
+                  "description": "Identifier of the Field resource to which the cluster belongs."
+                },
+                "IsSingleWell": {
+                  "type": "boolean",
+                  "description": "True when this record represents a single well rather than a multi-well cluster.",
+                  "default": false
+                },
+                "RigID": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uuid",
+                  "description": "Identifier of the associated Rig resource, or null when no rig is assigned."
+                },
+                "IsFixedPlatform": {
+                  "type": "boolean",
+                  "description": "True for a fixed platform; false for a floating or movable installation.",
+                  "default": false
+                },
+                "ClusterIdentityAssignments": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "description": "Identity values assigned to this cluster.",
+                  "items": {
+                    "type": "object",
+                    "description": "A cluster-specific value for a defined ClusterIdentity.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Stable identifier of this assignment."
+                      },
+                      "IdentityID": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "uuid",
+                        "description": "Identifier of the ClusterIdentity definition selected by this assignment."
+                      },
+                      "Value": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Cluster-specific value for the selected identity."
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "ClusterFeatureAssignments": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "description": "Feature options assigned to this cluster, optionally with validity periods.",
+                  "items": {
+                    "type": "object",
+                    "description": "Selection of one feature option for the cluster, optionally constrained to a validity interval.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Stable identifier of this assignment."
+                      },
+                      "FeatureCategoryID": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "uuid",
+                        "description": "Identifier of the cluster feature category."
+                      },
+                      "FeatureOptionID": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "uuid",
+                        "description": "Identifier of the selected option within that category."
+                      },
+                      "FromDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time",
+                        "description": "First instant at which the assignment is valid."
+                      },
+                      "ToDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time",
+                        "description": "Last instant at which the assignment is valid."
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "ReferencePoint": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Optional global cluster reference point using SI values and WGS84 references. Latitude and Longitude are radians; linear coordinates and TVD are meters.",
+                  "properties": {
+                    "X": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Riemannian north coordinate: meridian arc length from the equator, in meters; synonymous with RiemannianNorth."
+                    },
+                    "Y": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Riemannian east coordinate: arc length from the Greenwich meridian along the latitude parallel, in meters; synonymous with RiemannianEast."
+                    },
+                    "Z": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "True vertical depth in meters, referenced to the WGS84 vertical datum; synonymous with TVD."
+                    },
+                    "RiemannianNorth": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Riemannian north coordinate in meters."
+                    },
+                    "RiemannianEast": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Riemannian east coordinate in meters."
+                    },
+                    "Latitude": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Geodetic latitude in radians, referenced to WGS84."
+                    },
+                    "Longitude": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Geodetic longitude in radians, referenced to WGS84."
+                    },
+                    "TVD": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "True vertical depth in meters, referenced to the WGS84 vertical datum."
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "GroundMudLineDepth": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Vertical depth of ground level or mud line. Values are in meters (SI) and referenced to the fixed WGS84 vertical datum.",
+                  "properties": {
+                    "GaussianValue": {
+                      "type": "object",
+                      "description": "Gaussian value and uncertainty expressed in meters (SI).",
+                      "properties": {
+                        "MinValue": {
+                          "type": "number",
+                          "description": "Minimum value represented by the distribution, in meters (SI)."
+                        },
+                        "MaxValue": {
+                          "type": "number",
+                          "description": "Maximum value represented by the distribution, in meters (SI)."
+                        },
+                        "Mean": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Mean value of the distribution, in meters (SI)."
+                        },
+                        "StandardDeviation": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Standard deviation of the distribution, in meters (SI)."
+                        }
+                      },
+                      "required": [
+                        "MinValue",
+                        "MaxValue"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "GaussianValue"
+                  ],
+                  "additionalProperties": false
+                },
+                "TopWaterDepth": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Vertical depth of the top water level. Values are in meters (SI) and referenced to the fixed WGS84 vertical datum.",
+                  "properties": {
+                    "GaussianValue": {
+                      "type": "object",
+                      "description": "Gaussian value and uncertainty expressed in meters (SI).",
+                      "properties": {
+                        "MinValue": {
+                          "type": "number",
+                          "description": "Minimum value represented by the distribution, in meters (SI)."
+                        },
+                        "MaxValue": {
+                          "type": "number",
+                          "description": "Maximum value represented by the distribution, in meters (SI)."
+                        },
+                        "Mean": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Mean value of the distribution, in meters (SI)."
+                        },
+                        "StandardDeviation": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Standard deviation of the distribution, in meters (SI)."
+                        }
+                      },
+                      "required": [
+                        "MinValue",
+                        "MaxValue"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "GaussianValue"
+                  ],
+                  "additionalProperties": false
+                },
+                "Slots": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Slots belonging to the cluster, encoded as an object whose property names are slot UUIDs and whose values are complete Slot records.",
+                  "additionalProperties": {
+                    "type": "object",
+                    "description": "A well slot belonging to the cluster. The ID should match the UUID used as its key in the parent Slots object.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Unique identifier of the slot."
+                      },
+                      "Name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Human-readable slot name."
+                      },
+                      "Description": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Human-readable slot description."
+                      },
+                      "CreationDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time",
+                        "description": "UTC or offset timestamp at which the slot was created."
+                      },
+                      "LastModificationDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time",
+                        "description": "UTC or offset timestamp of the most recent modification."
+                      },
+                      "Latitude": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "description": "Slot latitude in radians (SI plane angle), referenced to WGS84.",
+                        "properties": {
+                          "GaussianValue": {
+                            "type": "object",
+                            "description": "Gaussian value and uncertainty expressed in radians (SI).",
+                            "properties": {
+                              "MinValue": {
+                                "type": "number",
+                                "description": "Minimum value represented by the distribution, in radians (SI)."
+                              },
+                              "MaxValue": {
+                                "type": "number",
+                                "description": "Maximum value represented by the distribution, in radians (SI)."
+                              },
+                              "Mean": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Mean value of the distribution, in radians (SI)."
+                              },
+                              "StandardDeviation": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Standard deviation of the distribution, in radians (SI)."
+                              }
+                            },
+                            "required": [
+                              "MinValue",
+                              "MaxValue"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "GaussianValue"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "Longitude": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "description": "Slot longitude in radians (SI plane angle), referenced to WGS84.",
+                        "properties": {
+                          "GaussianValue": {
+                            "type": "object",
+                            "description": "Gaussian value and uncertainty expressed in radians (SI).",
+                            "properties": {
+                              "MinValue": {
+                                "type": "number",
+                                "description": "Minimum value represented by the distribution, in radians (SI)."
+                              },
+                              "MaxValue": {
+                                "type": "number",
+                                "description": "Maximum value represented by the distribution, in radians (SI)."
+                              },
+                              "Mean": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Mean value of the distribution, in radians (SI)."
+                              },
+                              "StandardDeviation": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Standard deviation of the distribution, in radians (SI)."
+                              }
+                            },
+                            "required": [
+                              "MinValue",
+                              "MaxValue"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "GaussianValue"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "SlotFeatureAssignments": {
+                        "type": [
+                          "array",
+                          "null"
+                        ],
+                        "description": "Feature options assigned to this slot, optionally with validity periods.",
+                        "items": {
+                          "type": "object",
+                          "description": "Selection of one feature option for the slot, optionally constrained to a validity interval.",
+                          "properties": {
+                            "ID": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Stable identifier of this assignment."
+                            },
+                            "FeatureCategoryID": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "format": "uuid",
+                              "description": "Identifier of the slot feature category."
+                            },
+                            "FeatureOptionID": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "format": "uuid",
+                              "description": "Identifier of the selected option within that category."
+                            },
+                            "FromDate": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "format": "date-time",
+                              "description": "First instant at which the assignment is valid."
+                            },
+                            "ToDate": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "format": "date-time",
+                              "description": "Last instant at which the assignment is valid."
+                            }
+                          },
+                          "required": [
+                            "ID"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "MetaInfo"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "cluster"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_update_by_id",
+        "description": "Replace an existing cluster with the complete supplied record. The top-level id must equal cluster.MetaInfo.ID; this is a full update, not a partial patch, so include all data that should remain stored. Returns 200 on success, 400 for malformed or mismatched IDs, and 404 when absent.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "cluster": {
+              "type": "object",
+              "description": "Complete Cluster resource representing a drilling site, platform, or single-well location. MetaInfo.ID must be a caller-generated, non-empty UUID.",
+              "properties": {
+                "MetaInfo": {
+                  "type": "object",
+                  "description": "Identity and optional HTTP location metadata for the cluster.",
+                  "properties": {
+                    "ID": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Non-empty unique identifier of the cluster."
+                    },
+                    "HttpHostName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional host name from which the cluster can be retrieved."
+                    },
+                    "HttpHostBasePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional service base path from which the cluster can be retrieved."
+                    },
+                    "HttpEndPoint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional HTTP endpoint for this cluster resource."
+                    }
+                  },
+                  "required": [
+                    "ID"
+                  ],
+                  "additionalProperties": false
+                },
+                "Name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Human-readable cluster name."
+                },
+                "Description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Human-readable description of the cluster."
+                },
+                "CreationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp at which the cluster record was created."
+                },
+                "LastModificationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp of the most recent modification."
+                },
+                "FieldID": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uuid",
+                  "description": "Identifier of the Field resource to which the cluster belongs."
+                },
+                "IsSingleWell": {
+                  "type": "boolean",
+                  "description": "True when this record represents a single well rather than a multi-well cluster.",
+                  "default": false
+                },
+                "RigID": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uuid",
+                  "description": "Identifier of the associated Rig resource, or null when no rig is assigned."
+                },
+                "IsFixedPlatform": {
+                  "type": "boolean",
+                  "description": "True for a fixed platform; false for a floating or movable installation.",
+                  "default": false
+                },
+                "ClusterIdentityAssignments": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "description": "Identity values assigned to this cluster.",
+                  "items": {
+                    "type": "object",
+                    "description": "A cluster-specific value for a defined ClusterIdentity.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Stable identifier of this assignment."
+                      },
+                      "IdentityID": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "uuid",
+                        "description": "Identifier of the ClusterIdentity definition selected by this assignment."
+                      },
+                      "Value": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Cluster-specific value for the selected identity."
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "ClusterFeatureAssignments": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "description": "Feature options assigned to this cluster, optionally with validity periods.",
+                  "items": {
+                    "type": "object",
+                    "description": "Selection of one feature option for the cluster, optionally constrained to a validity interval.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Stable identifier of this assignment."
+                      },
+                      "FeatureCategoryID": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "uuid",
+                        "description": "Identifier of the cluster feature category."
+                      },
+                      "FeatureOptionID": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "uuid",
+                        "description": "Identifier of the selected option within that category."
+                      },
+                      "FromDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time",
+                        "description": "First instant at which the assignment is valid."
+                      },
+                      "ToDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time",
+                        "description": "Last instant at which the assignment is valid."
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "ReferencePoint": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Optional global cluster reference point using SI values and WGS84 references. Latitude and Longitude are radians; linear coordinates and TVD are meters.",
+                  "properties": {
+                    "X": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Riemannian north coordinate: meridian arc length from the equator, in meters; synonymous with RiemannianNorth."
+                    },
+                    "Y": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Riemannian east coordinate: arc length from the Greenwich meridian along the latitude parallel, in meters; synonymous with RiemannianEast."
+                    },
+                    "Z": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "True vertical depth in meters, referenced to the WGS84 vertical datum; synonymous with TVD."
+                    },
+                    "RiemannianNorth": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Riemannian north coordinate in meters."
+                    },
+                    "RiemannianEast": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Riemannian east coordinate in meters."
+                    },
+                    "Latitude": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Geodetic latitude in radians, referenced to WGS84."
+                    },
+                    "Longitude": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "Geodetic longitude in radians, referenced to WGS84."
+                    },
+                    "TVD": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "description": "True vertical depth in meters, referenced to the WGS84 vertical datum."
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "GroundMudLineDepth": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Vertical depth of ground level or mud line. Values are in meters (SI) and referenced to the fixed WGS84 vertical datum.",
+                  "properties": {
+                    "GaussianValue": {
+                      "type": "object",
+                      "description": "Gaussian value and uncertainty expressed in meters (SI).",
+                      "properties": {
+                        "MinValue": {
+                          "type": "number",
+                          "description": "Minimum value represented by the distribution, in meters (SI)."
+                        },
+                        "MaxValue": {
+                          "type": "number",
+                          "description": "Maximum value represented by the distribution, in meters (SI)."
+                        },
+                        "Mean": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Mean value of the distribution, in meters (SI)."
+                        },
+                        "StandardDeviation": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Standard deviation of the distribution, in meters (SI)."
+                        }
+                      },
+                      "required": [
+                        "MinValue",
+                        "MaxValue"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "GaussianValue"
+                  ],
+                  "additionalProperties": false
+                },
+                "TopWaterDepth": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Vertical depth of the top water level. Values are in meters (SI) and referenced to the fixed WGS84 vertical datum.",
+                  "properties": {
+                    "GaussianValue": {
+                      "type": "object",
+                      "description": "Gaussian value and uncertainty expressed in meters (SI).",
+                      "properties": {
+                        "MinValue": {
+                          "type": "number",
+                          "description": "Minimum value represented by the distribution, in meters (SI)."
+                        },
+                        "MaxValue": {
+                          "type": "number",
+                          "description": "Maximum value represented by the distribution, in meters (SI)."
+                        },
+                        "Mean": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Mean value of the distribution, in meters (SI)."
+                        },
+                        "StandardDeviation": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Standard deviation of the distribution, in meters (SI)."
+                        }
+                      },
+                      "required": [
+                        "MinValue",
+                        "MaxValue"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "GaussianValue"
+                  ],
+                  "additionalProperties": false
+                },
+                "Slots": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Slots belonging to the cluster, encoded as an object whose property names are slot UUIDs and whose values are complete Slot records.",
+                  "additionalProperties": {
+                    "type": "object",
+                    "description": "A well slot belonging to the cluster. The ID should match the UUID used as its key in the parent Slots object.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Unique identifier of the slot."
+                      },
+                      "Name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Human-readable slot name."
+                      },
+                      "Description": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Human-readable slot description."
+                      },
+                      "CreationDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time",
+                        "description": "UTC or offset timestamp at which the slot was created."
+                      },
+                      "LastModificationDate": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "format": "date-time",
+                        "description": "UTC or offset timestamp of the most recent modification."
+                      },
+                      "Latitude": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "description": "Slot latitude in radians (SI plane angle), referenced to WGS84.",
+                        "properties": {
+                          "GaussianValue": {
+                            "type": "object",
+                            "description": "Gaussian value and uncertainty expressed in radians (SI).",
+                            "properties": {
+                              "MinValue": {
+                                "type": "number",
+                                "description": "Minimum value represented by the distribution, in radians (SI)."
+                              },
+                              "MaxValue": {
+                                "type": "number",
+                                "description": "Maximum value represented by the distribution, in radians (SI)."
+                              },
+                              "Mean": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Mean value of the distribution, in radians (SI)."
+                              },
+                              "StandardDeviation": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Standard deviation of the distribution, in radians (SI)."
+                              }
+                            },
+                            "required": [
+                              "MinValue",
+                              "MaxValue"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "GaussianValue"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "Longitude": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "description": "Slot longitude in radians (SI plane angle), referenced to WGS84.",
+                        "properties": {
+                          "GaussianValue": {
+                            "type": "object",
+                            "description": "Gaussian value and uncertainty expressed in radians (SI).",
+                            "properties": {
+                              "MinValue": {
+                                "type": "number",
+                                "description": "Minimum value represented by the distribution, in radians (SI)."
+                              },
+                              "MaxValue": {
+                                "type": "number",
+                                "description": "Maximum value represented by the distribution, in radians (SI)."
+                              },
+                              "Mean": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Mean value of the distribution, in radians (SI)."
+                              },
+                              "StandardDeviation": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Standard deviation of the distribution, in radians (SI)."
+                              }
+                            },
+                            "required": [
+                              "MinValue",
+                              "MaxValue"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "GaussianValue"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "SlotFeatureAssignments": {
+                        "type": [
+                          "array",
+                          "null"
+                        ],
+                        "description": "Feature options assigned to this slot, optionally with validity periods.",
+                        "items": {
+                          "type": "object",
+                          "description": "Selection of one feature option for the slot, optionally constrained to a validity interval.",
+                          "properties": {
+                            "ID": {
+                              "type": "string",
+                              "format": "uuid",
+                              "description": "Stable identifier of this assignment."
+                            },
+                            "FeatureCategoryID": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "format": "uuid",
+                              "description": "Identifier of the slot feature category."
+                            },
+                            "FeatureOptionID": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "format": "uuid",
+                              "description": "Identifier of the selected option within that category."
+                            },
+                            "FromDate": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "format": "date-time",
+                              "description": "First instant at which the assignment is valid."
+                            },
+                            "ToDate": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "format": "date-time",
+                              "description": "Last instant at which the assignment is valid."
+                            }
+                          },
+                          "required": [
+                            "ID"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "MetaInfo"
+              ],
+              "additionalProperties": false
+            },
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Identifier of the stored record to update. It must equal cluster.MetaInfo.ID."
+            }
+          },
+          "required": [
+            "cluster",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_delete_by_id",
+        "description": "Permanently delete one stored cluster by UUID. Confirm the target and consider services that reference the cluster before calling; the operation removes its persisted cluster record, including nested slots. Returns 200 on success and 404 when absent.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier of the cluster to delete."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_feature_category_get_all_ids",
+        "description": "List the UUID of every stored cluster feature category without transferring complete records. These IDs identify a definition of allowed feature options that can be assigned to clusters and can be passed to cluster_feature_category_get_by_id.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_feature_category_get_all_meta_info",
+        "description": "List identity and optional HTTP location metadata for every stored cluster feature category without returning complete definitions. Use this for resource discovery when full content is unnecessary.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_feature_category_get_by_id",
+        "description": "Retrieve one complete cluster feature category by UUID. The record represents a definition of allowed feature options that can be assigned to clusters. Returns status 404 when no matching record exists and 400 for an empty UUID.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier of the cluster feature category to retrieve."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_feature_category_get_all",
+        "description": "Retrieve every stored cluster feature category as a complete definition. Each result represents a definition of allowed feature options that can be assigned to clusters; use the ID or metadata listing tools when complete content is unnecessary.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_feature_category_create",
+        "description": "Create and persist a definition of allowed feature options that can be assigned to clusters. Supply the complete clusterFeatureCategory object; clusterFeatureCategory.MetaInfo.ID must be a caller-generated, non-empty UUID that is not already stored. Returns 200 on success, 400 for malformed data, and 409 for a duplicate ID.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "clusterFeatureCategory": {
+              "type": "object",
+              "description": "Definition of a feature category and its allowed options for assignment to a cluster. MetaInfo.ID must be a caller-generated, non-empty UUID.",
+              "properties": {
+                "MetaInfo": {
+                  "type": "object",
+                  "description": "Identity and optional HTTP location metadata for the cluster feature category.",
+                  "properties": {
+                    "ID": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Non-empty unique identifier of the cluster feature category."
+                    },
+                    "HttpHostName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional host name from which the cluster feature category can be retrieved."
+                    },
+                    "HttpHostBasePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional service base path from which the cluster feature category can be retrieved."
+                    },
+                    "HttpEndPoint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional HTTP endpoint for this cluster feature category resource."
+                    }
+                  },
+                  "required": [
+                    "ID"
+                  ],
+                  "additionalProperties": false
+                },
+                "Name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Human-readable name of the cluster feature category."
+                },
+                "IsExclusive": {
+                  "type": "boolean",
+                  "description": "True when at most one option from this category may be assigned at a time.",
+                  "default": false
+                },
+                "HasValidityPeriod": {
+                  "type": "boolean",
+                  "description": "True when assignments from this category use FromDate and ToDate validity boundaries.",
+                  "default": false
+                },
+                "Options": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "description": "Allowed options in this category.",
+                  "items": {
+                    "type": "object",
+                    "description": "One selectable option within the feature category.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Stable identifier of the option within its category."
+                      },
+                      "Name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Human-readable option name."
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "CreationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp at which the category was created."
+                },
+                "LastModificationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp of the most recent modification."
+                }
+              },
+              "required": [
+                "MetaInfo"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "clusterFeatureCategory"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_feature_category_update_by_id",
+        "description": "Replace an existing cluster feature category with the complete supplied definition. The top-level id must equal clusterFeatureCategory.MetaInfo.ID; this is a full update rather than a partial patch. Returns 200 on success, 400 for malformed or mismatched IDs, and 404 when absent.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "clusterFeatureCategory": {
+              "type": "object",
+              "description": "Definition of a feature category and its allowed options for assignment to a cluster. MetaInfo.ID must be a caller-generated, non-empty UUID.",
+              "properties": {
+                "MetaInfo": {
+                  "type": "object",
+                  "description": "Identity and optional HTTP location metadata for the cluster feature category.",
+                  "properties": {
+                    "ID": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Non-empty unique identifier of the cluster feature category."
+                    },
+                    "HttpHostName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional host name from which the cluster feature category can be retrieved."
+                    },
+                    "HttpHostBasePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional service base path from which the cluster feature category can be retrieved."
+                    },
+                    "HttpEndPoint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional HTTP endpoint for this cluster feature category resource."
+                    }
+                  },
+                  "required": [
+                    "ID"
+                  ],
+                  "additionalProperties": false
+                },
+                "Name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Human-readable name of the cluster feature category."
+                },
+                "IsExclusive": {
+                  "type": "boolean",
+                  "description": "True when at most one option from this category may be assigned at a time.",
+                  "default": false
+                },
+                "HasValidityPeriod": {
+                  "type": "boolean",
+                  "description": "True when assignments from this category use FromDate and ToDate validity boundaries.",
+                  "default": false
+                },
+                "Options": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "description": "Allowed options in this category.",
+                  "items": {
+                    "type": "object",
+                    "description": "One selectable option within the feature category.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Stable identifier of the option within its category."
+                      },
+                      "Name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Human-readable option name."
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "CreationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp at which the category was created."
+                },
+                "LastModificationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp of the most recent modification."
+                }
+              },
+              "required": [
+                "MetaInfo"
+              ],
+              "additionalProperties": false
+            },
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Identifier of the stored record to update. It must equal clusterFeatureCategory.MetaInfo.ID."
+            }
+          },
+          "required": [
+            "clusterFeatureCategory",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_feature_category_delete_by_id",
+        "description": "Permanently delete one stored cluster feature category by UUID. Check assignments that may still reference this definition before deleting it. Returns 200 on success and 404 when no matching record exists.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier of the cluster feature category to delete."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_identity_get_all_ids",
+        "description": "List the UUID of every stored cluster identity without transferring complete records. These IDs identify a symbolic identity definition whose values can be assigned to individual clusters and can be passed to cluster_identity_get_by_id.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_identity_get_all_meta_info",
+        "description": "List identity and optional HTTP location metadata for every stored cluster identity without returning complete definitions. Use this for resource discovery when full content is unnecessary.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_identity_get_by_id",
+        "description": "Retrieve one complete cluster identity by UUID. The record represents a symbolic identity definition whose values can be assigned to individual clusters. Returns status 404 when no matching record exists and 400 for an empty UUID.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier of the cluster identity to retrieve."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_identity_get_all",
+        "description": "Retrieve every stored cluster identity as a complete definition. Each result represents a symbolic identity definition whose values can be assigned to individual clusters; use the ID or metadata listing tools when complete content is unnecessary.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_identity_create",
+        "description": "Create and persist a symbolic identity definition whose values can be assigned to individual clusters. Supply the complete clusterIdentity object; clusterIdentity.MetaInfo.ID must be a caller-generated, non-empty UUID that is not already stored. Returns 200 on success, 400 for malformed data, and 409 for a duplicate ID.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "clusterIdentity": {
+              "type": "object",
+              "description": "Definition of a symbolic identity type that clusters can populate through ClusterIdentityAssignments. MetaInfo.ID must be a caller-generated, non-empty UUID.",
+              "properties": {
+                "MetaInfo": {
+                  "type": "object",
+                  "description": "Identity and optional HTTP location metadata for the cluster identity.",
+                  "properties": {
+                    "ID": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Non-empty unique identifier of the cluster identity."
+                    },
+                    "HttpHostName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional host name from which the cluster identity can be retrieved."
+                    },
+                    "HttpHostBasePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional service base path from which the cluster identity can be retrieved."
+                    },
+                    "HttpEndPoint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional HTTP endpoint for this cluster identity resource."
+                    }
+                  },
+                  "required": [
+                    "ID"
+                  ],
+                  "additionalProperties": false
+                },
+                "Name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Symbolic name of the cluster identity, such as an operator-specific identifier type."
+                },
+                "CreationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp at which the identity definition was created."
+                },
+                "LastModificationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp of the most recent modification."
+                }
+              },
+              "required": [
+                "MetaInfo"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "clusterIdentity"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_identity_update_by_id",
+        "description": "Replace an existing cluster identity with the complete supplied definition. The top-level id must equal clusterIdentity.MetaInfo.ID; this is a full update rather than a partial patch. Returns 200 on success, 400 for malformed or mismatched IDs, and 404 when absent.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "clusterIdentity": {
+              "type": "object",
+              "description": "Definition of a symbolic identity type that clusters can populate through ClusterIdentityAssignments. MetaInfo.ID must be a caller-generated, non-empty UUID.",
+              "properties": {
+                "MetaInfo": {
+                  "type": "object",
+                  "description": "Identity and optional HTTP location metadata for the cluster identity.",
+                  "properties": {
+                    "ID": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Non-empty unique identifier of the cluster identity."
+                    },
+                    "HttpHostName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional host name from which the cluster identity can be retrieved."
+                    },
+                    "HttpHostBasePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional service base path from which the cluster identity can be retrieved."
+                    },
+                    "HttpEndPoint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional HTTP endpoint for this cluster identity resource."
+                    }
+                  },
+                  "required": [
+                    "ID"
+                  ],
+                  "additionalProperties": false
+                },
+                "Name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Symbolic name of the cluster identity, such as an operator-specific identifier type."
+                },
+                "CreationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp at which the identity definition was created."
+                },
+                "LastModificationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp of the most recent modification."
+                }
+              },
+              "required": [
+                "MetaInfo"
+              ],
+              "additionalProperties": false
+            },
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Identifier of the stored record to update. It must equal clusterIdentity.MetaInfo.ID."
+            }
+          },
+          "required": [
+            "clusterIdentity",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_identity_delete_by_id",
+        "description": "Permanently delete one stored cluster identity by UUID. Check assignments that may still reference this definition before deleting it. Returns 200 on success and 404 when no matching record exists.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier of the cluster identity to delete."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "slot_feature_category_get_all_ids",
+        "description": "List the UUID of every stored slot feature category without transferring complete records. These IDs identify a definition of allowed feature options that can be assigned to slots within clusters and can be passed to slot_feature_category_get_by_id.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "slot_feature_category_get_all_meta_info",
+        "description": "List identity and optional HTTP location metadata for every stored slot feature category without returning complete definitions. Use this for resource discovery when full content is unnecessary.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "slot_feature_category_get_by_id",
+        "description": "Retrieve one complete slot feature category by UUID. The record represents a definition of allowed feature options that can be assigned to slots within clusters. Returns status 404 when no matching record exists and 400 for an empty UUID.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier of the slot feature category to retrieve."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "slot_feature_category_get_all",
+        "description": "Retrieve every stored slot feature category as a complete definition. Each result represents a definition of allowed feature options that can be assigned to slots within clusters; use the ID or metadata listing tools when complete content is unnecessary.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "slot_feature_category_create",
+        "description": "Create and persist a definition of allowed feature options that can be assigned to slots within clusters. Supply the complete slotFeatureCategory object; slotFeatureCategory.MetaInfo.ID must be a caller-generated, non-empty UUID that is not already stored. Returns 200 on success, 400 for malformed data, and 409 for a duplicate ID.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "slotFeatureCategory": {
+              "type": "object",
+              "description": "Definition of a feature category and its allowed options for assignment to a slot. MetaInfo.ID must be a caller-generated, non-empty UUID.",
+              "properties": {
+                "MetaInfo": {
+                  "type": "object",
+                  "description": "Identity and optional HTTP location metadata for the slot feature category.",
+                  "properties": {
+                    "ID": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Non-empty unique identifier of the slot feature category."
+                    },
+                    "HttpHostName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional host name from which the slot feature category can be retrieved."
+                    },
+                    "HttpHostBasePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional service base path from which the slot feature category can be retrieved."
+                    },
+                    "HttpEndPoint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional HTTP endpoint for this slot feature category resource."
+                    }
+                  },
+                  "required": [
+                    "ID"
+                  ],
+                  "additionalProperties": false
+                },
+                "Name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Human-readable name of the slot feature category."
+                },
+                "IsExclusive": {
+                  "type": "boolean",
+                  "description": "True when at most one option from this category may be assigned at a time.",
+                  "default": false
+                },
+                "HasValidityPeriod": {
+                  "type": "boolean",
+                  "description": "True when assignments from this category use FromDate and ToDate validity boundaries.",
+                  "default": false
+                },
+                "Options": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "description": "Allowed options in this category.",
+                  "items": {
+                    "type": "object",
+                    "description": "One selectable option within the feature category.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Stable identifier of the option within its category."
+                      },
+                      "Name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Human-readable option name."
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "CreationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp at which the category was created."
+                },
+                "LastModificationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp of the most recent modification."
+                }
+              },
+              "required": [
+                "MetaInfo"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "slotFeatureCategory"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "slot_feature_category_update_by_id",
+        "description": "Replace an existing slot feature category with the complete supplied definition. The top-level id must equal slotFeatureCategory.MetaInfo.ID; this is a full update rather than a partial patch. Returns 200 on success, 400 for malformed or mismatched IDs, and 404 when absent.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "slotFeatureCategory": {
+              "type": "object",
+              "description": "Definition of a feature category and its allowed options for assignment to a slot. MetaInfo.ID must be a caller-generated, non-empty UUID.",
+              "properties": {
+                "MetaInfo": {
+                  "type": "object",
+                  "description": "Identity and optional HTTP location metadata for the slot feature category.",
+                  "properties": {
+                    "ID": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Non-empty unique identifier of the slot feature category."
+                    },
+                    "HttpHostName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional host name from which the slot feature category can be retrieved."
+                    },
+                    "HttpHostBasePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional service base path from which the slot feature category can be retrieved."
+                    },
+                    "HttpEndPoint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional HTTP endpoint for this slot feature category resource."
+                    }
+                  },
+                  "required": [
+                    "ID"
+                  ],
+                  "additionalProperties": false
+                },
+                "Name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Human-readable name of the slot feature category."
+                },
+                "IsExclusive": {
+                  "type": "boolean",
+                  "description": "True when at most one option from this category may be assigned at a time.",
+                  "default": false
+                },
+                "HasValidityPeriod": {
+                  "type": "boolean",
+                  "description": "True when assignments from this category use FromDate and ToDate validity boundaries.",
+                  "default": false
+                },
+                "Options": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "description": "Allowed options in this category.",
+                  "items": {
+                    "type": "object",
+                    "description": "One selectable option within the feature category.",
+                    "properties": {
+                      "ID": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Stable identifier of the option within its category."
+                      },
+                      "Name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "description": "Human-readable option name."
+                      }
+                    },
+                    "required": [
+                      "ID"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "CreationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp at which the category was created."
+                },
+                "LastModificationDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time",
+                  "description": "UTC or offset timestamp of the most recent modification."
+                }
+              },
+              "required": [
+                "MetaInfo"
+              ],
+              "additionalProperties": false
+            },
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Identifier of the stored record to update. It must equal slotFeatureCategory.MetaInfo.ID."
+            }
+          },
+          "required": [
+            "slotFeatureCategory",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "slot_feature_category_delete_by_id",
+        "description": "Permanently delete one stored slot feature category by UUID. Check assignments that may still reference this definition before deleting it. Returns 200 on success and 404 when no matching record exists.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier of the slot feature category to delete."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "cluster_usage_statistics_get",
+        "description": "Retrieve the Cluster microservice usage counters collected for REST operations. This administrative result reports endpoint activity rather than cluster domain data and requires no arguments.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      }
+    ]
+  }
+}

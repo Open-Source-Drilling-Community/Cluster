@@ -80,3 +80,7 @@ The WebApp project is a Blazor Server application that provides a user interface
 ## Notes
 - Path base: The app is mounted at `/Cluster/webapp` (`UsePathBase` in `WebApp/Program.cs`). If reverse-proxying, ensure the ingress/path matches this setting.
 - Certificates: `APIUtils` disables certificate validation for development convenience; use trusted certificates in production.
+
+## Shared-page package versions
+
+The host currently references Field WebPages 1.0.19 and Vertical Datum WebPage 1.0.3. Keep the external Razor assembly registration synchronized with these package references when adding or upgrading embedded pages.

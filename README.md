@@ -49,11 +49,11 @@ The Service exposes a Model Context Protocol endpoint alongside the REST API:
 
 MCP tools mirror the REST API for clusters, cluster identities, cluster feature categories, slot feature categories, and usage statistics. The main tool groups are:
 
-- `cluster.*`
-- `cluster_identity.*`
-- `cluster_feature_category.*`
-- `slot_feature_category.*`
-- `cluster_usage_statistics.get`
+- `cluster_...`
+- `cluster_identity_...`
+- `cluster_feature_category_...`
+- `slot_feature_category_...`
+- `cluster_usage_statistics_get`
 
 The Docker image reads optional service configuration from `/home/Cluster.Service.json`, or from the path specified by `CLUSTER_EXTERNAL_CONFIG`. This file can enable MCP hub registration through the `McpHub` section.
 
@@ -102,3 +102,7 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 ## Demo Environment
 - Example Service (dev): `https://dev.DigiWells.no/Cluster/api/swagger` (Swagger UI) and `https://dev.DigiWells.no/Cluster/api/Cluster` (API)
 - Example WebApp (dev): `https://dev.DigiWells.no/Cluster/webapp/Cluster`
+
+## Current WebApp dependencies
+
+The Cluster WebApp now consumes `NORCE.Drilling.Field.WebPages` 1.0.19 and `NORCE.Drilling.VerticalDatum.WebPage` 1.0.3. These packages provide the embedded Field and Vertical Datum pages registered by the host.
