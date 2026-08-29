@@ -158,7 +158,8 @@ else
                 EnsureCategory(category);
                 if (existingIds.Contains(category.MetaInfo!.ID))
                 {
-                    await Api.ClientCluster.PutSlotFeatureCategoryByIdAsync(category.MetaInfo.ID, category);
+                    await Api.ClientCluster.PutSlotFeatureCategoryByIdAsync(category.MetaInfo.ID,
+                        category.LastModificationDate ?? throw new InvalidOperationException("The category has no server modification timestamp."), category);
                 }
                 else
                 {

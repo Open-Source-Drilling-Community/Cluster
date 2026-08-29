@@ -485,73 +485,38 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         /// </summary>
         /// <param name="cluster"></param>
         /// <returns>true if the given Cluster has been added successfully to the microservice database</returns>
-        public bool AddCluster(Model.Cluster? cluster)
+        internal ClusterMutationResult AddCluster(Model.Cluster? cluster)
         {
-            if (cluster != null && cluster.MetaInfo != null && cluster.MetaInfo.ID != Guid.Empty)
+            if (cluster == null || cluster.MetaInfo == null || cluster.MetaInfo.ID == Guid.Empty)
             {
-                //update ClusterTable
-                var connection = _connectionManager.GetConnection();
-                if (connection != null)
-                {
-                    using SqliteTransaction transaction = connection.BeginTransaction();
-                    bool success = true;
-                    try
-                    {
-                        //add the Cluster to the ClusterTable
-                        string metaInfo = JsonSerializer.Serialize(cluster.MetaInfo, JsonSettings.Options);
-                        string data = JsonSerializer.Serialize(cluster, JsonSettings.Options);
-                        var command = connection.CreateCommand();
-                        command.CommandText = "INSERT INTO ClusterTable (" +
-                            "ID, " +
-                            "MetaInfo, " +
-                            "FieldID, " +
-                            "IsSingleWell, " +
-                            "RigID, " +
-                            "IsFixedPlatform, " +
-                            "Cluster" +
-                            ") VALUES (" +
-                            $"'{cluster.MetaInfo.ID}', " +
-                            $"'{metaInfo}', " +
-                            $"'{(cluster.FieldID != null ? cluster.FieldID : "")}', " +
-                            $"'{(cluster.IsSingleWell ? 1 : 0)}', " +
-                            $"'{(cluster.RigID != null ? cluster.RigID : "")}', " +
-                            $"'{(cluster.IsFixedPlatform ? 1 : 0)}', " +
-                            $"'{data}'" +
-                            ")";
-                        int count = command.ExecuteNonQuery();
-                        if (count != 1)
-                        {
-                            _logger.LogWarning("Impossible to insert the given Cluster into the ClusterTable");
-                            success = false;
-                        }
-                    }
-                    catch (SqliteException ex)
-                    {
-                        _logger.LogError(ex, "Impossible to add the given Cluster into ClusterTable");
-                        success = false;
-                    }
-                    //finalizing SQL transaction
-                    if (success)
-                    {
-                        transaction.Commit();
-                        _logger.LogInformation("Added the given Cluster of given ID into the ClusterTable successfully");
-                    }
-                    else
-                    {
-                        transaction.Rollback();
-                    }
-                    return success;
-                }
-                else
-                {
-                    _logger.LogWarning("Impossible to access the SQLite database");
-                }
+                return ClusterMutationResult.Invalid("Cluster.MetaInfo.ID", "invalid_id", "A non-empty caller-generated Cluster UUID is required.");
             }
-            else
+            using SqliteConnection? connection = _connectionManager.GetConnection();
+            if (connection == null) return ClusterMutationResult.StorageFailure();
+            using SqliteTransaction transaction = connection.BeginTransaction();
+            try
             {
-                _logger.LogWarning("The Cluster ID or the ID of its input are null or empty");
+                using (SqliteCommand exists = connection.CreateCommand())
+                {
+                    exists.Transaction = transaction;
+                    exists.CommandText = "SELECT COUNT(*) FROM ClusterTable WHERE ID=$id";
+                    exists.Parameters.AddWithValue("$id", cluster.MetaInfo.ID.ToString());
+                    if (Convert.ToInt64(exists.ExecuteScalar()) != 0) { transaction.Rollback(); return new ClusterMutationResult(ClusterMutationFailureKind.Conflict, new Model.ClusterMutationErrorEnvelope { Error = "already_exists", Message = "A Cluster with this UUID already exists." }); }
+                }
+                List<Model.ClusterMutationError> errors = ClusterReferenceIntegrityValidator.ValidateCluster(connection, transaction, cluster);
+                if (errors.Count != 0) { transaction.Rollback(); return ClusterMutationResult.InvalidReferences(errors); }
+                DateTimeOffset now = DateTimeOffset.UtcNow;
+                cluster.CreationDate = now;
+                cluster.LastModificationDate = now;
+                using SqliteCommand command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "INSERT INTO ClusterTable (ID, MetaInfo, FieldID, IsSingleWell, RigID, IsFixedPlatform, Cluster) VALUES ($id,$meta,$field,$single,$rig,$fixed,$cluster)";
+                AddClusterParameters(command, cluster);
+                if (command.ExecuteNonQuery() != 1) { transaction.Rollback(); return ClusterMutationResult.StorageFailure(); }
+                transaction.Commit(); return ClusterMutationResult.Success();
             }
-            return false;
+            catch (Exception ex) when (ex is SqliteException or JsonException)
+            { transaction.Rollback(); _logger.LogError(ex, "Impossible to add Cluster {ClusterId}", cluster.MetaInfo.ID); return ClusterMutationResult.StorageFailure(); }
         }
 
         /// <summary>
@@ -559,65 +524,48 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         /// </summary>
         /// <param name="cluster"></param>
         /// <returns>true if the given Cluster has been updated successfully</returns>
-        public bool UpdateClusterById(Guid guid, Model.Cluster? cluster)
+        internal ClusterMutationResult UpdateClusterById(Guid guid, DateTimeOffset expectedModifiedUtc, Model.Cluster? cluster)
         {
-            bool success = true;
-            if (guid != Guid.Empty && cluster != null && cluster.MetaInfo != null && cluster.MetaInfo.ID == guid)
+            if (guid == Guid.Empty || cluster?.MetaInfo?.ID != guid)
+                return ClusterMutationResult.Invalid("Cluster.MetaInfo.ID", "id_mismatch", "The route UUID must match Cluster.MetaInfo.ID.");
+            using SqliteConnection? connection = _connectionManager.GetConnection();
+            if (connection == null) return ClusterMutationResult.StorageFailure();
+            using SqliteTransaction transaction = connection.BeginTransaction();
+            try
             {
-                //update ClusterTable
-                var connection = _connectionManager.GetConnection();
-                if (connection != null)
+                Model.Cluster? stored;
+                using (SqliteCommand read = connection.CreateCommand())
                 {
-                    using SqliteTransaction transaction = connection.BeginTransaction();
-                    //update fields in ClusterTable
-                    try
-                    {
-                        string metaInfo = JsonSerializer.Serialize(cluster.MetaInfo, JsonSettings.Options);
-                        string data = JsonSerializer.Serialize(cluster, JsonSettings.Options);
-                        var command = connection.CreateCommand();
-                        command.CommandText = $"UPDATE ClusterTable SET " +
-                            $"MetaInfo = '{metaInfo}', " +
-                            $"FieldID = '{(cluster.FieldID != null ? cluster.FieldID : "")}', " +
-                            $"IsSingleWell = '{(cluster.IsSingleWell ? 1 : 0)}', " +
-                            $"RigID = '{(cluster.FieldID != null ? cluster.RigID : "")}', " +
-                            $"IsFixedPlatform = '{(cluster.IsFixedPlatform ? 1 : 0)}', " +
-                            $"Cluster = '{data}' " +
-                            $"WHERE ID = '{guid}'";
-                        int count = command.ExecuteNonQuery();
-                        if (count != 1)
-                        {
-                            _logger.LogWarning("Impossible to update the Cluster");
-                            success = false;
-                        }
-                    }
-                    catch (SqliteException ex)
-                    {
-                        _logger.LogError(ex, "Impossible to update the Cluster");
-                        success = false;
-                    }
+                    read.Transaction = transaction; read.CommandText = "SELECT Cluster FROM ClusterTable WHERE ID=$id"; read.Parameters.AddWithValue("$id", guid.ToString());
+                    stored = read.ExecuteScalar() is string json ? JsonSerializer.Deserialize<Model.Cluster>(json, JsonSettings.Options) : null;
+                }
+                if (stored == null) { transaction.Rollback(); return ClusterMutationResult.NotFound("The Cluster does not exist."); }
+                if (stored.LastModificationDate == null || stored.LastModificationDate.Value.UtcTicks != expectedModifiedUtc.UtcTicks)
+                { transaction.Rollback(); return ClusterMutationResult.ConcurrencyConflict($"Expected {expectedModifiedUtc:O}, but the stored Cluster was modified at {stored.LastModificationDate:O}."); }
+                List<Model.ClusterMutationError> errors = ClusterReferenceIntegrityValidator.ValidateCluster(connection, transaction, cluster);
+                if (errors.Count != 0) { transaction.Rollback(); return ClusterMutationResult.InvalidReferences(errors); }
+                cluster.CreationDate = stored.CreationDate;
+                cluster.LastModificationDate = DateTimeOffset.UtcNow;
+                using SqliteCommand command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "UPDATE ClusterTable SET MetaInfo=$meta, FieldID=$field, IsSingleWell=$single, RigID=$rig, IsFixedPlatform=$fixed, Cluster=$cluster WHERE ID=$id";
+                AddClusterParameters(command, cluster);
+                if (command.ExecuteNonQuery() != 1) { transaction.Rollback(); return ClusterMutationResult.StorageFailure(); }
+                transaction.Commit(); return ClusterMutationResult.Success();
+            }
+            catch (Exception ex) when (ex is SqliteException or JsonException)
+            { transaction.Rollback(); _logger.LogError(ex, "Impossible to update Cluster {ClusterId}", guid); return ClusterMutationResult.StorageFailure(); }
+        }
 
-                    // Finalizing
-                    if (success)
-                    {
-                        transaction.Commit();
-                        _logger.LogInformation("Updated the given Cluster successfully");
-                        return true;
-                    }
-                    else
-                    {
-                        transaction.Rollback();
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("Impossible to access the SQLite database");
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The Cluster ID or the ID of some of its attributes are null or empty");
-            }
-            return false;
+        private static void AddClusterParameters(SqliteCommand command, Model.Cluster cluster)
+        {
+            command.Parameters.AddWithValue("$id", cluster.MetaInfo!.ID.ToString());
+            command.Parameters.AddWithValue("$meta", JsonSerializer.Serialize(cluster.MetaInfo, JsonSettings.Options));
+            command.Parameters.AddWithValue("$field", cluster.FieldID?.ToString() ?? string.Empty);
+            command.Parameters.AddWithValue("$single", cluster.IsSingleWell ? 1 : 0);
+            command.Parameters.AddWithValue("$rig", cluster.RigID?.ToString() ?? string.Empty);
+            command.Parameters.AddWithValue("$fixed", cluster.IsFixedPlatform ? 1 : 0);
+            command.Parameters.AddWithValue("$cluster", JsonSerializer.Serialize(cluster, JsonSettings.Options));
         }
 
         /// <summary>
@@ -638,7 +586,9 @@ namespace OSDC.Drilling.Cluster.Service.Managers
                     try
                     {
                         var command = connection.CreateCommand();
-                        command.CommandText = $"DELETE FROM ClusterTable WHERE ID = '{guid}'";
+                        command.Transaction = transaction;
+                        command.CommandText = "DELETE FROM ClusterTable WHERE ID = $id";
+                        command.Parameters.AddWithValue("$id", guid.ToString());
                         int count = command.ExecuteNonQuery();
                         if (count < 0)
                         {

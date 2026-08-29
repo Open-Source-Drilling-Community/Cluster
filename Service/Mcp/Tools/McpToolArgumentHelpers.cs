@@ -212,6 +212,13 @@ internal static class McpToolArgumentHelpers
                 ["description"] = $"Identifier of the stored record to update. It must equal {bodyIdPath}."
             };
             required.Add("id");
+            properties["expectedModifiedUtc"] = new JsonObject
+            {
+                ["type"] = "string",
+                ["format"] = "date-time",
+                ["description"] = "LastModificationDate returned by the most recent read. The update is rejected if the stored resource changed since that read."
+            };
+            required.Add("expectedModifiedUtc");
         }
 
         return new JsonObject
@@ -526,6 +533,18 @@ internal static class McpToolArgumentHelpers
             return false;
         }
 
+        return true;
+    }
+
+    public static bool TryParseDateTimeOffset(JsonObject? arguments, string key, out DateTimeOffset value, out JsonNode? error)
+    {
+        value = default;
+        error = null;
+        if (arguments?[key] is not JsonNode node || !DateTimeOffset.TryParse(node.ToString(), out value) || value == default)
+        {
+            error = McpToolResponses.CreateValidationError($"Argument '{key}' must be a valid non-default timestamp.");
+            return false;
+        }
         return true;
     }
 

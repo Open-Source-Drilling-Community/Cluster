@@ -68,7 +68,7 @@ namespace ServiceTest.Controllers
             Assert.That(fetched.Options, Has.Count.EqualTo(2));
 
             fetched.Name = "Updated slot feature";
-            Assert.That(_controller.PutSlotFeatureCategoryById(id, fetched), Is.TypeOf<OkResult>());
+            Assert.That(_controller.PutSlotFeatureCategoryById(id, fetched.LastModificationDate!.Value, fetched), Is.TypeOf<OkObjectResult>());
 
             ActionResult<SlotFeatureCategory?> updatedResult = _controller.GetSlotFeatureCategoryById(id);
             SlotFeatureCategory? updated = ((OkObjectResult)updatedResult.Result!).Value as SlotFeatureCategory;

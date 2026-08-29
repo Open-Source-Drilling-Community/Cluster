@@ -105,7 +105,8 @@ else
                 EnsureMetaInfo(identity);
                 if (existingIds.Contains(identity.MetaInfo!.ID))
                 {
-                    await Api.ClientCluster.PutClusterIdentityByIdAsync(identity.MetaInfo.ID, identity);
+                    await Api.ClientCluster.PutClusterIdentityByIdAsync(identity.MetaInfo.ID,
+                        identity.LastModificationDate ?? throw new InvalidOperationException("The identity has no server modification timestamp."), identity);
                 }
                 else
                 {

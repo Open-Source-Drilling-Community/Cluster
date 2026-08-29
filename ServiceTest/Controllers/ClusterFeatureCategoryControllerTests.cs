@@ -4,11 +4,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using OSDC.Drilling.Cluster.Model;
 using OSDC.Drilling.Cluster.Service.Controllers;
+using OSDC.Drilling.Cluster.Service;
 using OSDC.Drilling.Cluster.Service.Managers;
 using NUnit.Framework;
 using OSDC.DotnetLibraries.General.DataManagement;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace ServiceTest.Controllers
 {
@@ -68,7 +70,7 @@ namespace ServiceTest.Controllers
             Assert.That(fetched.Options, Has.Count.EqualTo(2));
 
             fetched.Name = "Updated cluster feature";
-            Assert.That(_controller.PutClusterFeatureCategoryById(id, fetched), Is.TypeOf<OkResult>());
+            Assert.That(_controller.PutClusterFeatureCategoryById(id, fetched.LastModificationDate!.Value, fetched), Is.TypeOf<OkObjectResult>());
 
             ActionResult<ClusterFeatureCategory?> updatedResult = _controller.GetClusterFeatureCategoryById(id);
             ClusterFeatureCategory? updated = ((OkObjectResult)updatedResult.Result!).Value as ClusterFeatureCategory;
@@ -86,6 +88,48 @@ namespace ServiceTest.Controllers
 
             Assert.That(_controller.GetAllClusterFeatureCategoryMetaInfo().Result, Is.TypeOf<OkObjectResult>());
             Assert.That(_controller.GetAllClusterFeatureCategory().Result, Is.TypeOf<OkObjectResult>());
+        }
+
+        [Test]
+        public void CategoryDeleteAndReferencedOptionRemoval_AreRejected()
+        {
+            Guid categoryId = Guid.NewGuid();
+            Guid optionId = Guid.NewGuid();
+            Guid clusterId = Guid.NewGuid();
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            ClusterFeatureCategory category = new()
+            {
+                MetaInfo = new MetaInfo { ID = categoryId }, Name = "Referenced category",
+                CreationDate = now, LastModificationDate = now,
+                Options = [new ClusterFeatureOption { ID = optionId, Name = "Referenced option" }]
+            };
+            OSDC.Drilling.Cluster.Model.Cluster cluster = new()
+            {
+                MetaInfo = new MetaInfo { ID = clusterId },
+                ClusterFeatureAssignments = [new ClusterFeatureAssignment { ID = Guid.NewGuid(), FeatureCategoryID = categoryId, FeatureOptionID = optionId }]
+            };
+            using (SqliteConnection connection = _sqlConnectionManager!.GetConnection()!)
+            {
+                using SqliteCommand categoryCommand = connection.CreateCommand();
+                categoryCommand.CommandText = "INSERT INTO ClusterFeatureCategoryTable (ID, MetaInfo, Name, IsExclusive, HasValidityPeriod, CreationDate, LastModificationDate, ClusterFeatureCategory) VALUES ($id,$meta,$name,0,0,$created,$modified,$document)";
+                categoryCommand.Parameters.AddWithValue("$id", categoryId.ToString());
+                categoryCommand.Parameters.AddWithValue("$meta", JsonSerializer.Serialize(category.MetaInfo, JsonSettings.Options));
+                categoryCommand.Parameters.AddWithValue("$name", category.Name!);
+                categoryCommand.Parameters.AddWithValue("$created", now.ToString(SqlConnectionManager.DATE_TIME_FORMAT));
+                categoryCommand.Parameters.AddWithValue("$modified", now.ToString(SqlConnectionManager.DATE_TIME_FORMAT));
+                categoryCommand.Parameters.AddWithValue("$document", JsonSerializer.Serialize(category, JsonSettings.Options));
+                categoryCommand.ExecuteNonQuery();
+                using SqliteCommand clusterCommand = connection.CreateCommand();
+                clusterCommand.CommandText = "INSERT INTO ClusterTable (ID, MetaInfo, FieldID, IsSingleWell, RigID, IsFixedPlatform, Cluster) VALUES ($id,$meta,'',0,'',0,$document)";
+                clusterCommand.Parameters.AddWithValue("$id", clusterId.ToString());
+                clusterCommand.Parameters.AddWithValue("$meta", JsonSerializer.Serialize(cluster.MetaInfo, JsonSettings.Options));
+                clusterCommand.Parameters.AddWithValue("$document", JsonSerializer.Serialize(cluster, JsonSettings.Options));
+                clusterCommand.ExecuteNonQuery();
+            }
+
+            Assert.That(_controller!.DeleteClusterFeatureCategoryById(categoryId), Is.TypeOf<ConflictObjectResult>());
+            category.Options = [];
+            Assert.That(_controller.PutClusterFeatureCategoryById(categoryId, now, category), Is.TypeOf<ConflictObjectResult>());
         }
 
         [Test]

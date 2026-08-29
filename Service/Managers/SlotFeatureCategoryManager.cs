@@ -258,17 +258,23 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             {
                 PrepareCategory(data);
                 DateTimeOffset now = DateTimeOffset.UtcNow;
-                data.CreationDate ??= now;
+                data.CreationDate = now;
                 data.LastModificationDate = now;
                 string metaInfo = JsonSerializer.Serialize(data.MetaInfo, JsonSettings.Options);
                 string serialized = JsonSerializer.Serialize(data, JsonSettings.Options);
                 string? creationDate = data.CreationDate?.ToString(SqlConnectionManager.DATE_TIME_FORMAT);
                 string? lastModificationDate = data.LastModificationDate?.ToString(SqlConnectionManager.DATE_TIME_FORMAT);
                 var command = connection.CreateCommand();
-                command.CommandText = "INSERT INTO SlotFeatureCategoryTable (" +
-                    "ID, MetaInfo, Name, IsExclusive, HasValidityPeriod, CreationDate, LastModificationDate, SlotFeatureCategory" +
-                    ") VALUES (" +
-                    $"'{data.MetaInfo.ID}', '{metaInfo}', '{data.Name}', {(data.IsExclusive ? 1 : 0)}, {(data.HasValidityPeriod ? 1 : 0)}, '{creationDate}', '{lastModificationDate}', '{serialized}')";
+                command.Transaction = transaction;
+                command.CommandText = "INSERT INTO SlotFeatureCategoryTable (ID, MetaInfo, Name, IsExclusive, HasValidityPeriod, CreationDate, LastModificationDate, SlotFeatureCategory) VALUES ($id,$meta,$name,$exclusive,$validity,$created,$modified,$document)";
+                command.Parameters.AddWithValue("$id", data.MetaInfo.ID.ToString());
+                command.Parameters.AddWithValue("$meta", metaInfo);
+                command.Parameters.AddWithValue("$name", data.Name ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$exclusive", data.IsExclusive ? 1 : 0);
+                command.Parameters.AddWithValue("$validity", data.HasValidityPeriod ? 1 : 0);
+                command.Parameters.AddWithValue("$created", creationDate ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$modified", lastModificationDate ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$document", serialized);
                 int count = command.ExecuteNonQuery();
                 if (count != 1)
                 {
@@ -282,85 +288,6 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             {
                 transaction.Rollback();
                 _logger.LogError(ex, "Impossible to add SlotFeatureCategory");
-                return false;
-            }
-        }
-
-        public bool UpdateSlotFeatureCategoryById(Guid guid, Model.SlotFeatureCategory? data)
-        {
-            if (guid == Guid.Empty || data?.MetaInfo == null || data.MetaInfo.ID != guid)
-            {
-                return false;
-            }
-
-            var connection = _connectionManager.GetConnection();
-            if (connection == null)
-            {
-                return false;
-            }
-
-            using SqliteTransaction transaction = connection.BeginTransaction();
-            try
-            {
-                PrepareCategory(data);
-                data.LastModificationDate = DateTimeOffset.UtcNow;
-                string metaInfo = JsonSerializer.Serialize(data.MetaInfo, JsonSettings.Options);
-                string serialized = JsonSerializer.Serialize(data, JsonSettings.Options);
-                string? creationDate = data.CreationDate?.ToString(SqlConnectionManager.DATE_TIME_FORMAT);
-                string? lastModificationDate = data.LastModificationDate?.ToString(SqlConnectionManager.DATE_TIME_FORMAT);
-                var command = connection.CreateCommand();
-                command.CommandText = $"UPDATE SlotFeatureCategoryTable SET " +
-                    $"MetaInfo = '{metaInfo}', " +
-                    $"Name = '{data.Name}', " +
-                    $"IsExclusive = {(data.IsExclusive ? 1 : 0)}, " +
-                    $"HasValidityPeriod = {(data.HasValidityPeriod ? 1 : 0)}, " +
-                    $"CreationDate = '{creationDate}', " +
-                    $"LastModificationDate = '{lastModificationDate}', " +
-                    $"SlotFeatureCategory = '{serialized}' " +
-                    $"WHERE ID = '{guid}'";
-                int count = command.ExecuteNonQuery();
-                if (count != 1)
-                {
-                    transaction.Rollback();
-                    return false;
-                }
-                transaction.Commit();
-                return true;
-            }
-            catch (SqliteException ex)
-            {
-                transaction.Rollback();
-                _logger.LogError(ex, "Impossible to update SlotFeatureCategory");
-                return false;
-            }
-        }
-
-        public bool DeleteSlotFeatureCategoryById(Guid guid)
-        {
-            if (guid == Guid.Empty)
-            {
-                return false;
-            }
-
-            var connection = _connectionManager.GetConnection();
-            if (connection == null)
-            {
-                return false;
-            }
-
-            using SqliteTransaction transaction = connection.BeginTransaction();
-            try
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = $"DELETE FROM SlotFeatureCategoryTable WHERE ID = '{guid}'";
-                command.ExecuteNonQuery();
-                transaction.Commit();
-                return true;
-            }
-            catch (SqliteException ex)
-            {
-                transaction.Rollback();
-                _logger.LogError(ex, "Impossible to delete SlotFeatureCategory");
                 return false;
             }
         }

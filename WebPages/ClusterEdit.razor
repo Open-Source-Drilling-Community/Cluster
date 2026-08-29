@@ -967,7 +967,8 @@
                 }
 
                 Cluster cluster = BuildEditedCluster(DateTimeOffset.UtcNow);
-                await Api.ClientCluster.PutClusterByIdAsync(CurrentCluster.MetaInfo.ID, cluster);
+                await Api.ClientCluster.PutClusterByIdAsync(CurrentCluster.MetaInfo.ID,
+                    CurrentCluster.LastModificationDate ?? throw new InvalidOperationException("The Cluster has no server modification timestamp."), cluster);
                 CurrentCluster = await Api.ClientCluster.GetClusterByIdAsync(CurrentCluster.MetaInfo.ID);
                 ApplyClusterToEditor(CurrentCluster);
                 await RefreshReferenceSourcesAsync();

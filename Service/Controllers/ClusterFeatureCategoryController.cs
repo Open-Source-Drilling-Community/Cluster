@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using OSDC.Drilling.Cluster.Model;
 using OSDC.Drilling.Cluster.Service.Managers;
@@ -16,10 +17,12 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
     {
         private readonly ILogger<ClusterFeatureCategoryManager> _logger;
         private readonly ClusterFeatureCategoryManager _manager;
+        private readonly SqlConnectionManager _connectionManager;
 
         public ClusterFeatureCategoryController(ILogger<ClusterFeatureCategoryManager> logger, SqlConnectionManager connectionManager)
         {
             _logger = logger;
+            _connectionManager = connectionManager;
             _manager = ClusterFeatureCategoryManager.GetInstance(_logger, connectionManager);
         }
 
@@ -80,36 +83,20 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         }
 
         [HttpPut("{id:guid}", Name = "PutClusterFeatureCategoryById")]
-        public ActionResult PutClusterFeatureCategoryById(Guid id, [FromBody] Model.ClusterFeatureCategory? data)
+        [ProducesResponseType(typeof(Model.ClusterFeatureCategory), StatusCodes.Status200OK)]
+        public ActionResult PutClusterFeatureCategoryById(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] Model.ClusterFeatureCategory? data)
         {
             UsageStatisticsCluster.Instance.IncrementPutClusterFeatureCategoryByIdPerDay();
-            if (data?.MetaInfo == null || data.MetaInfo.ID != id)
-            {
-                return BadRequest();
-            }
-
-            if (_manager.GetClusterFeatureCategoryById(id) == null)
-            {
-                return NotFound();
-            }
-
-            return _manager.UpdateClusterFeatureCategoryById(id, data)
-                ? Ok()
-                : StatusCode(StatusCodes.Status500InternalServerError);
+            if (expectedModifiedUtc == default) return BadRequest(new ClusterMutationErrorEnvelope { Error = "invalid_request", Message = "expectedModifiedUtc is required." });
+            if (data == null) return BadRequest(new ClusterMutationErrorEnvelope { Error = "invalid_request", Message = "clusterFeatureCategory is required." });
+            return this.ToActionResult(ClusterCatalogMutationManager.UpdateClusterCategory(_connectionManager, _logger, id, expectedModifiedUtc, data), data);
         }
 
         [HttpDelete("{id:guid}", Name = "DeleteClusterFeatureCategoryById")]
         public ActionResult DeleteClusterFeatureCategoryById(Guid id)
         {
             UsageStatisticsCluster.Instance.IncrementDeleteClusterFeatureCategoryByIdPerDay();
-            if (_manager.GetClusterFeatureCategoryById(id) == null)
-            {
-                return NotFound();
-            }
-
-            return _manager.DeleteClusterFeatureCategoryById(id)
-                ? Ok()
-                : StatusCode(StatusCodes.Status500InternalServerError);
+            return this.ToActionResult(ClusterCatalogMutationManager.DeleteClusterCategory(_connectionManager, _logger, id));
         }
     }
 }

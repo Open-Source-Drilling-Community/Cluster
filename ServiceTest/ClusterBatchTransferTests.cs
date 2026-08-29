@@ -129,6 +129,27 @@ public sealed class ClusterBatchTransferTests
         });
     }
 
+    [Test]
+    public void Restore_validation_rejects_mismatched_slot_dictionary_key()
+    {
+        Guid clusterId = Guid.NewGuid();
+        Guid key = Guid.NewGuid();
+        ClusterBatchRestoreRequest request = new()
+        {
+            ConflictPolicy = ClusterBatchRestoreConflictPolicy.FailIfExists,
+            CatalogPolicy = ClusterBatchCatalogRestorePolicy.MapExisting,
+            Document = new ClusterBatchExportDocument
+            {
+                ExportedAtUtc = DateTimeOffset.UtcNow,
+                CatalogDependencies = new(), ExternalReferences = new(),
+                Clusters = [new ClusterModel { MetaInfo = Meta(clusterId), Slots = new Dictionary<Guid, Slot> { [key] = new() { ID = Guid.NewGuid() } } }]
+            }
+        };
+
+        List<ClusterBatchError> errors = ClusterBatchRestorer.ValidateRequest(request);
+        Assert.That(errors.Any(error => error.Code == "slot_id_mismatch" && error.PositionIndex == 0), Is.True);
+    }
+
     private static ClusterBatchRestoreRequest Request(ClusterModel cluster, ClusterIdentity identity,
         ClusterFeatureCategory category, SlotFeatureCategory slotCategory, Guid field, Guid rig) => new()
     {

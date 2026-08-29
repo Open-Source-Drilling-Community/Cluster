@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using OSDC.Drilling.Cluster.Model;
 using OSDC.Drilling.Cluster.Service.Managers;
@@ -16,10 +17,12 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
     {
         private readonly ILogger<SlotFeatureCategoryManager> _logger;
         private readonly SlotFeatureCategoryManager _manager;
+        private readonly SqlConnectionManager _connectionManager;
 
         public SlotFeatureCategoryController(ILogger<SlotFeatureCategoryManager> logger, SqlConnectionManager connectionManager)
         {
             _logger = logger;
+            _connectionManager = connectionManager;
             _manager = SlotFeatureCategoryManager.GetInstance(_logger, connectionManager);
         }
 
@@ -80,36 +83,20 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         }
 
         [HttpPut("{id:guid}", Name = "PutSlotFeatureCategoryById")]
-        public ActionResult PutSlotFeatureCategoryById(Guid id, [FromBody] Model.SlotFeatureCategory? data)
+        [ProducesResponseType(typeof(Model.SlotFeatureCategory), StatusCodes.Status200OK)]
+        public ActionResult PutSlotFeatureCategoryById(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] Model.SlotFeatureCategory? data)
         {
             UsageStatisticsCluster.Instance.IncrementPutSlotFeatureCategoryByIdPerDay();
-            if (data?.MetaInfo == null || data.MetaInfo.ID != id)
-            {
-                return BadRequest();
-            }
-
-            if (_manager.GetSlotFeatureCategoryById(id) == null)
-            {
-                return NotFound();
-            }
-
-            return _manager.UpdateSlotFeatureCategoryById(id, data)
-                ? Ok()
-                : StatusCode(StatusCodes.Status500InternalServerError);
+            if (expectedModifiedUtc == default) return BadRequest(new ClusterMutationErrorEnvelope { Error = "invalid_request", Message = "expectedModifiedUtc is required." });
+            if (data == null) return BadRequest(new ClusterMutationErrorEnvelope { Error = "invalid_request", Message = "slotFeatureCategory is required." });
+            return this.ToActionResult(ClusterCatalogMutationManager.UpdateSlotCategory(_connectionManager, _logger, id, expectedModifiedUtc, data), data);
         }
 
         [HttpDelete("{id:guid}", Name = "DeleteSlotFeatureCategoryById")]
         public ActionResult DeleteSlotFeatureCategoryById(Guid id)
         {
             UsageStatisticsCluster.Instance.IncrementDeleteSlotFeatureCategoryByIdPerDay();
-            if (_manager.GetSlotFeatureCategoryById(id) == null)
-            {
-                return NotFound();
-            }
-
-            return _manager.DeleteSlotFeatureCategoryById(id)
-                ? Ok()
-                : StatusCode(StatusCodes.Status500InternalServerError);
+            return this.ToActionResult(ClusterCatalogMutationManager.DeleteSlotCategory(_connectionManager, _logger, id));
         }
     }
 }

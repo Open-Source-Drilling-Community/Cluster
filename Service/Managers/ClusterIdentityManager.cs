@@ -180,17 +180,21 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             try
             {
                 DateTimeOffset now = DateTimeOffset.UtcNow;
-                data.CreationDate ??= now;
+                data.CreationDate = now;
                 data.LastModificationDate = now;
                 string metaInfo = JsonSerializer.Serialize(data.MetaInfo, JsonSettings.Options);
                 string serialized = JsonSerializer.Serialize(data, JsonSettings.Options);
                 string? creationDate = data.CreationDate?.ToString(SqlConnectionManager.DATE_TIME_FORMAT);
                 string? lastModificationDate = data.LastModificationDate?.ToString(SqlConnectionManager.DATE_TIME_FORMAT);
                 var command = connection.CreateCommand();
-                command.CommandText = "INSERT INTO ClusterIdentityTable (" +
-                    "ID, MetaInfo, Name, CreationDate, LastModificationDate, ClusterIdentity" +
-                    ") VALUES (" +
-                    $"'{data.MetaInfo.ID}', '{metaInfo}', '{data.Name}', '{creationDate}', '{lastModificationDate}', '{serialized}')";
+                command.Transaction = transaction;
+                command.CommandText = "INSERT INTO ClusterIdentityTable (ID, MetaInfo, Name, CreationDate, LastModificationDate, ClusterIdentity) VALUES ($id,$meta,$name,$created,$modified,$document)";
+                command.Parameters.AddWithValue("$id", data.MetaInfo.ID.ToString());
+                command.Parameters.AddWithValue("$meta", metaInfo);
+                command.Parameters.AddWithValue("$name", data.Name ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$created", creationDate ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$modified", lastModificationDate ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$document", serialized);
                 int count = command.ExecuteNonQuery();
                 if (count != 1)
                 {
@@ -204,82 +208,6 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             {
                 transaction.Rollback();
                 _logger.LogError(ex, "Impossible to add ClusterIdentity");
-                return false;
-            }
-        }
-
-        public bool UpdateClusterIdentityById(Guid guid, Model.ClusterIdentity? data)
-        {
-            if (guid == Guid.Empty || data?.MetaInfo == null || data.MetaInfo.ID != guid)
-            {
-                return false;
-            }
-
-            var connection = _connectionManager.GetConnection();
-            if (connection == null)
-            {
-                return false;
-            }
-
-            using SqliteTransaction transaction = connection.BeginTransaction();
-            try
-            {
-                data.LastModificationDate = DateTimeOffset.UtcNow;
-                string metaInfo = JsonSerializer.Serialize(data.MetaInfo, JsonSettings.Options);
-                string serialized = JsonSerializer.Serialize(data, JsonSettings.Options);
-                string? creationDate = data.CreationDate?.ToString(SqlConnectionManager.DATE_TIME_FORMAT);
-                string? lastModificationDate = data.LastModificationDate?.ToString(SqlConnectionManager.DATE_TIME_FORMAT);
-                var command = connection.CreateCommand();
-                command.CommandText = $"UPDATE ClusterIdentityTable SET " +
-                    $"MetaInfo = '{metaInfo}', " +
-                    $"Name = '{data.Name}', " +
-                    $"CreationDate = '{creationDate}', " +
-                    $"LastModificationDate = '{lastModificationDate}', " +
-                    $"ClusterIdentity = '{serialized}' " +
-                    $"WHERE ID = '{guid}'";
-                int count = command.ExecuteNonQuery();
-                if (count != 1)
-                {
-                    transaction.Rollback();
-                    return false;
-                }
-                transaction.Commit();
-                return true;
-            }
-            catch (SqliteException ex)
-            {
-                transaction.Rollback();
-                _logger.LogError(ex, "Impossible to update ClusterIdentity");
-                return false;
-            }
-        }
-
-        public bool DeleteClusterIdentityById(Guid guid)
-        {
-            if (guid == Guid.Empty)
-            {
-                return false;
-            }
-
-            var connection = _connectionManager.GetConnection();
-            if (connection == null)
-            {
-                return false;
-            }
-
-            using SqliteTransaction transaction = connection.BeginTransaction();
-            try
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = $"DELETE FROM ClusterIdentityTable WHERE ID = '{guid}'";
-                command.ExecuteNonQuery();
-                transaction.Commit();
-                return true;
-            }
-            catch (SqliteException ex)
-            {
-                transaction.Rollback();
-                _logger.LogError(ex, "Impossible to delete ClusterIdentity");
                 return false;
             }
         }

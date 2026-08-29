@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using OSDC.Drilling.Cluster.Model;
 using OSDC.Drilling.Cluster.Service.Managers;
@@ -16,10 +17,12 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
     {
         private readonly ILogger<ClusterIdentityManager> _logger;
         private readonly ClusterIdentityManager _manager;
+        private readonly SqlConnectionManager _connectionManager;
 
         public ClusterIdentityController(ILogger<ClusterIdentityManager> logger, SqlConnectionManager connectionManager)
         {
             _logger = logger;
+            _connectionManager = connectionManager;
             _manager = ClusterIdentityManager.GetInstance(_logger, connectionManager);
         }
 
@@ -80,36 +83,20 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         }
 
         [HttpPut("{id:guid}", Name = "PutClusterIdentityById")]
-        public ActionResult PutClusterIdentityById(Guid id, [FromBody] Model.ClusterIdentity? data)
+        [ProducesResponseType(typeof(Model.ClusterIdentity), StatusCodes.Status200OK)]
+        public ActionResult PutClusterIdentityById(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] Model.ClusterIdentity? data)
         {
             UsageStatisticsCluster.Instance.IncrementPutClusterIdentityByIdPerDay();
-            if (data?.MetaInfo == null || data.MetaInfo.ID != id)
-            {
-                return BadRequest();
-            }
-
-            if (_manager.GetClusterIdentityById(id) == null)
-            {
-                return NotFound();
-            }
-
-            return _manager.UpdateClusterIdentityById(id, data)
-                ? Ok()
-                : StatusCode(StatusCodes.Status500InternalServerError);
+            if (expectedModifiedUtc == default) return BadRequest(new ClusterMutationErrorEnvelope { Error = "invalid_request", Message = "expectedModifiedUtc is required." });
+            if (data == null) return BadRequest(new ClusterMutationErrorEnvelope { Error = "invalid_request", Message = "clusterIdentity is required." });
+            return this.ToActionResult(ClusterCatalogMutationManager.UpdateIdentity(_connectionManager, _logger, id, expectedModifiedUtc, data), data);
         }
 
         [HttpDelete("{id:guid}", Name = "DeleteClusterIdentityById")]
         public ActionResult DeleteClusterIdentityById(Guid id)
         {
             UsageStatisticsCluster.Instance.IncrementDeleteClusterIdentityByIdPerDay();
-            if (_manager.GetClusterIdentityById(id) == null)
-            {
-                return NotFound();
-            }
-
-            return _manager.DeleteClusterIdentityById(id)
-                ? Ok()
-                : StatusCode(StatusCodes.Status500InternalServerError);
+            return this.ToActionResult(ClusterCatalogMutationManager.DeleteIdentity(_connectionManager, _logger, id));
         }
     }
 }

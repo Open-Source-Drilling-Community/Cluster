@@ -183,8 +183,6 @@ public sealed class McpToolRegistrationTests
         });
     }
 
-    [TestCase("cluster_create")]
-    [TestCase("cluster_update_by_id")]
     [TestCase("cluster_delete_by_id")]
     [TestCase("cluster_identity_create")]
     public void Mutations_that_return_no_resource_publish_status_only_success_schema(string toolName)
@@ -192,6 +190,18 @@ public sealed class McpToolRegistrationTests
         JsonObject output = RequireObject(_tools[toolName].OutputSchema);
         Assert.That(PropertyNames(output), Is.EquivalentTo(new[] { "status" }));
         Assert.That(RequiredNames(output), Is.EquivalentTo(new[] { "status" }));
+    }
+
+    [TestCase("cluster_create")]
+    [TestCase("cluster_update_by_id")]
+    [TestCase("cluster_feature_category_update_by_id")]
+    [TestCase("cluster_identity_update_by_id")]
+    [TestCase("slot_feature_category_update_by_id")]
+    public void Mutations_returning_updated_resources_publish_data_schema(string toolName)
+    {
+        JsonObject output = RequireObject(_tools[toolName].OutputSchema);
+        Assert.That(PropertyNames(output), Is.EquivalentTo(new[] { "status", "data" }));
+        Assert.That(RequiredNames(output), Is.EquivalentTo(new[] { "status", "data" }));
     }
 
     [TestCase("cluster_feature_category_create", "clusterFeatureCategory")]
@@ -213,9 +223,10 @@ public sealed class McpToolRegistrationTests
     public void Update_schemas_require_matching_top_level_identifier(string toolName, string bodyName)
     {
         JsonObject root = RequireObject(_tools[toolName].InputSchema);
-        Assert.That(RequiredNames(root), Is.EquivalentTo(new[] { bodyName, "id" }));
+        Assert.That(RequiredNames(root), Is.EquivalentTo(new[] { bodyName, "id", "expectedModifiedUtc" }));
         Assert.That(Property(root, "id")["format"]?.GetValue<string>(), Is.EqualTo("uuid"));
         Assert.That(Property(root, "id")["description"]?.GetValue<string>(), Does.Contain($"{bodyName}.MetaInfo.ID"));
+        Assert.That(Property(root, "expectedModifiedUtc")["format"]?.GetValue<string>(), Is.EqualTo("date-time"));
     }
 
     private static JsonObject RequireObject(JsonNode? node)

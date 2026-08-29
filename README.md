@@ -65,6 +65,7 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 - Cluster identities: user-defined identity definitions can be managed separately and assigned to clusters with cluster-specific values.
 - Cluster features: user-defined feature categories/options can be managed separately and assigned to clusters with exclusivity and optional validity periods.
 - Slot features: user-defined slot feature categories/options can be managed separately and assigned to selected slots in the cluster editor.
+- Safe mutations: full replacements use optimistic concurrency, locally owned catalog references are validated atomically, referenced definitions/options cannot be removed, and Slot dictionary keys must match their `Slot.ID` values.
 - Slot editing: slots can be edited with north/east and latitude/longitude coordinates through the unit/reference system; the slot table summarizes assigned features.
 - Survey/trajectory displays: cluster survey runs and trajectories are shown in 3D and in horizontal projection, with optional uncertainty ellipses.
 - Field delineation overlays: when a cluster belongs to a field with delineation lines, those lines and their calculated boundaries are displayed together with cluster survey runs and trajectories. In 3D, delineation lines are placed on the north/east plane at the top or bottom of the displayed survey/trajectory bounding box. The bounding box itself is based on survey/trajectory data, not on delineation extents.

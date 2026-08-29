@@ -301,6 +301,9 @@ public static class ClusterBatchRestorer
             else if (!clusterIds.Add(id.Value)) errors.Add(Error(index, "Document.Clusters.MetaInfo.ID", "duplicate_uuid", $"Cluster UUID '{id}' occurs more than once."));
             if (cluster.FieldID == Guid.Empty) errors.Add(Error(index, "Document.Clusters.FieldID", "empty_uuid", "FieldID must be null or a non-empty UUID."));
             if (cluster.RigID == Guid.Empty) errors.Add(Error(index, "Document.Clusters.RigID", "empty_uuid", "RigID must be null or a non-empty UUID."));
+            foreach ((Guid slotKey, Slot slot) in cluster.Slots ?? [])
+                if (slotKey != slot.ID)
+                    errors.Add(Error(index, $"Document.Clusters.Slots[{slotKey}].ID", "slot_id_mismatch", $"Slot dictionary key '{slotKey}' must equal Slot.ID '{slot.ID}'."));
         }
         if (document.CatalogDependencies != null)
         {

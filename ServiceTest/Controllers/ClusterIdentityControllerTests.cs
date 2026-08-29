@@ -60,7 +60,7 @@ namespace ServiceTest.Controllers
             Assert.That(fetched!.Name, Is.EqualTo("Test cluster identity"));
 
             fetched.Name = "Updated cluster identity";
-            Assert.That(_controller.PutClusterIdentityById(id, fetched), Is.TypeOf<OkResult>());
+            Assert.That(_controller.PutClusterIdentityById(id, fetched.LastModificationDate!.Value, fetched), Is.TypeOf<OkObjectResult>());
 
             ActionResult<ClusterIdentity?> updatedResult = _controller.GetClusterIdentityById(id);
             ClusterIdentity? updated = ((OkObjectResult)updatedResult.Result!).Value as ClusterIdentity;

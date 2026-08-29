@@ -58,7 +58,7 @@ External MCP hub configuration example:
   - `POST /Cluster/api/Cluster/BatchExport` → export all clusters or an ordered selection with dependency manifests
   - `POST /Cluster/api/Cluster/BatchRestore` → validate, reconnect references, and atomically restore a document
   - `POST /Cluster/api/Cluster` → add new Cluster
-  - `PUT /Cluster/api/Cluster/{id}` → update existing Cluster
+  - `PUT /Cluster/api/Cluster/{id}?expectedModifiedUtc=<timestamp>` → replace an existing Cluster using its latest `LastModificationDate`
   - `DELETE /Cluster/api/Cluster/{id}` → delete Cluster
 - Usage statistics: `GET /Cluster/api/ClusterUsageStatistics`
 - Identity definitions:
@@ -66,21 +66,21 @@ External MCP hub configuration example:
   - `GET /Cluster/api/ClusterIdentity/HeavyData`
   - `GET /Cluster/api/ClusterIdentity/{id}`
   - `POST /Cluster/api/ClusterIdentity`
-  - `PUT /Cluster/api/ClusterIdentity/{id}`
+  - `PUT /Cluster/api/ClusterIdentity/{id}?expectedModifiedUtc=<timestamp>`
   - `DELETE /Cluster/api/ClusterIdentity/{id}`
 - Cluster feature category definitions:
   - `GET /Cluster/api/ClusterFeatureCategory`
   - `GET /Cluster/api/ClusterFeatureCategory/HeavyData`
   - `GET /Cluster/api/ClusterFeatureCategory/{id}`
   - `POST /Cluster/api/ClusterFeatureCategory`
-  - `PUT /Cluster/api/ClusterFeatureCategory/{id}`
+  - `PUT /Cluster/api/ClusterFeatureCategory/{id}?expectedModifiedUtc=<timestamp>`
   - `DELETE /Cluster/api/ClusterFeatureCategory/{id}`
 - Slot feature category definitions:
   - `GET /Cluster/api/SlotFeatureCategory`
   - `GET /Cluster/api/SlotFeatureCategory/HeavyData`
   - `GET /Cluster/api/SlotFeatureCategory/{id}`
   - `POST /Cluster/api/SlotFeatureCategory`
-  - `PUT /Cluster/api/SlotFeatureCategory/{id}`
+  - `PUT /Cluster/api/SlotFeatureCategory/{id}?expectedModifiedUtc=<timestamp>`
   - `DELETE /Cluster/api/SlotFeatureCategory/{id}`
 
 ## MCP Server
@@ -99,7 +99,9 @@ The MCP tool surface exposes the domain CRUD and batch-transfer subset of the RE
 - SlotFeatureCategory: `slot_feature_category_...`
 - Usage statistics remain available through REST and are intentionally not exposed through MCP.
 
-The `create` and `update_by_id` tools expect the same JSON object body as the corresponding REST endpoints, wrapped in an argument named after the entity, for example `cluster`, `clusterIdentity`, `clusterFeatureCategory`, or `slotFeatureCategory`. Every tool publishes explicit input and success-output JSON Schemas plus a human-readable title and read-only, destructive, idempotent, and open-world behavior annotations. Successful calls return schema-conforming structured content and a JSON text fallback. Failures return `isError=true` with a stable JSON text envelope and no success-shaped structured content. Cluster coordinates use SI values and WGS84 references: angular values are radians and linear/depth values are metres.
+The `create` and `update_by_id` tools expect the same JSON object body as the corresponding REST endpoints, wrapped in an argument named after the entity, for example `cluster`, `clusterIdentity`, `clusterFeatureCategory`, or `slotFeatureCategory`. Updates also require `expectedModifiedUtc`, copied exactly from the latest server `LastModificationDate`; a stale value returns `concurrency_conflict` (HTTP 409). Every tool publishes explicit input and success-output JSON Schemas plus a human-readable title and read-only, destructive, idempotent, and open-world behavior annotations. Successful calls return schema-conforming structured content and a JSON text fallback. Failures return `isError=true` with a stable JSON text envelope and no success-shaped structured content. Cluster coordinates use SI values and WGS84 references: angular values are radians and linear/depth values are metres.
+
+Ordinary Cluster creates and updates atomically validate Cluster identity assignments, Cluster and Slot feature category/option assignments, and the invariant that each `Slots` dictionary key equals the contained `Slot.ID`. Deleting a locally owned identity or feature category, or removing an option, returns `reference_conflict` (HTTP 409) while a stored Cluster uses it. These operations never cascade. Creation and modification timestamps are assigned by the server.
 
 The batch document uses `OSDC.Drilling.Cluster.BatchExport`, schema version 1. It contains complete clusters, only referenced local identity and cluster/slot feature definitions/options, and Field/Rig source UUID-to-name manifests. Restore resolves local catalogs by compatible UUID or unique normalized name and can create missing local definitions/options. Field and Rig resources are never created: an existing UUID is retained even if its display name changed; when that UUID is absent, the stored name must have one unique normalized-name match. All local catalog creation, reference rewriting, and cluster writes share one SQLite transaction.
 
@@ -122,11 +124,11 @@ Assuming `https://localhost:5001` and base path `/Cluster/api`.
 - Create a Cluster (minimal JSON requires a non-empty `MetaInfo.ID`):
   - `curl -k -X POST https://localhost:5001/Cluster/api/Cluster -H "Content-Type: application/json" -d "{ \"MetaInfo\": { \"ID\": \"11111111-1111-1111-1111-111111111111\" }, \"Name\": \"Cluster A\", \"IsSingleWell\": false }"`
 - Update a Cluster:
-  - `curl -k -X PUT https://localhost:5001/Cluster/api/Cluster/<guid> -H "Content-Type: application/json" -d "{ \"MetaInfo\": { \"ID\": \"<guid>\" }, \"Name\": \"Cluster A (updated)\" }"`
+  - First read the Cluster, retain the complete record and its `LastModificationDate`, then call `curl -k -X PUT "https://localhost:5001/Cluster/api/Cluster/<guid>?expectedModifiedUtc=<URL-encoded-last-modification-date>" -H "Content-Type: application/json" -d "<complete-cluster-json>"`
 - Delete a Cluster:
   - `curl -k -X DELETE https://localhost:5001/Cluster/api/Cluster/<guid>`
 
-Note: The data model in `Model` defines richer, domain-specific fields (e.g., reference coordinates and depths). The controller only requires `MetaInfo.ID` to be present for create/update operations; populate additional fields as needed for your workflow.
+Note: Updates are full replacements. Send every value that must remain stored, and use only locally catalogued identity/category/option UUIDs. The server rejects invalid references and mismatched Slot keys without changing the database.
 
 ## Data Persistence
 - Database: SQLite at `home/Cluster.db` (relative to solution root).

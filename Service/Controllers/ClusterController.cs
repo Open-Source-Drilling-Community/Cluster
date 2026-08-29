@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.Drilling.Cluster.Service.Managers;
@@ -311,6 +312,7 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         /// <param name="cluster"></param>
         /// <returns>true if the given Cluster has been added successfully to the microservice database, at the endpoint Cluster/api/Cluster</returns>
         [HttpPost(Name = "PostCluster")]
+        [ProducesResponseType(typeof(Model.Cluster), StatusCodes.Status200OK)]
         public ActionResult PostCluster([FromBody] Model.Cluster? data)
         {
             UsageStatisticsCluster.Instance.IncrementPostClusterPerDay();
@@ -322,14 +324,7 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
                 {   
                     //  If cluster was not found, call AddCluster, where the cluster.Calculate()
                     // method is called. 
-                    if (_clusterManager.AddCluster(data))
-                    {
-                        return Ok(); // status=OK is used rather than status=Created because NSwag auto-generated controllers use 200 (OK) rather than 201 (Created) as return codes
-                    }
-                    else
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError);
-                    }
+                    return this.ToActionResult(_clusterManager.AddCluster(data), data);
                 }
                 else
                 {
@@ -350,35 +345,13 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         /// <param name="cluster"></param>
         /// <returns>true if the given Cluster has been updated successfully to the microservice database, at the endpoint Cluster/api/Cluster/id</returns>
         [HttpPut("{id:guid}", Name = "PutClusterById")]
-        public ActionResult PutClusterById(Guid id, [FromBody] Model.Cluster? data)
+        [ProducesResponseType(typeof(Model.Cluster), StatusCodes.Status200OK)]
+        public ActionResult PutClusterById(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] Model.Cluster? data)
         {
             UsageStatisticsCluster.Instance.IncrementPutClusterByIdPerDay();
-            // Check if Cluster is in the data base
-            if (data != null && data.MetaInfo != null && data.MetaInfo.ID.Equals(id))
-            {
-                var existingData = _clusterManager.GetClusterById(id);
-                if (existingData != null)
-                {
-                    if (_clusterManager.UpdateClusterById(id, data))
-                    {
-                        return Ok();
-                    }
-                    else
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError);
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("The given Cluster has not been found in the database");
-                    return NotFound();
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The given Cluster is null, badly formed, or its does not match the ID to update");
-                return BadRequest();
-            }
+            if (expectedModifiedUtc == default) return BadRequest(new Model.ClusterMutationErrorEnvelope { Error = "invalid_request", Message = "expectedModifiedUtc is required." });
+            if (data == null) return BadRequest(new Model.ClusterMutationErrorEnvelope { Error = "invalid_request", Message = "cluster is required." });
+            return this.ToActionResult(_clusterManager.UpdateClusterById(id, expectedModifiedUtc, data), data);
         }
 
         /// <summary>
