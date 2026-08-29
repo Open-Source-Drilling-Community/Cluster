@@ -1,6 +1,6 @@
-using NORCE.Drilling.Cluster.WebPages;
+using OSDC.Drilling.Cluster.WebPages;
 
-namespace NORCE.Drilling.Cluster.WebApp;
+namespace OSDC.Drilling.Cluster.WebApp;
 
 public class WebPagesHostConfiguration :
     IClusterWebPagesConfiguration,

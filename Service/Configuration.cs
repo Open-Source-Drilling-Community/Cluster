@@ -1,4 +1,4 @@
-﻿namespace NORCE.Drilling.Cluster.Service
+namespace OSDC.Drilling.Cluster.Service
 {
     public class Configuration
     {

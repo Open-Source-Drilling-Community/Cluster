@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NORCE.Drilling.Cluster.Model
+namespace OSDC.Drilling.Cluster.Model
 {
     public class SlotFeatureCategory : IFeatureCategory
     {

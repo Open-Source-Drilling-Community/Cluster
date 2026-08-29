@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "norcedrillingclusterservice.name" -}}
+{{- define "osdcdrillingclusterservice.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "norcedrillingclusterservice.fullname" -}}
+{{- define "osdcdrillingclusterservice.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "norcedrillingclusterservice.chart" -}}
+{{- define "osdcdrillingclusterservice.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "norcedrillingclusterservice.labels" -}}
-helm.sh/chart: {{ include "norcedrillingclusterservice.chart" . }}
-{{ include "norcedrillingclusterservice.selectorLabels" . }}
+{{- define "osdcdrillingclusterservice.labels" -}}
+helm.sh/chart: {{ include "osdcdrillingclusterservice.chart" . }}
+{{ include "osdcdrillingclusterservice.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "norcedrillingclusterservice.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "norcedrillingclusterservice.name" . }}
+{{- define "osdcdrillingclusterservice.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "osdcdrillingclusterservice.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "norcedrillingclusterservice.serviceAccountName" -}}
+{{- define "osdcdrillingclusterservice.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "norcedrillingclusterservice.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "osdcdrillingclusterservice.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

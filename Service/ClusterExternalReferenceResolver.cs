@@ -8,9 +8,9 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using NORCE.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Model;
 
-namespace NORCE.Drilling.Cluster.Service;
+namespace OSDC.Drilling.Cluster.Service;
 
 public sealed class ClusterExternalReferenceResolutionOutcome
 {

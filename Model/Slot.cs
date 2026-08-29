@@ -1,4 +1,4 @@
-﻿using DWIS.Vocabulary.Schemas;
+using DWIS.Vocabulary.Schemas;
 using OSDC.DotnetLibraries.Drilling.DrillingProperties;
 using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.UnitConversion.Conversion.DrillingEngineering;
@@ -6,7 +6,7 @@ using OSDC.UnitConversion.Conversion;
 using System;
 using System.Collections.Generic;
 
-namespace NORCE.Drilling.Cluster.Model
+namespace OSDC.Drilling.Cluster.Model
 {
     /// <summary>
     /// a base class other classes may derive from

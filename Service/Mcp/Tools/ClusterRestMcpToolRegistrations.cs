@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NORCE.Drilling.Cluster.Service.Controllers;
-using NORCE.Drilling.Cluster.Service.Managers;
-using NORCE.Drilling.Cluster.Service;
-using ClusterModel = NORCE.Drilling.Cluster.Model.Cluster;
-using ClusterFeatureCategoryModel = NORCE.Drilling.Cluster.Model.ClusterFeatureCategory;
-using ClusterIdentityModel = NORCE.Drilling.Cluster.Model.ClusterIdentity;
-using SlotFeatureCategoryModel = NORCE.Drilling.Cluster.Model.SlotFeatureCategory;
-using ClusterBatchExportRequestModel = NORCE.Drilling.Cluster.Model.ClusterBatchExportRequest;
-using ClusterBatchRestoreRequestModel = NORCE.Drilling.Cluster.Model.ClusterBatchRestoreRequest;
+using OSDC.Drilling.Cluster.Service.Controllers;
+using OSDC.Drilling.Cluster.Service.Managers;
+using OSDC.Drilling.Cluster.Service;
+using ClusterModel = OSDC.Drilling.Cluster.Model.Cluster;
+using ClusterFeatureCategoryModel = OSDC.Drilling.Cluster.Model.ClusterFeatureCategory;
+using ClusterIdentityModel = OSDC.Drilling.Cluster.Model.ClusterIdentity;
+using SlotFeatureCategoryModel = OSDC.Drilling.Cluster.Model.SlotFeatureCategory;
+using ClusterBatchExportRequestModel = OSDC.Drilling.Cluster.Model.ClusterBatchExportRequest;
+using ClusterBatchRestoreRequestModel = OSDC.Drilling.Cluster.Model.ClusterBatchRestoreRequest;
 
-namespace NORCE.Drilling.Cluster.Service.Mcp.Tools;
+namespace OSDC.Drilling.Cluster.Service.Mcp.Tools;
 
 public static class ClusterRestMcpToolRegistrations
 {
@@ -38,7 +38,7 @@ public static class ClusterRestMcpToolRegistrations
             McpToolArgumentHelpers.CreateClusterBatchExportSchema(),
             McpToolArgumentHelpers.CreateClusterBatchExportOutputSchema(),
             new McpToolBehavior("Export Clusters with Dependencies", true, false, true, true),
-            (sp, args, ct) => InvokeWithBodyResultAsync<ClusterBatchExportRequestModel, NORCE.Drilling.Cluster.Model.ClusterBatchExportDocument>(
+            (sp, args, ct) => InvokeWithBodyResultAsync<ClusterBatchExportRequestModel, OSDC.Drilling.Cluster.Model.ClusterBatchExportDocument>(
                 args, "request", ct, (request, token) => ClusterController(sp).BatchExportClusters(request, token)));
 
         services.AddLegacyMcpTool(
@@ -47,7 +47,7 @@ public static class ClusterRestMcpToolRegistrations
             McpToolArgumentHelpers.CreateClusterBatchRestoreSchema(),
             McpToolArgumentHelpers.CreateClusterBatchRestoreOutputSchema(),
             new McpToolBehavior("Restore Clusters and Reconnect References", false, true, false, true),
-            (sp, args, ct) => InvokeWithBodyResultAsync<ClusterBatchRestoreRequestModel, NORCE.Drilling.Cluster.Model.ClusterBatchRestoreResponse>(
+            (sp, args, ct) => InvokeWithBodyResultAsync<ClusterBatchRestoreRequestModel, OSDC.Drilling.Cluster.Model.ClusterBatchRestoreResponse>(
                 args, "request", ct, (request, token) => ClusterController(sp).BatchRestoreClusters(request, token)));
     }
 

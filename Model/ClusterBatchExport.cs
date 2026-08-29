@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NORCE.Drilling.Cluster.Model;
+namespace OSDC.Drilling.Cluster.Model;
 
 public enum ClusterBatchExportScope
 {

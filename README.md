@@ -2,6 +2,8 @@
 
 A complete, domain-focused solution for managing Cluster data, composed of an ASP.NET Core microservice (Service), a Blazor Server frontend (WebApp), shared model/code-generation utilities (ModelSharedOut), and domain models (Model). The solution exposes a REST API with an OpenAPI definition and provides a UI for CRUD operations on Cluster entities, cluster identities, cluster feature categories, and slot feature categories.
 
+The repository uses the root namespace `OSDC.Drilling.Cluster`. Its reusable Razor package is `OSDC.Drilling.Cluster.WebPages`; Docker and Helm artifacts use the `osdcdrillingcluster...` identity. Existing `/Cluster` routes, database files, and domain UUIDs are unchanged. Follow [deployment/identity-cutover.md](deployment/identity-cutover.md) before replacing an existing `NORCE.Drilling.Cluster` deployment.
+
 ## Projects
 - Service: ASP.NET Core Web API at base path `/Cluster/api`; persists data in SQLite, serves Swagger UI, exposes MCP tools, and can register its MCP endpoint on an MCP hub. See `Service/README.md`.
 - WebApp: Blazor Server UI at base path `/Cluster/webapp`; consumes the Service via generated clients. See `WebApp/README.md`.
@@ -70,11 +72,11 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 
 ## Docker (Optional)
 - Build images from repo root:
-  - Service: `docker build -t norcedrillingclusterservice -f Service/Dockerfile .`
-  - WebApp: `docker build -t norcedrillingclusterwebappclient -f WebApp/Dockerfile .`
+  - Service: `docker build -t osdcdrillingclusterservice -f Service/Dockerfile .`
+  - WebApp: `docker build -t osdcdrillingclusterwebappclient -f WebApp/Dockerfile .`
 - Run locally:
-  - Service: `docker run --rm -p 5001:8080 -v %CD%/home:/home norcedrillingclusterservice` (PowerShell)
-  - WebApp: `docker run --rm -p 5011:8080 -e ASPNETCORE_URLS=http://+:8080 -e ClusterHostURL=https://host.docker.internal:5001/ norcedrillingclusterwebappclient`
+  - Service: `docker run --rm -p 5001:8080 -v %CD%/home:/home osdcdrillingclusterservice` (PowerShell)
+  - WebApp: `docker run --rm -p 5011:8080 -e ASPNETCORE_URLS=http://+:8080 -e ClusterHostURL=https://host.docker.internal:5001/ osdcdrillingclusterwebappclient`
 
 ## Dependencies
 - Runtime packages (high level):

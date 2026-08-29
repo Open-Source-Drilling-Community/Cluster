@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>OSDC.Drilling.Cluster.WebApp</RootNamespace>
     <UserSecretsId>89364871-a9ad-4f1c-b2ab-83cee18de1c9</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>

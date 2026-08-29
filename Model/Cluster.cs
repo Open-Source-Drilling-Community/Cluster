@@ -1,4 +1,4 @@
-﻿using DWIS.API.DTO;
+using DWIS.API.DTO;
 using DWIS.Vocabulary.Schemas;
 using OSDC.DotnetLibraries.Drilling.DrillingProperties;
 using OSDC.DotnetLibraries.General.DataManagement;
@@ -8,7 +8,7 @@ using OSDC.UnitConversion.Conversion.DrillingEngineering;
 using System;
 using System.Collections.Generic;
 
-namespace NORCE.Drilling.Cluster.Model
+namespace OSDC.Drilling.Cluster.Model
 {
     public class Cluster
     {

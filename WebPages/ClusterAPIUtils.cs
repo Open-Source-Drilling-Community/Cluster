@@ -1,7 +1,7 @@
-using NORCE.Drilling.Cluster.ModelShared;
+using OSDC.Drilling.Cluster.ModelShared;
 using OSDC.DotnetLibraries.Drilling.WebAppUtils;
 
-namespace NORCE.Drilling.Cluster.WebPages;
+namespace OSDC.Drilling.Cluster.WebPages;
 
 public class ClusterAPIUtils : APIUtils, IClusterAPIUtils
 {

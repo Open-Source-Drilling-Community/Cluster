@@ -6,7 +6,7 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NORCE.Drilling.Cluster.Service.Mcp;
+namespace OSDC.Drilling.Cluster.Service.Mcp;
 
 public static class McpServiceCollectionExtensions
 {

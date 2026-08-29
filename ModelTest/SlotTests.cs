@@ -1,8 +1,8 @@
 using System;
 using NUnit.Framework;
-using NORCE.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Model;
 
-namespace NORCE.Drilling.Cluster.ModelTest
+namespace OSDC.Drilling.Cluster.ModelTest
 {
     [TestFixture]
     public class SlotTests

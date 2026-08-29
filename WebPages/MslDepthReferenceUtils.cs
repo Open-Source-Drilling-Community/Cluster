@@ -1,7 +1,7 @@
-using ModelShared = NORCE.Drilling.Cluster.ModelShared;
-using NORCE.Drilling.Cluster.ModelShared;
+using ModelShared = OSDC.Drilling.Cluster.ModelShared;
+using OSDC.Drilling.Cluster.ModelShared;
 
-namespace NORCE.Drilling.Cluster.WebPages;
+namespace OSDC.Drilling.Cluster.WebPages;
 
 public static class MslDepthReferenceUtils
 {

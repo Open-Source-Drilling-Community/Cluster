@@ -20,7 +20,7 @@
 #pragma warning disable 8625 // Disable "CS8625 Cannot convert null literal to non-nullable reference type"
 #pragma warning disable 8765 // Disable "CS8765 Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes)."
 
-namespace NORCE.Drilling.Cluster.ModelShared
+namespace OSDC.Drilling.Cluster.ModelShared
 {
     using System = global::System;
 
@@ -15017,6 +15017,117 @@ namespace NORCE.Drilling.Cluster.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class GaussianDrillingProperty
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("GaussianValue")]
+        public GaussianDistribution GaussianValue { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class MetaInfo
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid ID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("HttpHostName")]
+        public string HttpHostName { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("HttpHostBasePath")]
+        public string HttpHostBasePath { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("HttpEndPoint")]
+        public string HttpEndPoint { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Point3DGlobalCoordinates
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("X")]
+        public double? X { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Y")]
+        public double? Y { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Z")]
+        public double? Z { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RiemannianNorth")]
+        public double? RiemannianNorth { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RiemannianEast")]
+        public double? RiemannianEast { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Latitude")]
+        public double? Latitude { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Longitude")]
+        public double? Longitude { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("TVD")]
+        public double? TVD { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class GaussianDistribution
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("MinValue")]
+        public double MinValue { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaxValue")]
+        public double MaxValue { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Mean")]
+        public double? Mean { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("StandardDeviation")]
+        public double? StandardDeviation { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Cluster
     {
 
@@ -15889,117 +16000,6 @@ namespace NORCE.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("GetClusterUsageStatisticsPerDay")]
         public History GetClusterUsageStatisticsPerDay { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class GaussianDrillingProperty
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("GaussianValue")]
-        public GaussianDistribution GaussianValue { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class MetaInfo
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("ID")]
-        public System.Guid ID { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("HttpHostName")]
-        public string HttpHostName { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("HttpHostBasePath")]
-        public string HttpHostBasePath { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("HttpEndPoint")]
-        public string HttpEndPoint { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Point3DGlobalCoordinates
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("X")]
-        public double? X { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("Y")]
-        public double? Y { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("Z")]
-        public double? Z { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("RiemannianNorth")]
-        public double? RiemannianNorth { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("RiemannianEast")]
-        public double? RiemannianEast { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("Latitude")]
-        public double? Latitude { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("Longitude")]
-        public double? Longitude { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("TVD")]
-        public double? TVD { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class GaussianDistribution
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("MinValue")]
-        public double MinValue { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("MaxValue")]
-        public double MaxValue { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("Mean")]
-        public double? Mean { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("StandardDeviation")]
-        public double? StandardDeviation { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

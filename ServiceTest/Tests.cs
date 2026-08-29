@@ -1,5 +1,5 @@
 using System.Net.Http.Headers;
-using NORCE.Drilling.Cluster.ModelShared;
+using OSDC.Drilling.Cluster.ModelShared;
 
 namespace ServiceTest
 {

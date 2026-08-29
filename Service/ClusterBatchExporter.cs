@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NORCE.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Model;
 
-namespace NORCE.Drilling.Cluster.Service;
+namespace OSDC.Drilling.Cluster.Service;
 
 public enum ClusterBatchExportFailureKind { None, InvalidRequest, ClusterNotFound, StorageFailure }
 

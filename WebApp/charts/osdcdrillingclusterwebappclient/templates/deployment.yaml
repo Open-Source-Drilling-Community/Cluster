@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "norcedrillingclusterservice.fullname" . }}
+  name: {{ include "osdcdrillingclusterwebappclient.fullname" . }}
   labels:
-    {{- include "norcedrillingclusterservice.labels" . | nindent 4 }}
+    {{- include "osdcdrillingclusterwebappclient.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "norcedrillingclusterservice.selectorLabels" . | nindent 6 }}
+      {{- include "osdcdrillingclusterwebappclient.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "norcedrillingclusterservice.selectorLabels" . | nindent 8 }}
+        {{- include "osdcdrillingclusterwebappclient.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "norcedrillingclusterservice.serviceAccountName" . }}
+      serviceAccountName: {{ include "osdcdrillingclusterwebappclient.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -49,13 +49,6 @@ spec:
           {{- end}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-          - mountPath: /home/
-            name: clusterdb
-      volumes:
-      - name: clusterdb
-        persistentVolumeClaim:
-          claimName: cluster-claim
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

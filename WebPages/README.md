@@ -1,6 +1,6 @@
-# NORCE.Drilling.Cluster.WebPages
+# OSDC.Drilling.Cluster.WebPages
 
-`NORCE.Drilling.Cluster.WebPages` is a Razor class library that packages the cluster management pages, reference-aware editors, feature/identity administration pages, display pages, and plotting components required by the Cluster web application.
+`OSDC.Drilling.Cluster.WebPages` is a Razor class library that packages the cluster management pages, reference-aware editors, feature/identity administration pages, display pages, and plotting components required by the Cluster web application.
 
 ## Contents
 
@@ -97,7 +97,7 @@ Example routing:
 
 ```razor
 <Router AppAssembly="@typeof(App).Assembly"
-        AdditionalAssemblies="new[] { typeof(NORCE.Drilling.Cluster.WebPages.ClusterMain).Assembly }">
+        AdditionalAssemblies="new[] { typeof(OSDC.Drilling.Cluster.WebPages.ClusterMain).Assembly }">
 ```
 
 The Cluster web app registers the Field assembly and provides wrapper pages for EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, and EarthMagneticField components. This keeps all user-facing routes under `/Cluster/webapp`.

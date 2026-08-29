@@ -1,12 +1,12 @@
 using System.Net;
 using System.Text;
 using Microsoft.Extensions.Configuration;
-using NORCE.Drilling.Cluster.Model;
-using NORCE.Drilling.Cluster.Service;
+using OSDC.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Service;
 using OSDC.DotnetLibraries.General.DataManagement;
-using ClusterModel = NORCE.Drilling.Cluster.Model.Cluster;
+using ClusterModel = OSDC.Drilling.Cluster.Model.Cluster;
 
-namespace NORCE.Drilling.Cluster.ServiceTest;
+namespace OSDC.Drilling.Cluster.ServiceTest;
 
 [TestFixture]
 public sealed class ClusterExternalReferenceResolverTests

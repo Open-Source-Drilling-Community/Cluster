@@ -13,12 +13,12 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
-        repository: digiwells/norcedrillingclusterservice
+        repository: digiwells/osdcdrillingclusterservice
         readme-filepath: ./Service/README.md
     - name: Docker Hub Description for WebApp
       uses: peter-evans/dockerhub-description@v4
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
-        repository: digiwells/norcedrillingclusterwebappclient
+        repository: digiwells/osdcdrillingclusterwebappclient
         readme-filepath: ./WebApp/README.md

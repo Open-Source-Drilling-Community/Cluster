@@ -55,11 +55,13 @@ The WebApp project is a Blazor Server application that provides a user interface
 - Reference handling supports field, cluster, cartographic, geodetic, MSL, ground/mud line, and other configured reference sources through the shared unit/reference components.
 
 ## Docker
+
+The published image is `digiwells/osdcdrillingclusterwebappclient:stable`. The Helm chart is `WebApp/charts/osdcdrillingclusterwebappclient`, creates the internal resource name `osdcclusterwebappclient`, and calls the Cluster service at `http://osdcclusterservice/` in production.
 - Build (from repo root):
-  - `docker build -t norcedrillingclusterwebappclient -f WebApp/Dockerfile .`
+  - `docker build -t osdcdrillingclusterwebappclient -f WebApp/Dockerfile .`
 - Run:
-  - PowerShell: `docker run --rm -p 5011:8080 -e ASPNETCORE_URLS=http://+:8080 -e ClusterHostURL=https://host.docker.internal:5001/ norcedrillingclusterwebappclient`
-  - Bash: `docker run --rm -p 5011:8080 -e ASPNETCORE_URLS=http://+:8080 -e ClusterHostURL=https://host.docker.internal:5001/ norcedrillingclusterwebappclient`
+  - PowerShell: `docker run --rm -p 5011:8080 -e ASPNETCORE_URLS=http://+:8080 -e ClusterHostURL=https://host.docker.internal:5001/ osdcdrillingclusterwebappclient`
+  - Bash: `docker run --rm -p 5011:8080 -e ASPNETCORE_URLS=http://+:8080 -e ClusterHostURL=https://host.docker.internal:5001/ osdcdrillingclusterwebappclient`
 - Access UI: `http://localhost:5011/Cluster/webapp/Cluster`
 
 ## Dependencies
@@ -81,7 +83,7 @@ The WebApp project is a Blazor Server application that provides a user interface
 - ModelSharedOut: generates `ClusterMergedModel.cs` and merged OpenAPI used by WebApp for strongly-typed calls and by the Service for Swagger UI.
 - ServiceTest: shares the same generated models for end-to-end and integration tests.
 - External Razor pages: `WebApp/ExternalRazorAssemblies.cs` registers the Field page assembly. Local wrapper pages host the EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, and EarthMagneticField components under the Cluster web app path base; service registration is centralized in `WebApp/ExternalWebPagesServiceCollectionExtensions.cs`.
-- Helm chart: `WebApp/charts/norcedrillingclusterwebappclient/values.yaml` configures ingress at `/Cluster/webapp` for various hosts.
+- Helm chart: `WebApp/charts/osdcdrillingclusterwebappclient/values.yaml` configures ingress at `/Cluster/webapp` for various hosts.
 
 ## Notes
 - Path base: The app is mounted at `/Cluster/webapp` (`UsePathBase` in `WebApp/Program.cs`). If reverse-proxying, ensure the ingress/path matches this setting.

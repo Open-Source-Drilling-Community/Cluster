@@ -1,6 +1,6 @@
 using OSDC.UnitConversion.DrillingRazorMudComponents;
 
-namespace NORCE.Drilling.Cluster.WebPages;
+namespace OSDC.Drilling.Cluster.WebPages;
 
 public static class DataUtils
 {
@@ -28,7 +28,7 @@ public static class DataUtils
         public static CartographicProjectionDatumGeodeticReferenceSource CartographicProjectionDatumGeodeticReferenceSource { get; set; } = new();
     }
 
-    public static void ApplyClusterReferenceValues(NORCE.Drilling.Cluster.ModelShared.Cluster? cluster)
+    public static void ApplyClusterReferenceValues(OSDC.Drilling.Cluster.ModelShared.Cluster? cluster)
     {
         UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = 0;
         UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = 0;
@@ -45,7 +45,7 @@ public static class DataUtils
         }
     }
 
-    public static void ApplyClusterReferenceValues(NORCE.Drilling.Cluster.ModelShared.ClusterLight? cluster)
+    public static void ApplyClusterReferenceValues(OSDC.Drilling.Cluster.ModelShared.ClusterLight? cluster)
     {
         UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = 0;
         UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = 0;

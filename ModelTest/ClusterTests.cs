@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using NORCE.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Model;
 
-namespace NORCE.Drilling.Cluster.ModelTest
+namespace OSDC.Drilling.Cluster.ModelTest
 {
     [TestFixture]
     public class ClusterTests
@@ -11,7 +11,7 @@ namespace NORCE.Drilling.Cluster.ModelTest
         [Test]
         public void Cluster_Defaults_AreNullOrFalse()
         {
-            var cluster = new NORCE.Drilling.Cluster.Model.Cluster();
+            var cluster = new OSDC.Drilling.Cluster.Model.Cluster();
 
             Assert.That(cluster.MetaInfo, Is.Null);
             Assert.That(cluster.Name, Is.Null);
@@ -32,7 +32,7 @@ namespace NORCE.Drilling.Cluster.ModelTest
         [Test]
         public void Cluster_SetBasicProperties_PersistsValues()
         {
-            var cluster = new NORCE.Drilling.Cluster.Model.Cluster();
+            var cluster = new OSDC.Drilling.Cluster.Model.Cluster();
             var now = DateTimeOffset.UtcNow;
             var id = Guid.NewGuid();
 
@@ -56,7 +56,7 @@ namespace NORCE.Drilling.Cluster.ModelTest
         [Test]
         public void Cluster_SlotsDictionary_AddAndRetrieve()
         {
-            var cluster = new NORCE.Drilling.Cluster.Model.Cluster
+            var cluster = new OSDC.Drilling.Cluster.Model.Cluster
             {
                 Slots = new Dictionary<Guid, Slot>()
             };

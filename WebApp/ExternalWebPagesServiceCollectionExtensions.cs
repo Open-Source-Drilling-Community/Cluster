@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NORCE.Drilling.Cluster.WebApp;
+namespace OSDC.Drilling.Cluster.WebApp;
 
 public static class ExternalWebPagesServiceCollectionExtensions
 {

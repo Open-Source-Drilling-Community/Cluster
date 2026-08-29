@@ -1,14 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-	<AssemblyName>NORCE.Drilling.Cluster.WebPages</AssemblyName>
-	<RootNamespace>NORCE.Drilling.Cluster.WebPages</RootNamespace>
-    <PackageId>NORCE.Drilling.Cluster.WebPages</PackageId>
-    <Title>NORCE.Drilling.Cluster.WebPages</Title>
+	<AssemblyName>OSDC.Drilling.Cluster.WebPages</AssemblyName>
+	<RootNamespace>OSDC.Drilling.Cluster.WebPages</RootNamespace>
+    <PackageId>OSDC.Drilling.Cluster.WebPages</PackageId>
+    <Title>OSDC.Drilling.Cluster.WebPages</Title>
     <Authors>Eric Cayeux</Authors>
     <Company>NORCE</Company>
     <Description>Reusable Razor class library containing the Cluster and statistics web pages. See the package README for setup, dependencies, and usage.</Description>

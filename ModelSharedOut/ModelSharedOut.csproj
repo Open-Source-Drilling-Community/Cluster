@@ -5,6 +5,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<RootNamespace>OSDC.Drilling.Cluster.ModelShared</RootNamespace>
 		<Authors>Energy Modelling and Automation group</Authors>
 		<Company>NORCE</Company>
 		<Title>Auto-generation of the API of the Cluster microservice (distributed shared model approach)</Title>

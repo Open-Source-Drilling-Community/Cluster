@@ -1,6 +1,6 @@
 using OSDC.DotnetLibraries.Drilling.WebAppUtils;
 
-namespace NORCE.Drilling.Cluster.WebPages;
+namespace OSDC.Drilling.Cluster.WebPages;
 
 public interface IClusterWebPagesConfiguration :
     IClusterHostURL,

@@ -1,6 +1,6 @@
 using OSDC.UnitConversion.DrillingRazorMudComponents;
 
-namespace NORCE.Drilling.Cluster.WebPages;
+namespace OSDC.Drilling.Cluster.WebPages;
 
 public class CartographicReference : ICartographicGridPositionReferenceSource
 {

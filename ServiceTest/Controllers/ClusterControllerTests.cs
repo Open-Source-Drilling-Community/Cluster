@@ -7,10 +7,10 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using NORCE.Drilling.Cluster.Service.Controllers;
-using NORCE.Drilling.Cluster.Service.Managers;
-using NORCE.Drilling.Cluster.Service;
-using NORCE.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Service.Controllers;
+using OSDC.Drilling.Cluster.Service.Managers;
+using OSDC.Drilling.Cluster.Service;
+using OSDC.Drilling.Cluster.Model;
 using System.Threading;
 using OSDC.DotnetLibraries.General.DataManagement;
 
@@ -57,9 +57,9 @@ namespace ServiceTest.Controllers
             manager.Clear();
         }
 
-        private static NORCE.Drilling.Cluster.Model.Cluster MakeCluster(Guid id)
+        private static OSDC.Drilling.Cluster.Model.Cluster MakeCluster(Guid id)
         {
-            return new NORCE.Drilling.Cluster.Model.Cluster
+            return new OSDC.Drilling.Cluster.Model.Cluster
             {
                 MetaInfo = new MetaInfo { ID = id },
                 Name = "Test Cluster",
@@ -92,7 +92,7 @@ namespace ServiceTest.Controllers
             Assert.That(getById.Result, Is.TypeOf<OkObjectResult>());
             var ok = (OkObjectResult)getById.Result!;
             Assert.That(ok.Value, Is.Not.Null);
-            var returned = ok.Value as NORCE.Drilling.Cluster.Model.Cluster;
+            var returned = ok.Value as OSDC.Drilling.Cluster.Model.Cluster;
             Assert.That(returned, Is.Not.Null);
             Assert.That(returned!.MetaInfo, Is.Not.Null);
             Assert.That(returned!.MetaInfo!.ID, Is.EqualTo(id));
@@ -120,10 +120,10 @@ namespace ServiceTest.Controllers
             var r1 = _controller!.PostCluster(null);
             Assert.That(r1, Is.TypeOf<BadRequestResult>());
 
-            var r2 = _controller!.PostCluster(new NORCE.Drilling.Cluster.Model.Cluster { MetaInfo = null });
+            var r2 = _controller!.PostCluster(new OSDC.Drilling.Cluster.Model.Cluster { MetaInfo = null });
             Assert.That(r2, Is.TypeOf<BadRequestResult>());
 
-            var r3 = _controller!.PostCluster(new NORCE.Drilling.Cluster.Model.Cluster { MetaInfo = new MetaInfo { ID = Guid.Empty } });
+            var r3 = _controller!.PostCluster(new OSDC.Drilling.Cluster.Model.Cluster { MetaInfo = new MetaInfo { ID = Guid.Empty } });
             Assert.That(r3, Is.TypeOf<BadRequestResult>());
         }
 
@@ -152,8 +152,8 @@ namespace ServiceTest.Controllers
             var res = _controller!.GetAllCluster();
             Assert.That(res.Result, Is.TypeOf<OkObjectResult>());
             var ok = (OkObjectResult)res.Result!;
-            Assert.That(ok.Value, Is.InstanceOf<IEnumerable<NORCE.Drilling.Cluster.Model.Cluster?>>());
-            var list = (IEnumerable<NORCE.Drilling.Cluster.Model.Cluster?>)ok.Value!;
+            Assert.That(ok.Value, Is.InstanceOf<IEnumerable<OSDC.Drilling.Cluster.Model.Cluster?>>());
+            var list = (IEnumerable<OSDC.Drilling.Cluster.Model.Cluster?>)ok.Value!;
             Assert.That(list, Is.Not.Null);
         }
 
@@ -172,8 +172,8 @@ namespace ServiceTest.Controllers
             var res = _controller!.GetAllClusterLight();
             Assert.That(res.Result, Is.TypeOf<OkObjectResult>());
             var ok = (OkObjectResult)res.Result!;
-            Assert.That(ok.Value, Is.InstanceOf<IEnumerable<NORCE.Drilling.Cluster.Model.ClusterLight>>());
-            var list = ((IEnumerable<NORCE.Drilling.Cluster.Model.ClusterLight>)ok.Value!).ToList();
+            Assert.That(ok.Value, Is.InstanceOf<IEnumerable<OSDC.Drilling.Cluster.Model.ClusterLight>>());
+            var list = ((IEnumerable<OSDC.Drilling.Cluster.Model.ClusterLight>)ok.Value!).ToList();
             Assert.That(list, Has.Count.EqualTo(1));
             Assert.That(list[0].MetaInfo?.ID, Is.EqualTo(id));
             Assert.That(list[0].Name, Is.EqualTo("Test Cluster"));

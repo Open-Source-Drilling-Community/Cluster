@@ -5,10 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Protocol;
-using NORCE.Drilling.Cluster.Service;
-using NORCE.Drilling.Cluster.Service.Managers;
-using NORCE.Drilling.Cluster.Service.Mcp;
-using NORCE.Drilling.Cluster.Service.Mcp.Tools;
+using OSDC.Drilling.Cluster.Service;
+using OSDC.Drilling.Cluster.Service.Managers;
+using OSDC.Drilling.Cluster.Service.Mcp;
+using OSDC.Drilling.Cluster.Service.Mcp.Tools;
 using System;
 using System.IO;
 
@@ -96,7 +96,7 @@ app.Use(async (context, next) =>
 });
 
 if (!String.IsNullOrEmpty(builder.Configuration["WellHostURL"]))
-    NORCE.Drilling.Cluster.Service.Configuration.WellHostURL = builder.Configuration["WellHostURL"];
+    OSDC.Drilling.Cluster.Service.Configuration.WellHostURL = builder.Configuration["WellHostURL"];
 
 if (builder.Environment.IsDevelopment())
 {

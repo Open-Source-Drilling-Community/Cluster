@@ -1,6 +1,6 @@
-namespace NORCE.Drilling.Cluster.WebPages;
+namespace OSDC.Drilling.Cluster.WebPages;
 
-using NORCE.Drilling.Cluster.ModelShared;
+using OSDC.Drilling.Cluster.ModelShared;
 using MathPoint3DGlobalCoordinates = OSDC.DotnetLibraries.General.Math.Point3DGlobalCoordinates;
 
 internal class SlotTemplate

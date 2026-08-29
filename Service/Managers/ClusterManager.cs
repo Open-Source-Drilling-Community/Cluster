@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using OSDC.DotnetLibraries.General.DataManagement;
@@ -7,10 +7,10 @@ using System.Text.Json;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Linq;
-using NORCE.Drilling.Cluster.Model;
-using NORCE.Drilling.Cluster.Service;
+using OSDC.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Service;
 
-namespace NORCE.Drilling.Cluster.Service.Managers
+namespace OSDC.Drilling.Cluster.Service.Managers
 {
     /// <summary>
     /// A manager for Cluster. The manager implements the singleton pattern as defined by 

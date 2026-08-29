@@ -6423,6 +6423,103 @@
   },
   "components": {
     "schemas": {
+      "GaussianDrillingProperty": {
+        "type": "object",
+        "properties": {
+          "GaussianValue": {
+            "$ref": "#/components/schemas/GaussianDistribution"
+          }
+        }
+      },
+      "MetaInfo": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "HttpHostName": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpHostBasePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpEndPoint": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Point3DGlobalCoordinates": {
+        "type": "object",
+        "properties": {
+          "X": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Y": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Z": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "RiemannianNorth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "RiemannianEast": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Latitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "TVD": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "GaussianDistribution": {
+        "type": "object",
+        "properties": {
+          "MinValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "MaxValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "Mean": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "StandardDeviation": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
       "Cluster": {
         "type": "object",
         "properties": {
@@ -7204,103 +7301,6 @@
           },
           "GetClusterUsageStatisticsPerDay": {
             "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "GaussianDrillingProperty": {
-        "type": "object",
-        "properties": {
-          "GaussianValue": {
-            "$ref": "#/components/schemas/GaussianDistribution"
-          }
-        }
-      },
-      "MetaInfo": {
-        "type": "object",
-        "properties": {
-          "ID": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "HttpHostName": {
-            "type": "string",
-            "nullable": true
-          },
-          "HttpHostBasePath": {
-            "type": "string",
-            "nullable": true
-          },
-          "HttpEndPoint": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "Point3DGlobalCoordinates": {
-        "type": "object",
-        "properties": {
-          "X": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Y": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Z": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "RiemannianNorth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "RiemannianEast": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "TVD": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "GaussianDistribution": {
-        "type": "object",
-        "properties": {
-          "MinValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "MaxValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "Mean": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "StandardDeviation": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
           }
         }
       },

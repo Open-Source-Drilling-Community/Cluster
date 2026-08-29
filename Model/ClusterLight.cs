@@ -3,7 +3,7 @@ using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.DotnetLibraries.General.Math;
 using System;
 
-namespace NORCE.Drilling.Cluster.Model
+namespace OSDC.Drilling.Cluster.Model
 {
     /// <summary>
     /// Light weight version of a Cluster.

@@ -73,7 +73,7 @@
             <ErrorList Values="_validationErrors" />
             @if (_validationErrors.Count == 0)
             {
-                <MudDataGrid T="NORCE.Drilling.Cluster.ModelShared.Cluster" Items="@_document.Clusters"
+                <MudDataGrid T="OSDC.Drilling.Cluster.ModelShared.Cluster" Items="@_document.Clusters"
                              QuickFilter="@RestoreFilter" Hover="true" ReadOnly="true" Elevation="0" Class="mt-3">
                     <ToolBarContent><MudText Typo="Typo.h6">Backup contents</MudText><MudSpacer />
                         <MudTextField @bind-Value="_restoreSearch" Placeholder="Search" Adornment="Adornment.Start"
@@ -83,7 +83,7 @@
                         <PropertyColumn Property="value => value.Description" Title="Description" Sortable="true" />
                         <TemplateColumn Title="UUID"><CellTemplate>@(context.Item.MetaInfo?.ID.ToString() ?? "—")</CellTemplate></TemplateColumn>
                     </Columns>
-                    <PagerContent><MudDataGridPager T="NORCE.Drilling.Cluster.ModelShared.Cluster" /></PagerContent>
+                    <PagerContent><MudDataGridPager T="OSDC.Drilling.Cluster.ModelShared.Cluster" /></PagerContent>
                 </MudDataGrid>
 
                 <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">Local identities and feature definitions</MudText>
@@ -161,7 +161,7 @@
             _busy = true; _backupErrors.Clear();
             ClusterBatchExportDocument document = await Api.ClientCluster.BatchExportClustersAsync(new ClusterBatchExportRequest { Scope = scope, ClusterIDs = ids });
             string json = System.Text.Json.JsonSerializer.Serialize(document, JsonOptions(true));
-            _downloadModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/NORCE.Drilling.Cluster.WebPages/clusterBatchBackup.js?v=20260828");
+            _downloadModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/OSDC.Drilling.Cluster.WebPages/clusterBatchBackup.js?v=20260828");
             await _downloadModule.InvokeVoidAsync("downloadJson", $"cluster-backup-{DateTime.UtcNow:yyyyMMddTHHmmssZ}.json", json);
             Snackbar.Add($"Backed up {document.Clusters?.Count ?? 0} cluster(s).", Severity.Success);
         }
@@ -250,7 +250,7 @@
     }
 
     private Func<ClusterLight, bool> ClusterFilter => value => string.IsNullOrWhiteSpace(_search) || $"{value.Name} {value.Description} {value.MetaInfo?.ID}".Contains(_search, StringComparison.OrdinalIgnoreCase);
-    private Func<NORCE.Drilling.Cluster.ModelShared.Cluster, bool> RestoreFilter => value => string.IsNullOrWhiteSpace(_restoreSearch) || $"{value.Name} {value.Description} {value.MetaInfo?.ID}".Contains(_restoreSearch, StringComparison.OrdinalIgnoreCase);
+    private Func<OSDC.Drilling.Cluster.ModelShared.Cluster, bool> RestoreFilter => value => string.IsNullOrWhiteSpace(_restoreSearch) || $"{value.Name} {value.Description} {value.MetaInfo?.ID}".Contains(_restoreSearch, StringComparison.OrdinalIgnoreCase);
 
     public async ValueTask DisposeAsync()
     { if (_downloadModule != null) try { await _downloadModule.DisposeAsync(); } catch (JSDisconnectedException) { } }

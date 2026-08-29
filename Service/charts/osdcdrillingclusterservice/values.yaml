@@ -1,15 +1,18 @@
-# Default values for norcedrillingclusterwebappclient.
+# Default values for osdcdrillingclusterservice.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 replicaCount: 1
+strategy:
+  # The service uses one SQLite database on the persistent volume. Do not overlap writers.
+  type: Recreate
 image:
-  repository: digiwells/norcedrillingclusterwebappclient
+  repository: docker.io/digiwells/osdcdrillingclusterservice
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "stable"
 imagePullSecrets: []
-nameOverride: "norcedrillingclusterwebappclient"
-fullnameOverride: "norcedrillingclusterwebappclient"
+nameOverride: "osdcdrillingclusterservice"
+fullnameOverride: "osdcclusterservice"
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -32,31 +35,30 @@ service:
   type: ClusterIP
   port: 80
   annotations:
-    description: "A webapp client for handling cluster"
+    description: "A microservice for handling cluster"
 ingress:
   enabled: true
   className: public
   annotations:
-    # nginx-ingress: Enable regex path matching for case-insensitive routing
-    # This allows /SurveyInstrument/webapp to match the same route as /surveyinstrument/webapp
+    # Enable regex path matching for case-insensitive Cluster routes.
     nginx.ingress.kubernetes.io/use-regex: "true"
   hosts:
     - host: localhost
       paths:
-        # Regex pattern matches /surveyinstrument/webapp or /SurveyInstrument/webapp, etc.
-        - path: /(?i)cluster/webapp
+        # Matches /cluster/api, /Cluster/api, and other casing variants.
+        - path: /(?i)cluster/api
           pathType: ImplementationSpecific
     - host: dev.digiwells.no
       paths:
-        - path: /(?i)cluster/webapp
+        - path: /(?i)cluster/api
           pathType: ImplementationSpecific
     - host: app.digiwells.no
       paths:
-        - path: /(?i)cluster/webapp
+        - path: /(?i)cluster/api
           pathType: ImplementationSpecific
     - host: awe.web.intra.norceresearch.no
       paths:
-        - path: /(?i)cluster/webapp
+        - path: /(?i)cluster/api
           pathType: ImplementationSpecific
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -80,3 +82,11 @@ tolerations: []
 affinity: {}
 probes:
   enabled: false
+persistence:
+  enabled: true
+  # Set this to cluster-claim when adopting the existing database PVC during identity cutover.
+  existingClaim: ""
+  claimName: cluster-claim
+  accessModes:
+    - ReadWriteMany
+  size: 500Mi

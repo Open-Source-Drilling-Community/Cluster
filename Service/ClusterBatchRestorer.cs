@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
-using NORCE.Drilling.Cluster.Model;
-using NORCE.Drilling.Cluster.Service.Managers;
+using OSDC.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Service.Managers;
 using OSDC.DotnetLibraries.General.DataManagement;
 
-namespace NORCE.Drilling.Cluster.Service;
+namespace OSDC.Drilling.Cluster.Service;
 
 public enum ClusterBatchRestoreFailureKind { None, InvalidRequest, Conflict, StorageFailure }
 

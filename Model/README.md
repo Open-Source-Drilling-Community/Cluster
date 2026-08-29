@@ -2,7 +2,7 @@
 
 The Model project provides the domain types used by the Cluster microservice and clients. It contains the core data structures representing a Cluster and related concepts that are exchanged via the REST API, persisted in storage, and used across the solution.
 
-- Namespace: `NORCE.Drilling.Cluster.Model`
+- Namespace: `OSDC.Drilling.Cluster.Model`
 - Target framework: `net8.0`
 
 ## Purpose
@@ -30,7 +30,7 @@ Basic construction and JSON serialization:
 ```csharp
 using System;
 using System.Text.Json;
-using NORCE.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Model;
 using OSDC.DotnetLibraries.General.DataManagement; // for MetaInfo
 
 var id = Guid.NewGuid();
@@ -69,7 +69,7 @@ var json = JsonSerializer.Serialize(cluster);
 Working with endpoint usage stats (optional telemetry):
 
 ```csharp
-using NORCE.Drilling.Cluster.Model;
+using OSDC.Drilling.Cluster.Model;
 
 // Increment counters as API calls are served
 UsageStatisticsCluster.Instance.IncrementGetAllClusterIdPerDay();

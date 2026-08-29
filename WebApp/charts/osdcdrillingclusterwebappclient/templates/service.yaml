@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "norcedrillingclusterservice.fullname" . }}
+  name: {{ include "osdcdrillingclusterwebappclient.fullname" . }}
   labels:
-    {{- include "norcedrillingclusterservice.labels" . | nindent 4 }}  {{- with .Values.service.annotations }}
+    {{- include "osdcdrillingclusterwebappclient.labels" . | nindent 4 }}  {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -15,5 +15,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "norcedrillingclusterservice.selectorLabels" . | nindent 4 }}
+    {{- include "osdcdrillingclusterwebappclient.selectorLabels" . | nindent 4 }}
 

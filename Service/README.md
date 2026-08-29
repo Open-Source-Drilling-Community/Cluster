@@ -140,11 +140,13 @@ Note: The data model in `Model` defines richer, domain-specific fields (e.g., re
 - Identity and feature definition tables store complete JSON serializations of their model instances, matching the cluster persistence pattern.
 
 ## Docker
+
+The published image is `digiwells/osdcdrillingclusterservice:stable`. The Helm chart is `Service/charts/osdcdrillingclusterservice` and creates the internal service name `osdcclusterservice`. Existing installations must adopt `cluster-claim` through `persistence.existingClaim`; follow `deployment/identity-cutover.md` so the original Helm release cannot delete the PVC.
 - Build (from repo root):
-  - `docker build -t norcedrillingclusterservice -f Service/Dockerfile .`
+  - `docker build -t osdcdrillingclusterservice -f Service/Dockerfile .`
 - Run:
-  - `docker run --rm -p 5001:8080 -v %CD%/home:/home norcedrillingclusterservice` (Windows PowerShell)
-  - `docker run --rm -p 5001:8080 -v $(pwd)/home:/home norcedrillingclusterservice` (bash)
+  - `docker run --rm -p 5001:8080 -v %CD%/home:/home osdcdrillingclusterservice` (Windows PowerShell)
+  - `docker run --rm -p 5001:8080 -v $(pwd)/home:/home osdcdrillingclusterservice` (bash)
 - Access: `https://localhost:5001/Cluster/api/swagger` (container listens on 8080; mapped to 5001 above)
 
 ## Dependencies
@@ -165,4 +167,4 @@ Note: The data model in `Model` defines richer, domain-specific fields (e.g., re
 
 ## Source & Credits
 - Generated from NORCE Drilling and Wells .NET template (see Templates repo and wiki for details).
-- Container image name: `norcedrillingclusterservice` (see Digiwells org on Docker Hub).
+- Container image name: `osdcdrillingclusterservice` (see Digiwells org on Docker Hub).

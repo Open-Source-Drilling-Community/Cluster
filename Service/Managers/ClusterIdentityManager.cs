@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace NORCE.Drilling.Cluster.Service.Managers
+namespace OSDC.Drilling.Cluster.Service.Managers
 {
     public class ClusterIdentityManager
     {
