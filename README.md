@@ -83,7 +83,7 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 - Runtime packages (high level):
   - Service: `Microsoft.Data.Sqlite`, `Swashbuckle.AspNetCore.*`, `Microsoft.OpenApi*`.
   - Model: `OSDC.DotnetLibraries.*` (Common, DataManagement, Statistics, DrillingProperties).
-  - WebApp: `MudBlazor`, `OSDC.DotnetLibraries.General.DataManagement`, the current `OSDC.Drilling.Field.WebPages` package, and reusable EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, and EarthMagneticField web page packages.
+  - WebApp: `MudBlazor`, `OSDC.DotnetLibraries.General.DataManagement`, the current `OSDC.Drilling.Field.WebPages` and `OSDC.Drilling.Rig.WebPages` packages, and reusable EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, and EarthMagneticField web page packages.
   - ModelSharedOut: `Microsoft.OpenApi.Readers`, `NSwag.CodeGeneration.CSharp`.
 - Project references:
   - Service → Model
@@ -108,4 +108,4 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 
 ## Current WebApp dependencies
 
-The Cluster WebApp consumes `OSDC.Drilling.Field.WebPages` 2.0.0, `OSDC.Drilling.EarthCartographicProjection.WebPages` 1.1.0, `OSDC.Drilling.EarthGeodesy.WebPages` 1.1.0, `OSDC.Drilling.EarthVerticalDatum.WebPages` 1.1.0, `OSDC.Drilling.EarthGravity.WebPages` 1.0.1, and `OSDC.Drilling.EarthMagneticField.WebPages` 1.0.1. The Earth contextual and calculator pages are hosted through local route wrappers so their routes remain under `/Cluster/webapp`.
+The Cluster WebApp consumes `OSDC.Drilling.Field.WebPages` 2.0.0, `OSDC.Drilling.Rig.WebPages` 1.1.0, `OSDC.Drilling.EarthCartographicProjection.WebPages` 1.1.0, `OSDC.Drilling.EarthGeodesy.WebPages` 1.1.0, `OSDC.Drilling.EarthVerticalDatum.WebPages` 1.1.0, `OSDC.Drilling.EarthGravity.WebPages` 1.0.1, and `OSDC.Drilling.EarthMagneticField.WebPages` 1.0.1. Field and Rig pages are hosted directly from their reusable Razor assemblies; Earth contextual and calculator pages use local route wrappers so all routes remain under `/Cluster/webapp`.

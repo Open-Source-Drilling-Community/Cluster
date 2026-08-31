@@ -8,5 +8,6 @@ public static class ExternalRazorAssemblies
     [
         typeof(OSDC.Drilling.Cluster.WebPages.ClusterMain).Assembly,
         typeof(OSDC.Drilling.Field.WebPages.Field).Assembly,
+        typeof(OSDC.Drilling.Rig.WebPages.Pages.RigMain).Assembly,
     ];
 }

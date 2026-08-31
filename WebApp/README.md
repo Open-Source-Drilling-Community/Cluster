@@ -38,6 +38,7 @@ The WebApp project is a Blazor Server application that provides a user interface
 
 ## Usage
 - Main page: Cluster list with search, selection, add, and delete actions.
+- Contextual Rig page: `/Cluster/webapp/Rig` hosts the `OSDC.Drilling.Rig.WebPages` catalog and editor against the configured Rig service.
 - Detail page: edit cluster metadata, field association, reference coordinates, identities, features, environment depths, slots, and slot features.
 - Admin pages: manage cluster identities, cluster feature categories/options, and slot feature categories/options.
 - Backup and restore: `/Cluster/webapp/ClusterBackupRestore` exports multiple clusters with their referenced local definitions and reconnects Field/Rig references during atomic restore.
@@ -72,6 +73,7 @@ The published image is `digiwells/osdcdrillingclusterwebappclient:stable`. The H
   - `OSDC.UnitConversion.DrillingRazorMudComponents` — UI components for unit systems (brings MudBlazor transitively).
   - `Plotly.Blazor` — charting components.
   - `OSDC.Drilling.Field.WebPages` — field pages, including the cartographic conversion calculator.
+  - `OSDC.Drilling.Rig.WebPages` — the rig catalog and detailed rig editor.
   - `OSDC.Drilling.EarthCartographicProjection.WebPages` — projection-definition pages.
   - `OSDC.Drilling.EarthGeodesy.WebPages` — geodetic-datum and spheroid pages.
   - `OSDC.Drilling.EarthVerticalDatum.WebPages`, `OSDC.Drilling.EarthGravity.WebPages`, and `OSDC.Drilling.EarthMagneticField.WebPages` — synchronous calculator pages.
@@ -82,7 +84,7 @@ The published image is `digiwells/osdcdrillingclusterwebappclient:stable`. The H
 - Service: backend API provider; configure `ClusterHostURL` to point to it. The Service publishes Swagger UI at `/Cluster/api/swagger` and serves the merged schema consumed by clients.
 - ModelSharedOut: generates `ClusterMergedModel.cs` and merged OpenAPI used by WebApp for strongly-typed calls and by the Service for Swagger UI.
 - ServiceTest: shares the same generated models for end-to-end and integration tests.
-- External Razor pages: `WebApp/ExternalRazorAssemblies.cs` registers the Field page assembly. Local wrapper pages host the EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, and EarthMagneticField components under the Cluster web app path base; service registration is centralized in `WebApp/ExternalWebPagesServiceCollectionExtensions.cs`.
+- External Razor pages: `WebApp/ExternalRazorAssemblies.cs` registers the Field and Rig page assemblies. Local wrapper pages host the EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, and EarthMagneticField components under the Cluster web app path base; service registration is centralized in `WebApp/ExternalWebPagesServiceCollectionExtensions.cs`.
 - Helm chart: `WebApp/charts/osdcdrillingclusterwebappclient/values.yaml` configures ingress at `/Cluster/webapp` for various hosts.
 
 ## Notes

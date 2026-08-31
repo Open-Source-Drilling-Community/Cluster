@@ -10,6 +10,12 @@ public static class ExternalWebPagesServiceCollectionExtensions
         services.AddSingleton<
             OSDC.Drilling.Field.WebPages.IFieldAPIUtils,
             OSDC.Drilling.Field.WebPages.FieldAPIUtils>();
+        services.AddSingleton<OSDC.Drilling.Rig.WebPages.IRigWebPagesConfiguration>(configuration);
+        services.AddSingleton<
+            OSDC.Drilling.Rig.WebPages.IRigAPIUtils,
+            OSDC.Drilling.Rig.WebPages.RigAPIUtils>();
+        services.AddScoped<OSDC.Drilling.Rig.WebPages.Shared.RigApiClient>();
+        services.AddScoped<OSDC.Drilling.Rig.WebPages.Shared.FieldClusterApiClient>();
         services.AddSingleton<
             OSDC.Drilling.EarthCartographicProjection.WebPages.IEarthCartographicProjectionConfiguration>(configuration);
         services.AddSingleton<

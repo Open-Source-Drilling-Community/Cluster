@@ -6617,6 +6617,36 @@ namespace OSDC.Drilling.Cluster.ModelShared
                             return;
                         }
                         else
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigMutationErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigMutationErrorEnvelope>("Bad Request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 409)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigMutationErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigMutationErrorEnvelope>("Conflict", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 502)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigMutationErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigMutationErrorEnvelope>("Bad Gateway", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
                         {
                             var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
@@ -6710,7 +6740,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Rig> GetRigByIdAsync(System.Guid id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<RigReadResponse> GetRigByIdAsync(System.Guid id, bool? includePhotos = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -6729,6 +6759,97 @@ namespace OSDC.Drilling.Cluster.ModelShared
                     // Operation Path: "Rig/{id}"
                     urlBuilder_.Append("Rig/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append('?');
+                    if (includePhotos != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("includePhotos")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includePhotos, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigReadResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Rig> PutRigByIdAsync(System.Guid id, System.DateTimeOffset expectedModifiedUtc, Rig body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            if (expectedModifiedUtc == null)
+                throw new System.ArgumentNullException("expectedModifiedUtc");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Rig/{id}"
+                    urlBuilder_.Append("Rig/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append('?');
+                    urlBuilder_.Append(System.Uri.EscapeDataString("expectedModifiedUtc")).Append('=').Append(System.Uri.EscapeDataString(expectedModifiedUtc.ToString("O", System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    urlBuilder_.Length--;
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -6763,77 +6884,54 @@ namespace OSDC.Drilling.Cluster.ModelShared
                             return objectResponse_.Object;
                         }
                         else
+                        if (status_ == 400)
                         {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                            var objectResponse_ = await ReadObjectResponseAsync<RigMutationErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigMutationErrorEnvelope>("Bad Request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PutRigByIdAsync(System.Guid id, Rig body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("PUT");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "Rig/{id}"
-                    urlBuilder_.Append("Rig/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
+                        else
+                        if (status_ == 404)
                         {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
+                            var objectResponse_ = await ReadObjectResponseAsync<RigMutationErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigMutationErrorEnvelope>("Not Found", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
+                        else
+                        if (status_ == 409)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<RigMutationErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigMutationErrorEnvelope>("Conflict", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 500)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigMutationErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigMutationErrorEnvelope>("Internal Server Error", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 502)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigMutationErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigMutationErrorEnvelope>("Bad Gateway", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -6998,7 +7096,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Rig>> GetAllRigAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RigReadResponse>> GetAllRigAsync(bool? includePhotos = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -7013,6 +7111,12 @@ namespace OSDC.Drilling.Cluster.ModelShared
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
                     // Operation Path: "Rig/HeavyData"
                     urlBuilder_.Append("Rig/HeavyData");
+                    urlBuilder_.Append('?');
+                    if (includePhotos != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("includePhotos")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includePhotos, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -7039,12 +7143,1211 @@ namespace OSDC.Drilling.Cluster.ModelShared
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<Rig>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<RigReadResponse>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RigBatchExportDocument> BatchExportRigsAsync(RigBatchExportRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Rig/BatchExport"
+                    urlBuilder_.Append("Rig/BatchExport");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigBatchExportDocument>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigBatchErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigBatchErrorEnvelope>("Bad Request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigBatchErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigBatchErrorEnvelope>("Not Found", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 409)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigBatchErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigBatchErrorEnvelope>("Conflict", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 502)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigBatchErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigBatchErrorEnvelope>("Bad Gateway", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RigBatchRestoreResponse> BatchRestoreRigsAsync(RigBatchRestoreRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Rig/BatchRestore"
+                    urlBuilder_.Append("Rig/BatchRestore");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigBatchRestoreResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigBatchErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigBatchErrorEnvelope>("Bad Request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 409)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigBatchErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigBatchErrorEnvelope>("Conflict", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 502)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigBatchErrorEnvelope>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<RigBatchErrorEnvelope>("Bad Gateway", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<System.Guid>> GetAllRigFeatureCategoryIdAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "RigFeatureCategory"
+                    urlBuilder_.Append("RigFeatureCategory");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<System.Guid>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RigFeatureCategory> PostRigFeatureCategoryAsync(RigFeatureCategory body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "RigFeatureCategory"
+                    urlBuilder_.Append("RigFeatureCategory");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigFeatureCategory>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<MetaInfo>> GetAllRigFeatureCategoryMetaInfoAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "RigFeatureCategory/MetaInfo"
+                    urlBuilder_.Append("RigFeatureCategory/MetaInfo");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<MetaInfo>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RigFeatureCategory>> GetAllRigFeatureCategoryAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "RigFeatureCategory/HeavyData"
+                    urlBuilder_.Append("RigFeatureCategory/HeavyData");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<RigFeatureCategory>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RigFeatureCategory> GetRigFeatureCategoryByIdAsync(System.Guid id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "RigFeatureCategory/{id}"
+                    urlBuilder_.Append("RigFeatureCategory/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigFeatureCategory>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RigFeatureCategory> PutRigFeatureCategoryByIdAsync(System.Guid id, System.DateTimeOffset? expectedModifiedUtc = null, RigFeatureCategory body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "RigFeatureCategory/{id}"
+                    urlBuilder_.Append("RigFeatureCategory/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append('?');
+                    if (expectedModifiedUtc != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("expectedModifiedUtc")).Append('=').Append(System.Uri.EscapeDataString(expectedModifiedUtc.Value.ToString("O", System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigFeatureCategory>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task DeleteRigFeatureCategoryByIdAsync(System.Guid id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "RigFeatureCategory/{id}"
+                    urlBuilder_.Append("RigFeatureCategory/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<RigPhotoMetadata>> PhotosAllAsync(System.Guid rigId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (rigId == null)
+                throw new System.ArgumentNullException("rigId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Rig/{rigId}/Photos"
+                    urlBuilder_.Append("Rig/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(rigId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Photos");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<RigPhotoMetadata>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RigPhotoMetadata> PhotosPOSTAsync(System.Guid rigId, FileParameter file = null, string title = null, string caption = null, string alternativeText = null, int? displayOrder = null, bool? isPrimary = null, string source = null, string attribution = null, string license = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (rigId == null)
+                throw new System.ArgumentNullException("rigId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var boundary_ = System.Guid.NewGuid().ToString();
+                    var content_ = new System.Net.Http.MultipartFormDataContent(boundary_);
+                    content_.Headers.Remove("Content-Type");
+                    content_.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary_);
+
+                    if (file == null)
+                        throw new System.ArgumentNullException("file");
+                    else
+                    {
+                        var content_file_ = new System.Net.Http.StreamContent(file.Data);
+                        if (!string.IsNullOrEmpty(file.ContentType))
+                            content_file_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(file.ContentType);
+                        content_.Add(content_file_, "file", file.FileName ?? "file");
+                    }
+
+                    if (title == null)
+                        throw new System.ArgumentNullException("title");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(title, System.Globalization.CultureInfo.InvariantCulture)), "title");
+                    }
+
+                    if (caption == null)
+                        throw new System.ArgumentNullException("caption");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(caption, System.Globalization.CultureInfo.InvariantCulture)), "caption");
+                    }
+
+                    if (alternativeText == null)
+                        throw new System.ArgumentNullException("alternativeText");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(alternativeText, System.Globalization.CultureInfo.InvariantCulture)), "alternativeText");
+                    }
+
+                    if (displayOrder == null)
+                        throw new System.ArgumentNullException("displayOrder");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(displayOrder, System.Globalization.CultureInfo.InvariantCulture)), "displayOrder");
+                    }
+
+                    if (isPrimary == null)
+                        throw new System.ArgumentNullException("isPrimary");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(isPrimary, System.Globalization.CultureInfo.InvariantCulture)), "isPrimary");
+                    }
+
+                    if (source == null)
+                        throw new System.ArgumentNullException("source");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(source, System.Globalization.CultureInfo.InvariantCulture)), "source");
+                    }
+
+                    if (attribution == null)
+                        throw new System.ArgumentNullException("attribution");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(attribution, System.Globalization.CultureInfo.InvariantCulture)), "attribution");
+                    }
+
+                    if (license == null)
+                        throw new System.ArgumentNullException("license");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(license, System.Globalization.CultureInfo.InvariantCulture)), "license");
+                    }
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Rig/{rigId}/Photos"
+                    urlBuilder_.Append("Rig/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(rigId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Photos");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigPhotoMetadata>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task ContentAsync(System.Guid rigId, System.Guid photoId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (rigId == null)
+                throw new System.ArgumentNullException("rigId");
+
+            if (photoId == null)
+                throw new System.ArgumentNullException("photoId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Rig/{rigId}/Photos/{photoId}/Content"
+                    urlBuilder_.Append("Rig/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(rigId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Photos/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(photoId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Content");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RigPhotoMetadata> PhotosPUTAsync(System.Guid rigId, System.Guid photoId, System.DateTimeOffset? expectedModifiedUtc = null, RigPhotoMetadata body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (rigId == null)
+                throw new System.ArgumentNullException("rigId");
+
+            if (photoId == null)
+                throw new System.ArgumentNullException("photoId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Rig/{rigId}/Photos/{photoId}"
+                    urlBuilder_.Append("Rig/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(rigId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Photos/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(photoId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append('?');
+                    if (expectedModifiedUtc != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("expectedModifiedUtc")).Append('=').Append(System.Uri.EscapeDataString(expectedModifiedUtc.Value.ToString("O", System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RigPhotoMetadata>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task PhotosDELETEAsync(System.Guid rigId, System.Guid photoId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (rigId == null)
+                throw new System.ArgumentNullException("rigId");
+
+            if (photoId == null)
+                throw new System.ArgumentNullException("photoId");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "Rig/{rigId}/Photos/{photoId}"
+                    urlBuilder_.Append("Rig/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(rigId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/Photos/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(photoId, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
                         }
                         else
                         {
@@ -15030,7 +16333,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
                     var field = System.Reflection.IntrospectionExtensions.GetTypeInfo(value.GetType()).GetDeclaredField(name);
                     if (field != null)
                     {
-                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute)) 
+                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute))
                             as System.Runtime.Serialization.EnumMemberAttribute;
                         if (attribute != null)
                         {
@@ -15042,7 +16345,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
                     return converted == null ? string.Empty : converted;
                 }
             }
-            else if (value is bool) 
+            else if (value is bool)
             {
                 return System.Convert.ToString((bool)value, cultureInfo).ToLowerInvariant();
             }
@@ -17754,6 +19057,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class Accumulator
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -17772,9 +19078,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("AccumulatorClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public AccumulatorClass AccumulatorClass { get; set; }
+        public AccumulatorClass? AccumulatorClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Capacity")]
         public double? Capacity { get; set; }
@@ -17821,6 +19146,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class AutoDriller
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -17839,9 +19167,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("ControlMode")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public AutodrillerControlMode ControlMode { get; set; }
+        public AutodrillerControlMode? ControlMode { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitRop")]
         public double? MaxLimitRop { get; set; }
@@ -17866,18 +19213,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("MinLimitTrq")]
         public double? MinLimitTrq { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SetpointWob")]
-        public double? SetpointWob { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SetpointRop")]
-        public double? SetpointRop { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SetpointDiffp")]
-        public double? SetpointDiffp { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SetpointTrq")]
-        public double? SetpointTrq { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -17915,6 +19250,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class AuxSolidsControl
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -17933,21 +19271,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("SolidsControlClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public SolidsControlClass SolidsControlClass { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("DesanderOn")]
-        public bool? DesanderOn { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("DesilterOn")]
-        public bool? DesilterOn { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("DegasserOn")]
-        public bool? DegasserOn { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CentrifugeOn")]
-        public bool? CentrifugeOn { get; set; }
+        public SolidsControlClass? SolidsControlClass { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -18017,7 +19362,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("BopLinesClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public BopLineClass BopLinesClass { get; set; }
+        public BopLineClass? BopLinesClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("LineOd")]
         public double? LineOd { get; set; }
@@ -18043,6 +19388,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class BopStack
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18061,16 +19409,35 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("BopStackClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public BopStackClass BopStackClass { get; set; }
+        public BopStackClass? BopStackClass { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("UnitReferenceList")]
-        public string UnitReferenceList { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("UnitReferences")]
+        public System.Collections.Generic.ICollection<string> UnitReferences { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("BopControlType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ControllerType BopControlType { get; set; }
+        public ControllerType? BopControlType { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("BoreDiameter")]
         public double? BoreDiameter { get; set; }
@@ -18101,18 +19468,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("BopLineMaxLimitOperatingPressure")]
         public double? BopLineMaxLimitOperatingPressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CasingPressure")]
-        public double? CasingPressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("KillLinePressure")]
-        public double? KillLinePressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ChokeLinePressure")]
-        public double? ChokeLinePressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ShutInDrillpipePressure")]
-        public double? ShutInDrillpipePressure { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -18149,7 +19504,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("BopStackComponentClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public BopComponentClass BopStackComponentClass { get; set; }
+        public BopComponentClass? BopStackComponentClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("BoreDiameter")]
         public double? BoreDiameter { get; set; }
@@ -18187,6 +19542,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class CasingDriveSystem
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18205,9 +19563,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("CsgDrvClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public CasingDriveClass CsgDrvClass { get; set; }
+        public CasingDriveClass? CsgDrvClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("HoistingCapacity")]
         public double? HoistingCapacity { get; set; }
@@ -18251,6 +19628,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class CasingRunningTool
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18271,6 +19651,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CasingTongs
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -18293,6 +19676,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class CatWalk
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18314,6 +19700,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class CementPump
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18332,9 +19721,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("PumpClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public PumpClass PumpClass { get; set; }
+        public PumpClass? PumpClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("PlungerDiameter")]
         public double? PlungerDiameter { get; set; }
@@ -18390,6 +19798,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class CementUnit
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18408,12 +19819,31 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Mounting")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public MountingType Mounting { get; set; }
+        public MountingType? Mounting { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("Features")]
-        public string Features { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("Capabilities")]
+        public System.Collections.Generic.ICollection<string> Capabilities { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("NumberOfPumps")]
         public int? NumberOfPumps { get; set; }
@@ -18432,6 +19862,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Centrifuge
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -18487,6 +19920,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class ChokeManifold
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18505,9 +19941,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("ChokeControlClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ControlClass ChokeControlClass { get; set; }
+        public ControlClass? ChokeControlClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitDesignPressure")]
         public double? MaxLimitDesignPressure { get; set; }
@@ -18557,6 +20012,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class CoilDriveSystem
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18575,18 +20033,34 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("CoilDrvClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public MountingType CoilDrvClass { get; set; }
+        public MountingType? CoilDrvClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ReelPayloadCapacity")]
         public double? ReelPayloadCapacity { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ReelPayloadLength")]
         public double? ReelPayloadLength { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ReelRemainingLength")]
-        public double? ReelRemainingLength { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("InjectorHeadRadius")]
         public double? InjectorHeadRadius { get; set; }
@@ -18609,33 +20083,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("InjHeadMaxSpeed")]
         public double? InjHeadMaxSpeed { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("CtLoad")]
-        public double? CtLoad { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CtWeightOnBit")]
-        public double? CtWeightOnBit { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CtCoilSpeed")]
-        public double? CtCoilSpeed { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CtCircPressure")]
-        public double? CtCircPressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CtWellheadPressure")]
-        public double? CtWellheadPressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CtEngineSpeed")]
-        public double? CtEngineSpeed { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CtInjHeadDrivePressure")]
-        public double? CtInjHeadDrivePressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CtInjTubingReelDrivePress")]
-        public double? CtInjTubingReelDrivePress { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CtChainTension")]
-        public double? CtChainTension { get; set; }
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -18648,20 +20095,11 @@ namespace OSDC.Drilling.Cluster.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum CompensatorStatus
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Active")]
-        Active = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Inactive")]
-        Inactive = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ContinuousCirculationDevice
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -18681,9 +20119,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("CcdControlClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ControlClass CcdControlClass { get; set; }
+        public ControlClass? CcdControlClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("WorkingPumpPressure")]
         public double? WorkingPumpPressure { get; set; }
@@ -18763,6 +20220,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class CrownBlock
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18780,6 +20240,25 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("SheaveDiameter")]
         public double? SheaveDiameter { get; set; }
@@ -18799,9 +20278,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitCompensatorStroke")]
         public double? MaxLimitCompensatorStroke { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("Hookload")]
-        public double? Hookload { get; set; }
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -18816,6 +20292,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class CuttingsDryer
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -18838,6 +20317,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class CuttingsTransportSystem
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18858,6 +20340,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Degasser
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -18880,6 +20365,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class Derrick
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18898,9 +20386,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("DerrickClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public DerrickClass DerrickClass { get; set; }
+        public DerrickClass? DerrickClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Height")]
         public double? Height { get; set; }
@@ -18947,6 +20454,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class Desander
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -18967,6 +20477,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Desilter
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -18989,6 +20502,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class Drawworks
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -19007,9 +20523,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("DrawworksClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public DrawworksClass DrawworksClass { get; set; }
+        public DrawworksClass? DrawworksClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitDesignLoad")]
         public double? MaxLimitDesignLoad { get; set; }
@@ -19062,6 +20597,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class DrillLine
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -19079,6 +20617,25 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Number")]
         public int? Number { get; set; }
@@ -19095,9 +20652,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitOperatingBreakingLoad")]
         public double? MaxLimitOperatingBreakingLoad { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("Hookload")]
-        public double? Hookload { get; set; }
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -19112,6 +20666,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class DrillingChokeManifold
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -19131,9 +20688,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("ManifoldType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ManifoldClass ManifoldType { get; set; }
+        public ManifoldClass? ManifoldType { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("TrimSize")]
         public double? TrimSize { get; set; }
@@ -19151,21 +20727,21 @@ namespace OSDC.Drilling.Cluster.ModelShared
         public bool? JunkBasket { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ChokeCount")]
-        public string ChokeCount { get; set; }
+        public int? ChokeCount { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("FlowMeterCount")]
-        public string FlowMeterCount { get; set; }
+        public int? FlowMeterCount { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("PressureSensorVotingNumber")]
-        public string PressureSensorVotingNumber { get; set; }
+        public int? PressureSensorVotingNumber { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ChokeNumber")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ChokeNumber ChokeNumber { get; set; }
+        public ChokeNumber? ChokeNumber { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ChokeFunction")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ChokeFunction ChokeFunction { get; set; }
+        public ChokeFunction? ChokeFunction { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ChokeCvCurves")]
         public System.Collections.Generic.ICollection<ChokeCvCurvePoint> ChokeCvCurves { get; set; }
@@ -19193,51 +20769,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitFlowrate")]
         public double? MaxLimitFlowrate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("PressureBeforeChoke")]
-        public double? PressureBeforeChoke { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("PressureAfterChoke")]
-        public double? PressureAfterChoke { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CvValue")]
-        public double? CvValue { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CloggingOccuring")]
-        public double? CloggingOccuring { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("TemperatureBeforeChoke")]
-        public double? TemperatureBeforeChoke { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("TemperatureAfterChoke")]
-        public double? TemperatureAfterChoke { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("FlowThroughChoke")]
-        public double? FlowThroughChoke { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("MudDensityOut")]
-        public double? MudDensityOut { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("MudDensityIn")]
-        public double? MudDensityIn { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ReliefValvePressure")]
-        public double? ReliefValvePressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("PressureBeforeFlowMeter")]
-        public double? PressureBeforeFlowMeter { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("PressureAfterFlowMeter")]
-        public double? PressureAfterFlowMeter { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("InletPressure")]
-        public double? InletPressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("OutletPressure")]
-        public double? OutletPressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("VotingSensorsFailed")]
-        public int? VotingSensorsFailed { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -19395,6 +20926,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class DrillingFluidTypeDescriptor
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -19403,11 +20937,11 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("DrillingFluidClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public DrillingFluidClass DrillingFluidClass { get; set; }
+        public DrillingFluidClass? DrillingFluidClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("DrillingFluidType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public DrillingFluidType DrillingFluidType { get; set; }
+        public DrillingFluidType? DrillingFluidType { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -19423,6 +20957,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class DrillingMarineRiser
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -19442,9 +20979,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("RiserClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public RiserClass RiserClass { get; set; }
+        public RiserClass? RiserClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("JointWeight")]
         public double? JointWeight { get; set; }
@@ -19503,6 +21059,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class DrillstringHeaveCompensator
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -19521,16 +21080,31 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("HeaveCompClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public HeaveCompensatorClass HeaveCompClass { get; set; }
+        public HeaveCompensatorClass? HeaveCompClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("CompensatorCapacity")]
         public double? CompensatorCapacity { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CompensatorStatus")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public CompensatorStatus CompensatorStatus { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitCompensatorStroke")]
         public double? MaxLimitCompensatorStroke { get; set; }
@@ -19550,6 +21124,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class DriveMode
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -19568,9 +21145,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("DriveModeClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public DriveModeClass DriveModeClass { get; set; }
+        public DriveModeClass? DriveModeClass { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -19605,6 +21201,24 @@ namespace OSDC.Drilling.Cluster.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum DynamicPositioningClass
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"None")]
+        None = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DP1")]
+        DP1 = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DP2")]
+        DP2 = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DP3")]
+        DP3 = 3,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public enum EngineModelType
     {
 
@@ -19617,8 +21231,105 @@ namespace OSDC.Drilling.Cluster.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum EquipmentLifecycleStatus
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unknown")]
+        Unknown = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Planned")]
+        Planned = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Installed")]
+        Installed = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"InService")]
+        InService = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Suspended")]
+        Suspended = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"UnderMaintenance")]
+        UnderMaintenance = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Retired")]
+        Retired = 6,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class EquipmentMeasurementCapability
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCode")]
+        public string MeasurementCode { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("PhysicalQuantity")]
+        public string PhysicalQuantity { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SourceKind")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public MeasurementSourceKind? SourceKind { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SourceType")]
+        public string SourceType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SourceComponentID")]
+        public System.Guid? SourceComponentID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Manufacturer")]
+        public string Manufacturer { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Model")]
+        public string Model { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ProductCode")]
+        public string ProductCode { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
+        public string SerialNumber { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MinimumValue")]
+        public double? MinimumValue { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumValue")]
+        public double? MaximumValue { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AbsoluteAccuracy")]
+        public double? AbsoluteAccuracy { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RelativeAccuracy")]
+        public double? RelativeAccuracy { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("UpdateFrequency")]
+        public double? UpdateFrequency { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class FloatValve
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -19638,9 +21349,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("FloatValveClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public FloatValveClass FloatValveClass { get; set; }
+        public FloatValveClass? FloatValveClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Diameter")]
         public double? Diameter { get; set; }
@@ -19687,6 +21417,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class FlowRoutingManifold
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -19705,9 +21438,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("ManifoldType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ManifoldClass ManifoldType { get; set; }
+        public ManifoldClass? ManifoldType { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("FlangeSize")]
         public double? FlangeSize { get; set; }
@@ -19723,7 +21475,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("ManifoldFlowPath")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ManifoldFlowPath ManifoldFlowPath { get; set; }
+        public ManifoldFlowPath? ManifoldFlowPath { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ManifoldFlowcurves")]
         public System.Collections.Generic.ICollection<RoutingManifoldCurvePoint> ManifoldFlowcurves { get; set; }
@@ -19743,24 +21495,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitFlowrate")]
         public double? MaxLimitFlowrate { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("InletPressure")]
-        public double? InletPressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("OutletPressure")]
-        public double? OutletPressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ReliefValvePressure")]
-        public double? ReliefValvePressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CloggingOccuring")]
-        public double? CloggingOccuring { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("TemperatureInlet")]
-        public double? TemperatureInlet { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("TemperatureOutlet")]
-        public double? TemperatureOutlet { get; set; }
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -19775,6 +21509,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class FlowSensor
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -19794,18 +21531,31 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("FlowTransducer")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public FlowSensorType FlowTransducer { get; set; }
+        public FlowSensorType? FlowTransducer { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("FlowOutOfBorehole")]
         public bool? FlowOutOfBorehole { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("MudFlowrateOut")]
-        public double? MudFlowrateOut { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("MudFlowrateIn")]
-        public double? MudFlowrateIn { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -19837,6 +21587,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class Generator
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -19855,9 +21608,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("GeneratorClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public GeneratorClass GeneratorClass { get; set; }
+        public GeneratorClass? GeneratorClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Speed")]
         public double? Speed { get; set; }
@@ -19873,11 +21645,11 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("SpeedMode")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public SpeedMode SpeedMode { get; set; }
+        public SpeedMode? SpeedMode { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("EngineModel")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public EngineModelType EngineModel { get; set; }
+        public EngineModelType? EngineModel { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("PowerplantGeneratorNumber")]
         public int? PowerplantGeneratorNumber { get; set; }
@@ -19893,11 +21665,11 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("CoolingMedium")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public GeneratorCooling CoolingMedium { get; set; }
+        public GeneratorCooling? CoolingMedium { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Phases")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public GeneratorPhases Phases { get; set; }
+        public GeneratorPhases? Phases { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitPower")]
         public double? MaxLimitPower { get; set; }
@@ -19922,39 +21694,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("MinLimitFrequency")]
         public double? MinLimitFrequency { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("EnginePower")]
-        public double? EnginePower { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("GeneratorPower")]
-        public double? GeneratorPower { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("EngineFuelConsumption")]
-        public double? EngineFuelConsumption { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("EngineSpecificFuelConsumption")]
-        public double? EngineSpecificFuelConsumption { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("RunningHours")]
-        public double? RunningHours { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("EngineSpeed")]
-        public double? EngineSpeed { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("GeneratorVoltage")]
-        public double? GeneratorVoltage { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("GridVoltage")]
-        public double? GridVoltage { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("GridFrequency")]
-        public double? GridFrequency { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("GeneratorFrequency")]
-        public double? GeneratorFrequency { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("EngineTemperature")]
-        public double? EngineTemperature { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -20058,6 +21797,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class HoistingSystem
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -20066,7 +21808,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("HoistingSystemType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public HoistingSystemType HoistingSystemType { get; set; }
+        public HoistingSystemType? HoistingSystemType { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Drawworks")]
         public Drawworks Drawworks { get; set; }
@@ -20110,6 +21852,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class IronRoughneck
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -20128,8 +21873,47 @@ namespace OSDC.Drilling.Cluster.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class JackUpProfile
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("LegLength")]
+        public double? LegLength { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LongitudinalLegSpacing")]
+        public double? LongitudinalLegSpacing { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("TransverseLegSpacing")]
+        public double? TransverseLegSpacing { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumCantileverSkidOut")]
+        public double? MaximumCantileverSkidOut { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumCantileverTransverseReach")]
+        public double? MaximumCantileverTransverseReach { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SubstructureTravel")]
+        public double? SubstructureTravel { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumPreload")]
+        public double? MaximumPreload { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Kelly
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -20149,9 +21933,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("KellyClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public KellyClass KellyClass { get; set; }
+        public KellyClass? KellyClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("KellyJointLength")]
         public double? KellyJointLength { get; set; }
@@ -20170,15 +21973,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitTorque")]
         public double? MaxLimitTorque { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceRotation")]
-        public double? SurfaceRotation { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceTorque")]
-        public double? SurfaceTorque { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("KellyHeight")]
-        public double? KellyHeight { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -20252,6 +22046,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class MarineMpdEquipment
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -20270,9 +22067,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("MarineMpdClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public MarineMpdClass MarineMpdClass { get; set; }
+        public MarineMpdClass? MarineMpdClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Length")]
         public double? Length { get; set; }
@@ -20285,7 +22101,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("ControlMeans")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ControllerType ControlMeans { get; set; }
+        public ControllerType? ControlMeans { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ContainsFlowSpool")]
         public bool? ContainsFlowSpool { get; set; }
@@ -20317,8 +22133,59 @@ namespace OSDC.Drilling.Cluster.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class MarineUnitProfile
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("HullLength")]
+        public double? HullLength { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("HullWidth")]
+        public double? HullWidth { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("HullDepth")]
+        public double? HullDepth { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("OperatingDraft")]
+        public double? OperatingDraft { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("TransitDraft")]
+        public double? TransitDraft { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("OperatingDisplacement")]
+        public double? OperatingDisplacement { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("VariableDeckLoad")]
+        public double? VariableDeckLoad { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumTransitSpeed")]
+        public double? MaximumTransitSpeed { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AccommodationCapacity")]
+        public int? AccommodationCapacity { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("HelideckCapability")]
+        public string HelideckCapability { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CraneCount")]
+        public int? CraneCount { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class MeasurementAfm
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -20338,32 +22205,27 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("UpdateRate")]
         public double? UpdateRate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("Active")]
-        public bool? Active { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("AfmMudDensity")]
-        public double? AfmMudDensity { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("AfmMudTemperature")]
-        public double? AfmMudTemperature { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("AfmPv")]
-        public double? AfmPv { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("AfmYp")]
-        public double? AfmYp { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("AfmRheometerMeasurements")]
-        public System.Collections.Generic.ICollection<RheometerAfmMeasurement> AfmRheometerMeasurements { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("RtViscConsistencyIndex")]
-        public double? RtViscConsistencyIndex { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("RtViscFlowBehaviorIndex")]
-        public double? RtViscFlowBehaviorIndex { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -20373,6 +22235,24 @@ namespace OSDC.Drilling.Cluster.ModelShared
             get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
             set { _additionalProperties = value; }
         }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum MeasurementSourceKind
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Sensor")]
+        Sensor = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Calculated")]
+        Calculated = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Manual")]
+        Manual = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Other")]
+        Other = 3,
 
     }
 
@@ -20401,6 +22281,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class MpdControlDevice
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -20419,9 +22302,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("MpdControlDeviceClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public MpdControlDeviceClass MpdControlDeviceClass { get; set; }
+        public MpdControlDeviceClass? MpdControlDeviceClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("NominalSize")]
         public double? NominalSize { get; set; }
@@ -20474,6 +22376,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class MpdController
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -20492,9 +22397,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("MpdGradientMode")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public MpdGradientMode MpdGradientMode { get; set; }
+        public MpdGradientMode? MpdGradientMode { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("PrimaryChokeTrim")]
         public double? PrimaryChokeTrim { get; set; }
@@ -20507,21 +22431,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("MinLimitMudPumpFlowrate")]
         public double? MinLimitMudPumpFlowrate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ManipulatedMpdChoke")]
-        public double? ManipulatedMpdChoke { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ManipulatedLiftPumpRate")]
-        public double? ManipulatedLiftPumpRate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ControlledDownholePressure")]
-        public double? ControlledDownholePressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("BackpressureFlowrate")]
-        public double? BackpressureFlowrate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("AnnulusRefillFlowrate")]
-        public double? AnnulusRefillFlowrate { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -20556,6 +22465,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class MudGasSeparator
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -20577,6 +22489,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class MudPump
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -20595,13 +22510,32 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Type")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
         public MudPumpType Type { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("PumpClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public PumpClass PumpClass { get; set; }
+        public PumpClass? PumpClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("PumpAction")]
         public int? PumpAction { get; set; }
@@ -20609,14 +22543,11 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("PumpEfficiency")]
         public double? PumpEfficiency { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("PumpDisplacement")]
-        public double? PumpDisplacement { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("LinerId")]
-        public double? LinerId { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("Stroke")]
         public double? Stroke { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LinerConfigurations")]
+        public System.Collections.Generic.ICollection<MudPumpLinerConfiguration> LinerConfigurations { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("PulsationDamperPressure")]
         public double? PulsationDamperPressure { get; set; }
@@ -20627,23 +22558,38 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitDesignPressure")]
         public double? MaxLimitDesignPressure { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("MaxLimitOperatingPressure")]
-        public double? MaxLimitOperatingPressure { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitOperatingPower")]
         public double? MaxLimitOperatingPower { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("MaxLimitOperatingFlowRate")]
-        public double? MaxLimitOperatingFlowRate { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitOperatingSpeed")]
         public double? MaxLimitOperatingSpeed { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("MudPumpStrokeRate")]
-        public double? MudPumpStrokeRate { get; set; }
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
-        [System.Text.Json.Serialization.JsonPropertyName("MudPumpFlowRate")]
-        public double? MudPumpFlowRate { get; set; }
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class MudPumpLinerConfiguration
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("LinerInnerDiameter")]
+        public double? LinerInnerDiameter { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DisplacementPerStroke")]
+        public double? DisplacementPerStroke { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumVolumetricFlowRate")]
+        public double? MaximumVolumetricFlowRate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumDischargePressure")]
+        public double? MaximumDischargePressure { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -20672,6 +22618,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class MudTank
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -20690,13 +22639,32 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("TankClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public TankClass TankClass { get; set; }
+        public TankClass? TankClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("TankFluidType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public TankFluidType TankFluidType { get; set; }
+        public TankFluidType? TankFluidType { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitOperatingVolume")]
         public double? MaxLimitOperatingVolume { get; set; }
@@ -20716,6 +22684,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class MultiPhaseSeparator
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -20734,9 +22705,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("SeparatorClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public SeparatorPhaseClass SeparatorClass { get; set; }
+        public SeparatorPhaseClass? SeparatorClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaximumOperatingPressure")]
         public double? MaximumOperatingPressure { get; set; }
@@ -20749,7 +22739,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("SeparatorMedium")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public SeparatorMedium SeparatorMedium { get; set; }
+        public SeparatorMedium? SeparatorMedium { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitDesignPressure")]
         public double? MaxLimitDesignPressure { get; set; }
@@ -20766,12 +22756,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("MinLimitOperatingTemperature")]
         public double? MinLimitOperatingTemperature { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("PressureSeparator")]
-        public double? PressureSeparator { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("TemperatureSeparator")]
-        public double? TemperatureSeparator { get; set; }
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -20786,6 +22770,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class PipeDeck
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -20807,6 +22794,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class PipeRack
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -20850,32 +22840,14 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class ReturnFlowLine
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Description")]
         public string Description { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class RheometerAfmMeasurement
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("AfmViscShearRate")]
-        public double? AfmViscShearRate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("AfmViscShearStress")]
-        public double? AfmViscShearStress { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -20906,6 +22878,39 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
         public System.DateTimeOffset? LastModificationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Identification")]
+        public RigIdentification Identification { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RigType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigType? RigType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("OperatingEnvironment")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigEnvironment? OperatingEnvironment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MobilityType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigMobilityType? MobilityType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("OperatingEnvelope")]
+        public RigOperatingEnvelope OperatingEnvelope { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MarineUnitProfile")]
+        public MarineUnitProfile MarineUnitProfile { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("JackUpProfile")]
+        public JackUpProfile JackUpProfile { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("StationKeepingSystem")]
+        public StationKeepingSystem StationKeepingSystem { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("StorageCapacities")]
+        public System.Collections.Generic.ICollection<RigStorageCapacity> StorageCapacities { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FeatureAssignments")]
+        public System.Collections.Generic.ICollection<RigFeatureAssignment> FeatureAssignments { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MudPumpList")]
         public System.Collections.Generic.ICollection<MudPump> MudPumpList { get; set; }
@@ -21039,14 +23044,587 @@ namespace OSDC.Drilling.Cluster.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchCatalogDependencies
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("FeatureCategories")]
+        public System.Collections.Generic.ICollection<RigFeatureCategory> FeatureCategories { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchCatalogMapping
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SourceID")]
+        public System.Guid SourceID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LocalID")]
+        public System.Guid LocalID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Resolution")]
+        public string Resolution { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RigBatchCatalogRestorePolicy
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unspecified")]
+        Unspecified = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"MapExisting")]
+        MapExisting = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"MapOrCreateMissing")]
+        MapOrCreateMissing = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchError
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("PositionIndex")]
+        public int? PositionIndex { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Property")]
+        public string Property { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Code")]
+        public string Code { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Message")]
+        public string Message { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchErrorEnvelope
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Error")]
+        public string Error { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Message")]
+        public string Message { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Errors")]
+        public System.Collections.Generic.ICollection<RigBatchError> Errors { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchExportDocument
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("FormatIdentifier")]
+        public string FormatIdentifier { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SchemaVersion")]
+        public int SchemaVersion { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ExportedAtUtc")]
+        public System.DateTimeOffset ExportedAtUtc { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CatalogDependencies")]
+        public RigBatchCatalogDependencies CatalogDependencies { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ExternalReferences")]
+        public RigBatchExternalReferences ExternalReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Rigs")]
+        public System.Collections.Generic.ICollection<Rig> Rigs { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Photos")]
+        public System.Collections.Generic.ICollection<RigBatchPhoto> Photos { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchExportRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Scope")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigBatchExportScope Scope { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RigIDs")]
+        public System.Collections.Generic.ICollection<System.Guid> RigIDs { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RigBatchExportScope
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unspecified")]
+        Unspecified = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"All")]
+        All = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Selected")]
+        Selected = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchExternalReference
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("SourceID")]
+        public System.Guid SourceID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Name")]
+        public string Name { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchExternalReferenceMapping
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Resource")]
+        public string Resource { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SourceID")]
+        public System.Guid SourceID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LocalID")]
+        public System.Guid LocalID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Resolution")]
+        public string Resolution { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchExternalReferences
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Clusters")]
+        public System.Collections.Generic.ICollection<RigBatchExternalReference> Clusters { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchPhoto
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Metadata")]
+        public RigPhotoMetadata Metadata { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ContentBase64")]
+        public string ContentBase64 { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RigBatchRestoreConflictPolicy
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unspecified")]
+        Unspecified = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"FailIfExists")]
+        FailIfExists = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ReplaceExisting")]
+        ReplaceExisting = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchRestoreRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ConflictPolicy")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigBatchRestoreConflictPolicy ConflictPolicy { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CatalogPolicy")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigBatchCatalogRestorePolicy CatalogPolicy { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Document")]
+        public RigBatchExportDocument Document { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigBatchRestoreResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("RestoredAtUtc")]
+        public System.DateTimeOffset RestoredAtUtc { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CreatedCount")]
+        public int CreatedCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ReplacedCount")]
+        public int ReplacedCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RestoredPhotoCount")]
+        public int RestoredPhotoCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CreatedCatalogDefinitionCount")]
+        public int CreatedCatalogDefinitionCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CreatedCatalogOptionCount")]
+        public int CreatedCatalogOptionCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CatalogMappings")]
+        public System.Collections.Generic.ICollection<RigBatchCatalogMapping> CatalogMappings { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ExternalReferenceMappings")]
+        public System.Collections.Generic.ICollection<RigBatchExternalReferenceMapping> ExternalReferenceMappings { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RigIDs")]
+        public System.Collections.Generic.ICollection<System.Guid> RigIDs { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class RigChoke
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Description")]
         public string Description { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RigEnvironment
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unknown")]
+        Unknown = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Onshore")]
+        Onshore = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Offshore")]
+        Offshore = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"InlandWater")]
+        InlandWater = 3,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigExternalIdentifier
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Authority")]
+        public string Authority { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Identifier")]
+        public string Identifier { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigFeatureAssignment
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid ID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FeatureCategoryID")]
+        public System.Guid FeatureCategoryID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FeatureOptionID")]
+        public System.Guid FeatureOptionID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FromDate")]
+        public System.DateTimeOffset? FromDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ToDate")]
+        public System.DateTimeOffset? ToDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Notes")]
+        public string Notes { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("EvidenceReference")]
+        public string EvidenceReference { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigFeatureCategory
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
+        public MetaInfo MetaInfo { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Code")]
+        public string Code { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("IsExclusive")]
+        public bool IsExclusive { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("HasValidityPeriod")]
+        public bool HasValidityPeriod { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("IsBuiltIn")]
+        public bool IsBuiltIn { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("IsDeprecated")]
+        public bool IsDeprecated { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Options")]
+        public System.Collections.Generic.ICollection<RigFeatureOption> Options { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
+        public System.DateTimeOffset? CreationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
+        public System.DateTimeOffset? LastModificationDate { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigFeatureOption
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid ID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Code")]
+        public string Code { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("IsBuiltIn")]
+        public bool IsBuiltIn { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("IsDeprecated")]
+        public bool IsDeprecated { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigIdentification
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Owner")]
+        public string Owner { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Operator")]
+        public string Operator { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ManufacturerOrShipyard")]
+        public string ManufacturerOrShipyard { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DesignName")]
+        public string DesignName { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("YearBuilt")]
+        public int? YearBuilt { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("YearEnteredService")]
+        public int? YearEnteredService { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Registration")]
+        public string Registration { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Flag")]
+        public string Flag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ClassificationSociety")]
+        public string ClassificationSociety { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ClassNotation")]
+        public string ClassNotation { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ApprovalsAndCertifications")]
+        public System.Collections.Generic.ICollection<string> ApprovalsAndCertifications { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FormerNames")]
+        public System.Collections.Generic.ICollection<string> FormerNames { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ExternalIdentifiers")]
+        public System.Collections.Generic.ICollection<RigExternalIdentifier> ExternalIdentifiers { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MajorModifications")]
+        public System.Collections.Generic.ICollection<RigModification> MajorModifications { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -21084,6 +23662,18 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("ClusterID")]
         public System.Guid? ClusterID { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("RigType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigType? RigType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("OperatingEnvironment")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigEnvironment? OperatingEnvironment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MobilityType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigMobilityType? MobilityType { get; set; }
+
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -21098,6 +23688,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class RigMast
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -21174,6 +23767,493 @@ namespace OSDC.Drilling.Cluster.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RigMobilityType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unknown")]
+        Unknown = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Fixed")]
+        Fixed = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Mobile")]
+        Mobile = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"SelfPropelled")]
+        SelfPropelled = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"NonSelfPropelled")]
+        NonSelfPropelled = 4,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigModification
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Date")]
+        public System.DateTimeOffset? Date { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Description")]
+        public string Description { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigMutationError
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Property")]
+        public string Property { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Code")]
+        public string Code { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Message")]
+        public string Message { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigMutationErrorEnvelope
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Error")]
+        public string Error { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Message")]
+        public string Message { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Errors")]
+        public System.Collections.Generic.ICollection<RigMutationError> Errors { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigOperatingEnvelope
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumDrillingDepth")]
+        public double? MaximumDrillingDepth { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumWaterDepth")]
+        public double? MaximumWaterDepth { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RatedHookLoad")]
+        public double? RatedHookLoad { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumSetbackLoad")]
+        public double? MaximumSetbackLoad { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumRotaryLoad")]
+        public double? MaximumRotaryLoad { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumMudSystemPressure")]
+        public double? MaximumMudSystemPressure { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MinimumAmbientTemperature")]
+        public double? MinimumAmbientTemperature { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumAmbientTemperature")]
+        public double? MaximumAmbientTemperature { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumOperatingWindSpeed")]
+        public double? MaximumOperatingWindSpeed { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumSurvivalWindSpeed")]
+        public double? MaximumSurvivalWindSpeed { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigPhotoMetadata
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
+        public MetaInfo MetaInfo { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RigID")]
+        public System.Guid RigID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FileName")]
+        public string FileName { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Title")]
+        public string Title { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Caption")]
+        public string Caption { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AlternativeText")]
+        public string AlternativeText { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ContentType")]
+        public string ContentType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ByteLength")]
+        public long ByteLength { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Sha256")]
+        public string Sha256 { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DisplayOrder")]
+        public int DisplayOrder { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("IsPrimary")]
+        public bool IsPrimary { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Source")]
+        public string Source { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Attribution")]
+        public string Attribution { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("License")]
+        public string License { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
+        public System.DateTimeOffset? CreationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
+        public System.DateTimeOffset? LastModificationDate { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigReadResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("MetaInfo")]
+        public MetaInfo MetaInfo { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Description")]
+        public string Description { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CreationDate")]
+        public System.DateTimeOffset? CreationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LastModificationDate")]
+        public System.DateTimeOffset? LastModificationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Identification")]
+        public RigIdentification Identification { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RigType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigType? RigType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("OperatingEnvironment")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigEnvironment? OperatingEnvironment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MobilityType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigMobilityType? MobilityType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("OperatingEnvelope")]
+        public RigOperatingEnvelope OperatingEnvelope { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MarineUnitProfile")]
+        public MarineUnitProfile MarineUnitProfile { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("JackUpProfile")]
+        public JackUpProfile JackUpProfile { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("StationKeepingSystem")]
+        public StationKeepingSystem StationKeepingSystem { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("StorageCapacities")]
+        public System.Collections.Generic.ICollection<RigStorageCapacity> StorageCapacities { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FeatureAssignments")]
+        public System.Collections.Generic.ICollection<RigFeatureAssignment> FeatureAssignments { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MudPumpList")]
+        public System.Collections.Generic.ICollection<MudPump> MudPumpList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CementPumpList")]
+        public System.Collections.Generic.ICollection<CementPump> CementPumpList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CementUnit")]
+        public CementUnit CementUnit { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DriveMode")]
+        public DriveMode DriveMode { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MainRigMast")]
+        public RigMast MainRigMast { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AuxiliaryRigMast")]
+        public RigMast AuxiliaryRigMast { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MudTankList")]
+        public System.Collections.Generic.ICollection<MudTank> MudTankList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("GeneratorList")]
+        public System.Collections.Generic.ICollection<Generator> GeneratorList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ShaleShakerList")]
+        public System.Collections.Generic.ICollection<ShaleShaker> ShaleShakerList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AuxSolidsControl")]
+        public AuxSolidsControl AuxSolidsControl { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DrillingFluidType")]
+        public DrillingFluidTypeDescriptor DrillingFluidType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FlowSensor")]
+        public FlowSensor FlowSensor { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementAfm")]
+        public MeasurementAfm MeasurementAfm { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ReturnFlowLine")]
+        public ReturnFlowLine ReturnFlowLine { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MudGasSeparatorList")]
+        public System.Collections.Generic.ICollection<MudGasSeparator> MudGasSeparatorList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DesanderList")]
+        public System.Collections.Generic.ICollection<Desander> DesanderList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DesilterList")]
+        public System.Collections.Generic.ICollection<Desilter> DesilterList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CentrifugeList")]
+        public System.Collections.Generic.ICollection<Centrifuge> CentrifugeList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DegasserList")]
+        public System.Collections.Generic.ICollection<Degasser> DegasserList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CuttingsTransportSystem")]
+        public CuttingsTransportSystem CuttingsTransportSystem { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CuttingsDryerList")]
+        public System.Collections.Generic.ICollection<CuttingsDryer> CuttingsDryerList { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("PipeDeck")]
+        public PipeDeck PipeDeck { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Accumulator")]
+        public Accumulator Accumulator { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("BopStack")]
+        public BopStack BopStack { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FloatValve")]
+        public FloatValve FloatValve { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AutoDriller")]
+        public AutoDriller AutoDriller { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MpdController")]
+        public MpdController MpdController { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MpdControlDevice")]
+        public MpdControlDevice MpdControlDevice { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ContinuousCirculationDevice")]
+        public ContinuousCirculationDevice ContinuousCirculationDevice { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DrillingChokeManifold")]
+        public DrillingChokeManifold DrillingChokeManifold { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("SurfaceMpdEquipment")]
+        public SurfaceMpdEquipment SurfaceMpdEquipment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MarineMpdEquipment")]
+        public MarineMpdEquipment MarineMpdEquipment { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MultiPhaseSeparator")]
+        public MultiPhaseSeparator MultiPhaseSeparator { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("FlowRoutingManifold")]
+        public FlowRoutingManifold FlowRoutingManifold { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DrillstringHeaveCompensator")]
+        public DrillstringHeaveCompensator DrillstringHeaveCompensator { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DrillingMarineRiser")]
+        public DrillingMarineRiser DrillingMarineRiser { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RiserHeaveCompensator")]
+        public RiserHeaveCompensator RiserHeaveCompensator { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DrillFloorElevation")]
+        public double? DrillFloorElevation { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("IsFixedPlatform")]
+        public bool IsFixedPlatform { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ClusterID")]
+        public System.Guid? ClusterID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Photos")]
+        public System.Collections.Generic.ICollection<RigPhotoMetadata> Photos { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigStorageCapacity
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("StorageType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public RigStorageType StorageType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("Name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumVolume")]
+        public double? MaximumVolume { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumMass")]
+        public double? MaximumMass { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RigStorageType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Other")]
+        Other = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DieselFuel")]
+        DieselFuel = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DrillWater")]
+        DrillWater = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"PotableWater")]
+        PotableWater = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ActiveDrillingFluid")]
+        ActiveDrillingFluid = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ReserveDrillingFluid")]
+        ReserveDrillingFluid = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BaseOil")]
+        BaseOil = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Brine")]
+        Brine = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BulkCement")]
+        BulkCement = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BulkBarite")]
+        BulkBarite = 9,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"BulkBentonite")]
+        BulkBentonite = 10,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Cuttings")]
+        Cuttings = 11,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum RigType
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unknown")]
+        Unknown = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"ConventionalLandRig")]
+        ConventionalLandRig = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"MobileLandRig")]
+        MobileLandRig = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"PlatformRig")]
+        PlatformRig = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"JackUp")]
+        JackUp = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Semisubmersible")]
+        Semisubmersible = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Drillship")]
+        Drillship = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"TenderAssistedRig")]
+        TenderAssistedRig = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DrillingBarge")]
+        DrillingBarge = 8,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public enum RiserClass
     {
 
@@ -21207,6 +24287,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class RiserHeaveCompensator
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -21225,16 +24308,31 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("RiserCompensatorClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public RiserCompensatorClass RiserCompensatorClass { get; set; }
+        public RiserCompensatorClass? RiserCompensatorClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("CompensatorCapacity")]
         public double? CompensatorCapacity { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("CompensatorStatus")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public CompensatorStatus CompensatorStatus { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitCompensatorStroke")]
         public double? MaxLimitCompensatorStroke { get; set; }
@@ -21253,6 +24351,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class RotaryHose
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -21275,6 +24376,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class RotaryTable
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -21293,16 +24397,35 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("RotaryTableType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public RotaryTableType RotaryTableType { get; set; }
+        public RotaryTableType? RotaryTableType { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("TableOpeningDiameter")]
         public double? TableOpeningDiameter { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("BushingType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public RotaryTableBushingType BushingType { get; set; }
+        public RotaryTableBushingType? BushingType { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("BushingSize")]
         public double? BushingSize { get; set; }
@@ -21472,6 +24595,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class ShaleShaker
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -21490,12 +24616,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("ShakerClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ShakerClass ShakerClass { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ActiveShakers")]
-        public string ActiveShakers { get; set; }
+        public ShakerClass? ShakerClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ShakerScreens")]
         public System.Collections.Generic.ICollection<ShakerScreenDefinition> ShakerScreens { get; set; }
@@ -21517,6 +24659,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Slips
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -21572,6 +24717,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class StandPipe
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -21599,6 +24747,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class StandPipeManifold
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -21617,12 +24768,31 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("PipeDiameter")]
         public double? PipeDiameter { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("StandpipeSpecLevel")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public StandpipeSpecLevel StandpipeSpecLevel { get; set; }
+        public StandpipeSpecLevel? StandpipeSpecLevel { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitDesignPressure")]
         public double? MaxLimitDesignPressure { get; set; }
@@ -21663,6 +24833,60 @@ namespace OSDC.Drilling.Cluster.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum StationKeepingMode
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Unknown")]
+        Unknown = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Fixed")]
+        Fixed = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"SelfElevating")]
+        SelfElevating = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Moored")]
+        Moored = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DynamicPositioning")]
+        DynamicPositioning = 4,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class StationKeepingSystem
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("Modes")]
+
+        // TODO(system.text.json): Add string enum item converter
+        public System.Collections.Generic.ICollection<StationKeepingMode> Modes { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DynamicPositioningClass")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public DynamicPositioningClass? DynamicPositioningClass { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("ThrusterCount")]
+        public int? ThrusterCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MooringLineCount")]
+        public int? MooringLineCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MaximumMooringLineTension")]
+        public double? MaximumMooringLineTension { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public enum SurfaceMpdClass
     {
 
@@ -21677,6 +24901,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SurfaceMpdEquipment
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -21696,9 +24923,28 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("SurfaceMpdClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public SurfaceMpdClass SurfaceMpdClass { get; set; }
+        public SurfaceMpdClass? SurfaceMpdClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("MinimumBoreholeSize")]
         public double? MinimumBoreholeSize { get; set; }
@@ -21729,21 +24975,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("MinLimitMudPumpFlowrate")]
         public double? MinLimitMudPumpFlowrate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("StrokeRate")]
-        public double? StrokeRate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("FlowRate")]
-        public double? FlowRate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("PressureAtDischarge")]
-        public double? PressureAtDischarge { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("Power")]
-        public double? Power { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("PressureAtInlet")]
-        public double? PressureAtInlet { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -21802,6 +25033,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class TopDrive
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -21820,13 +25054,32 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("TopDriveClass")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public TopDriveClass TopDriveClass { get; set; }
+        public TopDriveClass? TopDriveClass { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("TopDriveControllerType")]
         [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public TopDriveControllerType TopDriveControllerType { get; set; }
+        public TopDriveControllerType? TopDriveControllerType { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Orientable")]
         public bool? Orientable { get; set; }
@@ -21858,8 +25111,29 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitBreakoutTorque")]
         public double? MaxLimitBreakoutTorque { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("TopDriveHeight")]
-        public double? TopDriveHeight { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("RatedPower")]
+        public double? RatedPower { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RatedHoistingCapacity")]
+        public double? RatedHoistingCapacity { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RatedContinuousTorque")]
+        public double? RatedContinuousTorque { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RatedIntermittentTorque")]
+        public double? RatedIntermittentTorque { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MotorCount")]
+        public int? MotorCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MotorType")]
+        public string MotorType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("IbopConfiguration")]
+        public string IbopConfiguration { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AutomationSystemCompatibility")]
+        public string AutomationSystemCompatibility { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("ProportionalGain")]
         public double? ProportionalGain { get; set; }
@@ -21939,6 +25213,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     public partial class TorqueTurnSub
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
 
@@ -21956,6 +25233,25 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Length")]
         public double? Length { get; set; }
@@ -21996,33 +25292,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("MinLimitTemperature")]
         public double? MinLimitTemperature { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceTorque")]
-        public double? SurfaceTorque { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("Hookload")]
-        public double? Hookload { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceTurnCount")]
-        public int? SurfaceTurnCount { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceAcceleration")]
-        public double? SurfaceAcceleration { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceRotationRate")]
-        public double? SurfaceRotationRate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceBorePressure")]
-        public double? SurfaceBorePressure { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceAxialVibration")]
-        public double? SurfaceAxialVibration { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceTorsionalVibration")]
-        public double? SurfaceTorsionalVibration { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("SurfaceLateralVibration")]
-        public double? SurfaceLateralVibration { get; set; }
-
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -22037,6 +25306,9 @@ namespace OSDC.Drilling.Cluster.ModelShared
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class TravellingBlock
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("ID")]
+        public System.Guid? ID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("Name")]
         public string Name { get; set; }
@@ -22056,6 +25328,25 @@ namespace OSDC.Drilling.Cluster.ModelShared
         [System.Text.Json.Serialization.JsonPropertyName("SerialNumber")]
         public string SerialNumber { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("AssetTag")]
+        public string AssetTag { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("InstallationDate")]
+        public System.DateTimeOffset? InstallationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CommissioningDate")]
+        public System.DateTimeOffset? CommissioningDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("LifecycleStatus")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public EquipmentLifecycleStatus? LifecycleStatus { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("CertificationReferences")]
+        public System.Collections.Generic.ICollection<string> CertificationReferences { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("MeasurementCapabilities")]
+        public System.Collections.Generic.ICollection<EquipmentMeasurementCapability> MeasurementCapabilities { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("Weight")]
         public double? Weight { get; set; }
 
@@ -22073,12 +25364,6 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("MaxLimitOperatingLoad")]
         public double? MaxLimitOperatingLoad { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("HookVelocity")]
-        public double? HookVelocity { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("HookPosition")]
-        public double? HookPosition { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -22124,6 +25409,12 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         [System.Text.Json.Serialization.JsonPropertyName("DeleteRigByIdPerDay")]
         public History DeleteRigByIdPerDay { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("BatchExportRigsPerDay")]
+        public History BatchExportRigsPerDay { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("BatchRestoreRigsPerDay")]
+        public History BatchRestoreRigsPerDay { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 
@@ -25025,6 +28316,33 @@ namespace OSDC.Drilling.Cluster.ModelShared
             set { _additionalProperties = value; }
         }
 
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class FileParameter
+    {
+        public FileParameter(System.IO.Stream data)
+            : this (data, null, null)
+        {
+        }
+
+        public FileParameter(System.IO.Stream data, string fileName)
+            : this (data, fileName, null)
+        {
+        }
+
+        public FileParameter(System.IO.Stream data, string fileName, string contentType)
+        {
+            Data = data;
+            FileName = fileName;
+            ContentType = contentType;
+        }
+
+        public System.IO.Stream Data { get; private set; }
+
+        public string FileName { get; private set; }
+
+        public string ContentType { get; private set; }
     }
 
 

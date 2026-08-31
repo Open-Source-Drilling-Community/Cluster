@@ -5,6 +5,7 @@ namespace OSDC.Drilling.Cluster.WebApp;
 public class WebPagesHostConfiguration :
     IClusterWebPagesConfiguration,
     OSDC.Drilling.Field.WebPages.IFieldWebPagesConfiguration,
+    OSDC.Drilling.Rig.WebPages.IRigWebPagesConfiguration,
     OSDC.Drilling.EarthCartographicProjection.WebPages.IEarthCartographicProjectionConfiguration,
     OSDC.Drilling.EarthGeodesy.WebPages.IEarthGeodesyWebPagesConfiguration,
     OSDC.Drilling.EarthGravity.WebPages.IEarthGravityWebPagesConfiguration,
@@ -27,6 +28,11 @@ public class WebPagesHostConfiguration :
     string OSDC.Drilling.EarthCartographicProjection.WebPages.IEarthCartographicProjectionConfiguration.UnitConversionUrl => UnitConversionHostURL ?? string.Empty;
     string OSDC.Drilling.EarthGeodesy.WebPages.IEarthGeodesyWebPagesConfiguration.EarthGeodesyHostURL => EarthGeodesyHostURL ?? string.Empty;
     string OSDC.Drilling.EarthVerticalDatum.WebPages.IEarthVerticalDatumWebPagesConfiguration.EarthVerticalDatumHostURL => EarthVerticalDatumHostURL ?? string.Empty;
+    string OSDC.Drilling.Rig.WebPages.IRigWebPagesConfiguration.VerticalDatumHostURL
+    {
+        get => EarthVerticalDatumHostURL ?? string.Empty;
+        set => EarthVerticalDatumHostURL = value;
+    }
     string? OSDC.Drilling.Field.WebPages.IFieldWebPagesConfiguration.VerticalDatumHostURL
     {
         get => EarthVerticalDatumHostURL;
