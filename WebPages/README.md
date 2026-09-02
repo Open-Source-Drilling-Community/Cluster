@@ -12,7 +12,7 @@
 - `ClusterSurveyRuns`
 - `ClusterTrajectories`
 - `ClusterBackupRestore`
-- `StatisticsMain`
+- `StatisticsCluster`: persistent request summaries in a sortable endpoint and functional-area table
 - `ScatterPlot`
 - `Scatter3DPlot`
 - Cluster page support classes such as API access helpers and unit/reference helpers

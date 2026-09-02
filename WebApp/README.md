@@ -1,9 +1,10 @@
 # WebApp (Cluster UI)
 
-The WebApp project is a Blazor Server application that provides a user interface to manage Cluster data stored by the Service (Cluster microservice). It consumes the Service API via generated, strongly-typed clients from `ModelSharedOut` and renders forms, tables, and charts with MudBlazor components.
+The WebApp project is a Blazor Server application that provides a service overview and a user interface to manage Cluster data stored by the Service (Cluster microservice). It consumes the Service API via generated, strongly-typed clients from `ModelSharedOut` and renders forms, tables, and charts with MudBlazor components.
 
 ## Purpose In The Solution
 - Frontend UI hosted under the base path `/Cluster/webapp` (see `WebApp/Program.cs`).
+- Home page at `/Cluster/webapp/Home` summarizing the Cluster domain, persistence, workflows, and access methods.
 - Calls the Cluster microservice at `/Cluster/api` using generated clients from `ModelSharedOut`.
 - Also integrates with Field, Trajectory, Rig, EarthCartographicProjection, EarthGeodesy, EarthVerticalDatum, EarthGravity, EarthMagneticField, and UnitConversion services for auxiliary data, displays, calculations, and unit/reference handling.
 
@@ -25,7 +26,7 @@ The WebApp project is a Blazor Server application that provides a user interface
   - `UnitConversionHostURL`: base URL of the UnitConversion Service.
 - Defaults for local development:
   - WebApp URLs: `https://localhost:5011; http://localhost:5012` (see `WebApp/Properties/launchSettings.json`).
-  - Service base path: `/Cluster/webapp`, so the main page is at `https://localhost:5011/Cluster/webapp/Cluster`.
+  - WebApp path base: `/Cluster/webapp`, with Home at `https://localhost:5011/Cluster/webapp/Home`.
 
 ## Installation
 1. Restore and build:
@@ -33,15 +34,17 @@ The WebApp project is a Blazor Server application that provides a user interface
    - `dotnet build WebApp -c Debug`
 2. Run locally:
    - `dotnet run --project WebApp`
-   - Navigate to `https://localhost:5011/Cluster/webapp/Cluster`
+   - Navigate to `https://localhost:5011/Cluster/webapp/Home`
 3. Ensure the Service is running and reachable at the configured `ClusterHostURL` (default `https://localhost:5001/`).
 
 ## Usage
+- Home page: `/Cluster/webapp/Home` summarizes the domain, persistence model, primary workflows, and REST, MCP, and web interfaces.
 - Main page: Cluster list with search, selection, add, and delete actions.
 - Contextual Rig page: `/Cluster/webapp/Rig` hosts the `OSDC.Drilling.Rig.WebPages` catalog and editor against the configured Rig service.
 - Detail page: edit cluster metadata, field association, reference coordinates, identities, features, environment depths, slots, and slot features.
 - Admin pages: manage cluster identities, cluster feature categories/options, and slot feature categories/options.
 - Backup and restore: `/Cluster/webapp/ClusterBackupRestore` exports multiple clusters with their referenced local definitions and reconnects Field/Rig references during atomic restore.
+- Usage statistics: `/Cluster/webapp/StatisticsCluster` displays persistent request history in a sortable method, endpoint, and functional-area table.
 - Display pages: show cluster trajectories and survey runs in 3D and horizontal projection.
 - Field delineation overlays: cluster trajectory and survey-run displays load delineation lines from the selected field and draw original lines plus calculated boundaries. Boundaries are dashed in the horizontal projection. In 3D, delineation lines are placed on the north/east plane at the top or bottom of the survey/trajectory bounding box without changing the plot bounds.
 - Calculators menu:
@@ -63,7 +66,7 @@ The published image is `digiwells/osdcdrillingclusterwebappclient:stable`. The H
 - Run:
   - PowerShell: `docker run --rm -p 5011:8080 -e ASPNETCORE_URLS=http://+:8080 -e ClusterHostURL=https://host.docker.internal:5001/ osdcdrillingclusterwebappclient`
   - Bash: `docker run --rm -p 5011:8080 -e ASPNETCORE_URLS=http://+:8080 -e ClusterHostURL=https://host.docker.internal:5001/ osdcdrillingclusterwebappclient`
-- Access UI: `http://localhost:5011/Cluster/webapp/Cluster`
+- Access UI: `http://localhost:5011/Cluster/webapp/Home`
 
 ## Dependencies
 - Project references:

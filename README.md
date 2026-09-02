@@ -40,7 +40,7 @@ The repository uses the root namespace `OSDC.Drilling.Cluster`. Its reusable Raz
 - Create a Cluster (requires `MetaInfo.ID`):
   - `curl -k -X POST https://localhost:5001/Cluster/api/Cluster -H "Content-Type: application/json" -d "{ \"MetaInfo\": { \"ID\": \"11111111-1111-1111-1111-111111111111\" }, \"Name\": \"Cluster A\" }"`
 - Open the UI:
-  - Navigate to `https://localhost:5011/Cluster/webapp/Cluster`
+  - Navigate to `https://localhost:5011/Cluster/webapp/Home`
 
 ## MCP Server
 
@@ -104,7 +104,7 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 
 ## Demo Environment
 - Example Service (dev): `https://dev.DigiWells.no/Cluster/api/swagger` (Swagger UI) and `https://dev.DigiWells.no/Cluster/api/Cluster` (API)
-- Example WebApp (dev): `https://dev.DigiWells.no/Cluster/webapp/Cluster`
+- Example WebApp (dev): `https://dev.DigiWells.no/Cluster/webapp/Home`
 
 ## Current WebApp dependencies
 

@@ -6,15 +6,24 @@
 
 <MudStack Spacing="3">
     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mt-4">
-        <MudText Typo="Typo.h5"><strong>Usage Statistics</strong></MudText>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@isLoading_" OnClick="RefreshAsync">
+        <div>
+            <MudText Typo="Typo.h5"><strong>Usage Statistics</strong></MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                Cluster service requests retained across restarts by the persistent service data volume.
+            </MudText>
+        </div>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Refresh"
+                   Disabled="@isLoading_"
+                   OnClick="RefreshAsync">
             Refresh
         </MudButton>
     </MudStack>
 
     @if (isLoading_)
     {
-        <MudProgressCircular Indeterminate="true" />
+        <MudProgressLinear Indeterminate="true" />
     }
     else if (statistics_ == null)
     {
@@ -24,11 +33,11 @@
     {
         <MudGrid>
             <MudItem xs="12" sm="6" md="3">
-                <MudText Typo="Typo.subtitle2">Total count</MudText>
+                <MudText Typo="Typo.subtitle2">Total requests</MudText>
                 <MudText Typo="Typo.h6">@totalCount_</MudText>
             </MudItem>
             <MudItem xs="12" sm="6" md="3">
-                <MudText Typo="Typo.subtitle2">Today</MudText>
+                <MudText Typo="Typo.subtitle2">Today (UTC)</MudText>
                 <MudText Typo="Typo.h6">@todayCount_</MudText>
             </MudItem>
             <MudItem xs="12" sm="6" md="3">
@@ -41,39 +50,37 @@
             </MudItem>
         </MudGrid>
 
-        <MudExpansionPanels MultiExpansion="true">
-            @foreach (var group in groups_)
-            {
-                <MudExpansionPanel Text="@($"{group.Area} ({group.Total})")" Expanded="@group.IsInitiallyExpanded">
-                    <MudTable Items="group.Rows" Dense="true" Hover="true" SortLabel="Sort by">
-                        <HeaderContent>
-                            <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, string>(row => row.Method)">Method</MudTableSortLabel></MudTh>
-                            <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, string>(row => row.Endpoint)">Endpoint</MudTableSortLabel></MudTh>
-                            <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, object>(row => row.Today)">Today</MudTableSortLabel></MudTh>
-                            <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, object>(row => row.Total)">Total</MudTableSortLabel></MudTh>
-                            <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, object>(row => row.LastUsed ?? DateTimeOffset.MinValue)">Last used</MudTableSortLabel></MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Method">@context.Method</MudTd>
-                            <MudTd DataLabel="Endpoint">@context.Endpoint</MudTd>
-                            <MudTd DataLabel="Today">@context.Today</MudTd>
-                            <MudTd DataLabel="Total">@context.Total</MudTd>
-                            <MudTd DataLabel="Last used">@FormatDate(context.LastUsed)</MudTd>
-                        </RowTemplate>
-                        <NoRecordsContent>
-                            <MudText>No counters were returned for this area.</MudText>
-                        </NoRecordsContent>
-                    </MudTable>
-                </MudExpansionPanel>
-            }
-        </MudExpansionPanels>
+        <MudTable Items="rows_" Dense="true" Hover="true" Bordered="true" Striped="true" SortLabel="Sort by">
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, string>(row => row.Method)">Method</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, string>(row => row.Endpoint)">Endpoint</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, string>(row => row.Area)">Area</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, object>(row => row.Today)">Today</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, object>(row => row.Total)">Total</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, object>(row => row.LastUsed ?? DateTimeOffset.MinValue)">Last used</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Method">
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="@MethodColor(context.Method)">
+                        @context.Method
+                    </MudChip>
+                </MudTd>
+                <MudTd DataLabel="Endpoint">@context.Endpoint</MudTd>
+                <MudTd DataLabel="Area">@context.Area</MudTd>
+                <MudTd DataLabel="Today">@context.Today</MudTd>
+                <MudTd DataLabel="Total">@context.Total</MudTd>
+                <MudTd DataLabel="Last used">@FormatDate(context.LastUsed)</MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No usage counters were returned by the Cluster service.</MudText>
+            </NoRecordsContent>
+        </MudTable>
     }
 </MudStack>
 
 @code {
     private UsageStatisticsCluster? statistics_;
     private readonly List<UsageRow> rows_ = [];
-    private readonly List<UsageGroup> groups_ = [];
     private long totalCount_;
     private long todayCount_;
     private bool isLoading_ = true;
@@ -93,10 +100,9 @@
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Problem UsageStatistics initialization");
+            logger.LogError(ex, "Problem loading Cluster usage statistics");
             statistics_ = null;
             rows_.Clear();
-            groups_.Clear();
             totalCount_ = 0;
             todayCount_ = 0;
             Snackbar.Add("Unable to load Cluster usage statistics.", Severity.Error);
@@ -110,7 +116,6 @@
     private void BuildRows()
     {
         rows_.Clear();
-        groups_.Clear();
         totalCount_ = 0;
         todayCount_ = 0;
 
@@ -123,7 +128,7 @@
                      .Where(property => property.PropertyType == typeof(History) && property.Name.EndsWith("PerDay", StringComparison.Ordinal))
                      .OrderBy(property => ToEndpointDescriptor(property.Name).Area, StringComparer.Ordinal)
                      .ThenBy(property => ToEndpointDescriptor(property.Name).Endpoint, StringComparer.Ordinal)
-                     .ThenBy(property => ToEndpointDescriptor(property.Name).Method, StringComparer.Ordinal))
+                     .ThenBy(property => MethodSortOrder(ToEndpointDescriptor(property.Name).Method)))
         {
             if (property.GetValue(statistics_) is not History history)
             {
@@ -139,17 +144,6 @@
             todayCount_ += today;
             rows_.Add(new UsageRow(descriptor.Area, descriptor.Endpoint, descriptor.Method, today, total, lastUsed));
         }
-
-        groups_.AddRange(rows_
-            .GroupBy(row => row.Area)
-            .Select(group => new UsageGroup(
-                group.Key,
-                group.OrderBy(row => row.Endpoint, StringComparer.Ordinal)
-                    .ThenBy(row => MethodSortOrder(row.Method))
-                    .ToList(),
-                group.Sum(row => row.Total),
-                group.Sum(row => row.Today)))
-            .OrderBy(group => group.Area, StringComparer.Ordinal));
     }
 
     private static long Total(History history) =>
@@ -182,7 +176,8 @@
             string value when value.StartsWith("Post", StringComparison.Ordinal) => "POST",
             string value when value.StartsWith("Put", StringComparison.Ordinal) => "PUT",
             string value when value.StartsWith("Delete", StringComparison.Ordinal) => "DELETE",
-            _ => "-"
+            string value when value.StartsWith("Batch", StringComparison.Ordinal) => "POST",
+            _ => "OTHER"
         };
 
         string endpoint = SplitWords(RemoveMethodPrefix(name));
@@ -239,6 +234,15 @@
         _ => 4
     };
 
+    private static Color MethodColor(string method) => method switch
+    {
+        "GET" => Color.Info,
+        "POST" => Color.Success,
+        "PUT" => Color.Warning,
+        "DELETE" => Color.Error,
+        _ => Color.Default
+    };
+
     private static string FormatDate(DateTimeOffset? value) =>
         value.HasValue && value.Value != default
             ? value.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
@@ -246,8 +250,4 @@
 
     private sealed record EndpointDescriptor(string Area, string Endpoint, string Method);
     private sealed record UsageRow(string Area, string Endpoint, string Method, long Today, long Total, DateTimeOffset? LastUsed);
-    private sealed record UsageGroup(string Area, List<UsageRow> Rows, long Total, long Today)
-    {
-        public bool IsInitiallyExpanded => Total > 0;
-    }
 }
