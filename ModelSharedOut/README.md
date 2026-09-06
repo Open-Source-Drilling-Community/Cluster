@@ -36,6 +36,8 @@ ModelSharedOut is a .NET 8 console tool that builds a distributed shared model f
    - `TrajectoryModel.json` provides survey-run, trajectory, survey-station, and uncertainty-ellipse DTOs.
    - `RigModel.json` provides rig DTOs used by cluster editing.
    - `EarthVerticalDatumModel.json` provides the synchronous DTOs used for MSL depth reference calculations.
+   - Refresh `TrajectoryModel.json` from Trajectory's service-owned
+     `ModelSharedOut/json-schemas/TrajectoryFullName.json`, not its transitive merged aggregate.
 3. Run the generator:
    - `dotnet run --project ModelSharedOut`
 4. Verify outputs:
