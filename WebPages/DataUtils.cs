@@ -1,3 +1,4 @@
+using OSDC.Drilling.Cluster.ModelShared;
 using OSDC.UnitConversion.DrillingRazorMudComponents;
 
 namespace OSDC.Drilling.Cluster.WebPages;
@@ -22,17 +23,19 @@ public static class DataUtils
         public static GroundMudLineDepthReferenceSource GroundMudLineDepthReferenceSource { get; set; } = new();
         public static SeaWaterLevelDepthReferenceSource SeaWaterLevelDepthReferenceSource { get; set; } = new();
         public static MeanSeaLevelDepthReferenceSource MeanSeaLevelDepthReferenceSource { get; set; } = new();
+        public static RotaryTableDepthReferenceSource RotaryTableDepthReferenceSource { get; set; } = new();
         public static FieldPositionReferenceSource FieldPositionReferenceSource { get; set; } = new();
         public static ClusterPositionReferenceSource ClusterPositionReferenceSource { get; set; } = new();
         public static CartographicGridPositionReferenceSource CartographicGridPositionReferenceSource { get; set; } = new();
         public static CartographicProjectionDatumGeodeticReferenceSource CartographicProjectionDatumGeodeticReferenceSource { get; set; } = new();
     }
 
-    public static void ApplyClusterReferenceValues(OSDC.Drilling.Cluster.ModelShared.Cluster? cluster)
+    public static void ApplyClusterReferenceValues(OSDC.Drilling.Cluster.ModelShared.Cluster? cluster, IEnumerable<RigReadResponse>? rigs = null)
     {
         UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = 0;
         UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = 0;
         UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = null;
+        ApplyFixedPlatformDrillFloorReference(cluster?.IsFixedPlatform, cluster?.RigID, rigs);
         UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterNorthPositionReference = -cluster?.ReferencePoint?.RiemannianNorth;
         UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterEastPositionReference = -cluster?.ReferencePoint?.RiemannianEast;
         if (cluster?.GroundMudLineDepth?.GaussianValue?.Mean != null)
@@ -45,11 +48,12 @@ public static class DataUtils
         }
     }
 
-    public static void ApplyClusterReferenceValues(OSDC.Drilling.Cluster.ModelShared.ClusterLight? cluster)
+    public static void ApplyClusterReferenceValues(OSDC.Drilling.Cluster.ModelShared.ClusterLight? cluster, IEnumerable<RigReadResponse>? rigs = null)
     {
         UnitAndReferenceParameters.GroundMudLineDepthReferenceSource.GroundMudLineDepthReference = 0;
         UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource.SeaWaterLevelDepthReference = 0;
         UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = null;
+        ApplyFixedPlatformDrillFloorReference(cluster?.IsFixedPlatform, cluster?.RigID, rigs);
         UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterNorthPositionReference = -cluster?.ReferencePoint?.RiemannianNorth;
         UnitAndReferenceParameters.ClusterPositionReferenceSource.ClusterEastPositionReference = -cluster?.ReferencePoint?.RiemannianEast;
         if (cluster?.GroundMudLineDepth?.GaussianValue?.Mean != null)
@@ -59,6 +63,19 @@ public static class DataUtils
         if (cluster?.TopWaterDepth?.GaussianValue?.Mean != null)
         {
             ApplyTopWaterDepthWGS84(cluster.TopWaterDepth.GaussianValue.Mean);
+        }
+    }
+
+    public static void ApplyFieldReferenceValues(OSDC.Drilling.Cluster.ModelShared.Field? field)
+    {
+        UnitAndReferenceParameters.FieldPositionReferenceSource.FieldNorthPositionReference = -field?.ReferencePoint?.RiemannianNorth;
+        UnitAndReferenceParameters.FieldPositionReferenceSource.FieldEastPositionReference = -field?.ReferencePoint?.RiemannianEast;
+        if (field?.ReferencePoint?.RiemannianNorth == null || field.ReferencePoint.RiemannianEast == null)
+        {
+            if (string.Equals(UnitAndReferenceParameters.PositionReferenceName, "Field", StringComparison.Ordinal))
+            {
+                UnitAndReferenceParameters.PositionReferenceName = "WGS84";
+            }
         }
     }
 
@@ -110,9 +127,41 @@ public static class DataUtils
         public double? SeaWaterLevelDepthReference { get; set; }
     }
 
+    private static void ApplyFixedPlatformDrillFloorReference(bool? isFixedPlatform, Guid? rigId, IEnumerable<RigReadResponse>? rigs)
+    {
+        UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = null;
+        if (isFixedPlatform != true || rigId is not Guid selectedRigId || selectedRigId == Guid.Empty || rigs == null)
+        {
+            ResetUnavailableDrillFloorSelection();
+            return;
+        }
+
+        if (rigs.FirstOrDefault(rig => rig?.MetaInfo?.ID == selectedRigId)?.DrillFloorElevation is double drillFloorElevation)
+        {
+            UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = -drillFloorElevation;
+        }
+        else
+        {
+            ResetUnavailableDrillFloorSelection();
+        }
+    }
+
+    private static void ResetUnavailableDrillFloorSelection()
+    {
+        if (string.Equals(UnitAndReferenceParameters.DepthReferenceName, "Rotary table", StringComparison.Ordinal))
+        {
+            UnitAndReferenceParameters.DepthReferenceName = "WGS84";
+        }
+    }
+
     public class MeanSeaLevelDepthReferenceSource : IMeanSeaLevelDepthReferenceSource
     {
         public double? MeanSeaLevelDepthReference { get; set; }
+    }
+
+    public class RotaryTableDepthReferenceSource : IRotaryTableDepthReferenceSource
+    {
+        public double? RotaryTableDepthReference { get; set; }
     }
 
     public class FieldPositionReferenceSource : IFieldPositionReferenceSource

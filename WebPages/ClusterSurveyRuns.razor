@@ -11,14 +11,17 @@
                               HttpController="UnitSystem/"
                               UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
                               UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
-                              PositionReferenceName="WGS84"
-                              CartographicGridPositionReferenceSource="_cartographicReference"
-                              ClusterPositionReferenceSource="_clusterReference"
+                              PositionReferenceName="@DataUtils.UnitAndReferenceParameters.PositionReferenceName"
+                              PositionReferenceNameChanged="@DataUtils.UpdatePositionReferenceName"
+                              CartographicGridPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.CartographicGridPositionReferenceSource"
+                              FieldPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.FieldPositionReferenceSource"
+                              ClusterPositionReferenceSource="@DataUtils.UnitAndReferenceParameters.ClusterPositionReferenceSource"
                               DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
                               DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
                               GroundMudLineDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.GroundMudLineDepthReferenceSource"
                               SeaWaterLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.SeaWaterLevelDepthReferenceSource"
-                              MeanSeaLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource">
+                              MeanSeaLevelDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource"
+                              RotaryTableDepthReferenceSource="@DataUtils.UnitAndReferenceParameters.RotaryTableDepthReferenceSource">
     @if (fieldList == null || clusterList == null)
     {
         <p><em>Loading...</em></p>
@@ -33,26 +36,17 @@
                         <MudText Typo="Typo.body2">All wellbore survey runs for the selected real cluster, shown in 3D and as a horizontal projection.</MudText>
                     </MudItem>
                     <MudItem xs="12" sm="6" md="3">
-                        <MudSelect Label="Field" T="Guid?" Value="@selectedFieldId" ValueChanged="OnFieldChanged" ShrinkLabel Clearable="true">
-                            @foreach (ClusterModelShared.FieldLight field in AvailableFields)
-                            {
-                                <MudSelectItem T="Guid?" Value="@((Guid?)field.MetaInfo.ID)">@field.Name</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <MudAutocomplete Label="Field" T="Guid?" Value="@selectedFieldId" ValueChanged="OnFieldChanged"
+                                         SearchFunc="SearchFieldsAsync" ToStringFunc="GetFieldName"
+                                         Clearable="true" ResetValueOnEmptyText="true" CoerceText="false"
+                                         MinCharacters="0" MaxItems="@((int?)null)" ShrinkLabel />
                     </MudItem>
                     <MudItem xs="12" sm="6" md="3">
-                        <MudSelect Label="Cluster"
-                                   T="Guid?"
-                                   Value="@selectedClusterId"
-                                   ValueChanged="OnClusterChanged"
-                                   ShrinkLabel
-                                   Clearable="true"
-                                   Disabled="@(selectedFieldId == null || AvailableClusters.Count == 0)">
-                            @foreach (ClusterModelShared.ClusterLight cluster in AvailableClusters)
-                            {
-                                <MudSelectItem T="Guid?" Value="@((Guid?)cluster.MetaInfo.ID)">@cluster.Name</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <MudAutocomplete Label="Cluster" T="Guid?" Value="@selectedClusterId" ValueChanged="OnClusterChanged"
+                                         SearchFunc="SearchClustersAsync" ToStringFunc="GetClusterName"
+                                         Clearable="true" ResetValueOnEmptyText="true" CoerceText="false"
+                                         MinCharacters="0" MaxItems="@((int?)null)" ShrinkLabel
+                                         Disabled="@(selectedFieldId == null || AvailableClusters.Count == 0)" />
                     </MudItem>
                     <MudItem xs="12" md="1">
                         <MudButton Variant="Variant.Filled"
@@ -193,6 +187,7 @@
 @code {
     private List<ClusterModelShared.FieldLight>? fieldList;
     private List<ClusterModelShared.ClusterLight>? clusterList;
+    private List<ClusterModelShared.RigReadResponse>? rigList;
     private List<ClusterModelShared.SurveyRunLight> surveyRunLightList = [];
     private List<ClusterModelShared.SurveyRun> surveyRunList = [];
     private List<ClusterModelShared.FieldDelineationLine> selectedFieldDelineationLines = [];
@@ -207,8 +202,6 @@
     private bool isCalculatingEllipses;
     private double ellipseConfidenceFactor = 0.95;
     private bool cameraIsAboveScene = true;
-    private readonly CartographicReference _cartographicReference = new() { CartographicGridNorthPositionReference = 0, CartographicGridEastPositionReference = 0 };
-    private readonly ClusterReference _clusterReference = new() { ClusterNorthPositionReference = 0, ClusterEastPositionReference = 0 };
     private List<PlotTrace> plotTraces = [];
     private Dictionary<Guid, List<ClusterModelShared.SurveyStationEllipseResult>> ellipseResultsBySurveyRun = [];
 
@@ -242,6 +235,7 @@
             logger.LogInformation("Trying to load list of Fields and Clusters");
             Task<ICollection<ClusterModelShared.FieldLight>> fieldTask = Api.ClientField.GetAllFieldLightAsync();
             Task<ICollection<ClusterModelShared.ClusterLight>> clusterTask = Api.ClientCluster.GetAllClusterLightAsync();
+            Task<ICollection<ClusterModelShared.RigReadResponse>> rigTask = Api.ClientRig.GetAllRigAsync(false);
 
             await Task.WhenAll(fieldTask, clusterTask);
 
@@ -254,6 +248,19 @@
                 .Where(cluster => cluster?.MetaInfo != null && !cluster.IsSingleWell)
                 .OrderBy(cluster => cluster.Name)
                 .ToList();
+
+            try
+            {
+                rigList = (await rigTask)
+                    .Where(rig => rig?.MetaInfo != null)
+                    .OrderBy(rig => rig.Name)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Unable to load Rig data; drill-floor depth reference is unavailable");
+                rigList = [];
+            }
         }
         catch (ApiException ex)
         {
@@ -283,6 +290,42 @@
             .OrderBy(cluster => cluster.Name)
             .ToList() ?? [];
 
+    private Task<IEnumerable<Guid?>> SearchFieldsAsync(string? value, CancellationToken cancellationToken) =>
+        Task.FromResult(FilterByName(AvailableFields, value, field => field.Name, field => field.MetaInfo.ID));
+
+    private Task<IEnumerable<Guid?>> SearchClustersAsync(string? value, CancellationToken cancellationToken) =>
+        Task.FromResult(FilterByName(AvailableClusters, value, cluster => cluster.Name, cluster => cluster.MetaInfo.ID));
+
+    private string GetFieldName(Guid? id) =>
+        GetDisplayName(id, fieldList ?? [], field => field.Name, field => field.MetaInfo?.ID);
+
+    private string GetClusterName(Guid? id) =>
+        GetDisplayName(id, clusterList ?? [], cluster => cluster.Name, cluster => cluster.MetaInfo?.ID);
+
+    private static IEnumerable<Guid?> FilterByName<T>(IEnumerable<T> items, string? value,
+        Func<T, string?> getName, Func<T, Guid> getId)
+    {
+        string? term = value?.Trim();
+        return items
+            .Where(item => string.IsNullOrEmpty(term) ||
+                (getName(item)?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                getId(item).ToString("D").Contains(term, StringComparison.OrdinalIgnoreCase))
+            .Select(item => (Guid?)getId(item));
+    }
+
+    private static string GetDisplayName<T>(Guid? id, IEnumerable<T> items,
+        Func<T, string?> getName, Func<T, Guid?> getId)
+    {
+        if (id is not Guid value)
+        {
+            return string.Empty;
+        }
+
+        T? item = items.FirstOrDefault(candidate => getId(candidate) == value);
+        string? name = item is null ? null : getName(item);
+        return string.IsNullOrWhiteSpace(name) ? value.ToString("D") : name;
+    }
+
     private async Task OnFieldChanged(Guid? fieldId)
     {
         selectedFieldId = fieldId;
@@ -293,7 +336,6 @@
         ClearPlots();
         errorMessage = null;
         await ApplySelectedClusterReferenceValuesAsync(null);
-        ResetPositionReferences();
         await InvokeAsync(StateHasChanged);
     }
 
@@ -313,7 +355,6 @@
             ClearPlots();
             errorMessage = null;
             await ApplySelectedClusterReferenceValuesAsync(null);
-            ResetPositionReferences();
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -330,18 +371,30 @@
     private async Task ApplySelectedClusterReferenceValuesAsync(Guid? clusterId)
     {
         ClusterModelShared.ClusterLight? selectedCluster = clusterList?.FirstOrDefault(cluster => cluster.MetaInfo?.ID == clusterId);
-        DataUtils.ApplyClusterReferenceValues(selectedCluster);
+        DataUtils.ApplyClusterReferenceValues(selectedCluster, rigList);
+        await ApplySelectedFieldReferenceValuesAsync(selectedCluster?.FieldID ?? selectedFieldId);
+        await CartographicPositionReferenceUtils.ApplyAsync(Api, selectedCluster, logger);
         DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
             await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, selectedCluster);
-        ResetPositionReferences();
     }
 
-    private void ResetPositionReferences()
+    private async Task ApplySelectedFieldReferenceValuesAsync(Guid? fieldId)
     {
-        _cartographicReference.CartographicGridNorthPositionReference = 0;
-        _cartographicReference.CartographicGridEastPositionReference = 0;
-        _clusterReference.ClusterNorthPositionReference = 0;
-        _clusterReference.ClusterEastPositionReference = 0;
+        if (fieldId is not Guid selectedFieldIdValue || selectedFieldIdValue == Guid.Empty)
+        {
+            DataUtils.ApplyFieldReferenceValues(null);
+            return;
+        }
+
+        try
+        {
+            DataUtils.ApplyFieldReferenceValues(await Api.ClientField.GetFieldByIdAsync(selectedFieldIdValue));
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to resolve the field position reference for field {FieldId}", selectedFieldIdValue);
+            DataUtils.ApplyFieldReferenceValues(null);
+        }
     }
 
 

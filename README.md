@@ -61,13 +61,13 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 ## Main Capabilities
 - Cluster management: create, edit, import, export, and delete clusters.
 - Portable batch transfer: export or atomically restore several clusters together with referenced local identity/feature definitions and verified Field/Rig UUID-name manifests.
-- Field association: clusters can be linked to a field and displayed using field, cluster, cartographic, geodetic, and depth reference systems.
+- Field association: clusters can be linked to a field and displayed using field, cluster, cartographic, geodetic, and depth reference systems; trajectory and survey-run displays resolve the Field offset from its persisted reference point and the cartographic offset from the owning Field conversion API.
 - Cluster identities: user-defined identity definitions can be managed separately and assigned to clusters with cluster-specific values.
 - Cluster features: user-defined feature categories/options can be managed separately and assigned to clusters with exclusivity and optional validity periods.
 - Slot features: user-defined slot feature categories/options can be managed separately and assigned to selected slots in the cluster editor.
 - Safe mutations: full replacements use optimistic concurrency, locally owned catalog references are validated atomically, referenced definitions/options cannot be removed, and Slot dictionary keys must match their `Slot.ID` values.
 - Slot editing: slots can be edited with north/east and latitude/longitude coordinates through the unit/reference system; the slot table summarizes assigned features.
-- Survey/trajectory displays: cluster survey runs and trajectories are shown in 3D and in horizontal projection, with optional uncertainty ellipses.
+- Survey/trajectory displays: cluster survey runs and trajectories are shown in 3D and in horizontal projection, with optional uncertainty ellipses and a Rig drill-floor (`RTE`) depth reference when the selected fixed platform has a linked Rig with `DrillFloorElevation`.
 - Field delineation overlays: when a cluster belongs to a field with delineation lines, those lines and their calculated boundaries are displayed together with cluster survey runs and trajectories. In 3D, delineation lines are placed on the north/east plane at the top or bottom of the displayed survey/trajectory bounding box. The bounding box itself is based on survey/trajectory data, not on delineation extents.
 - Calculators: the web app exposes synchronous cartographic conversion, vertical datum conversion, Earth gravity evaluation, and Earth magnetic-field evaluation pages under the `Calculators` menu. Calculation requests and results are not persisted by the Earth services.
 
