@@ -18,7 +18,7 @@ The WebApp project is a Blazor Server application that provides a service overvi
   - `FieldHostURL`: base URL of the Field Service.
   - `TrajectoryHostURL`: base URL of the Trajectory Service.
 
-Production uses `http://osdcdrillingtrajectoryservice/`; reusable pages append
+Production uses `http://osdctrajectoryservice/`; reusable pages append
 the stable `Trajectory/api/` base path.
   - `RigHostURL`: base URL of the Rig Service.
   - `EarthCartographicProjectionHostURL`: base URL of EarthCartographicProjection.
