@@ -1,9 +1,9 @@
 {
-  "openapi": "3.0.4",
+  "openapi": "3.0.3",
   "info": {
-    "title": "OSDC Earth Vertical Datum API",
-    "description": "Stateless bidirectional conversion between EGM84 mean-sea-level and WGS84 ellipsoidal depths using OSDC SI and positive-down conventions.",
-    "version": "v1"
+    "title": "OSDC Earth Vertical Datum distributed shared model",
+    "description": "Generated API client and DTO contract consumed by WebPages and ServiceTest.",
+    "version": "1.0"
   },
   "paths": {
     "/EarthVerticalDatum": {
@@ -20,7 +20,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumModelInfo"
+                  "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
                 }
               }
             }
@@ -40,17 +40,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.MeanSeaLevelToWgs84Request"
+                "$ref": "#/components/schemas/MeanSeaLevelToWgs84Request"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.MeanSeaLevelToWgs84Request"
+                "$ref": "#/components/schemas/MeanSeaLevelToWgs84Request"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.MeanSeaLevelToWgs84Request"
+                "$ref": "#/components/schemas/MeanSeaLevelToWgs84Request"
               }
             }
           }
@@ -61,7 +61,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.MeanSeaLevelToWgs84Response"
+                  "$ref": "#/components/schemas/MeanSeaLevelToWgs84Response"
                 }
               }
             }
@@ -71,7 +71,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumValidationProblem"
+                  "$ref": "#/components/schemas/EarthVerticalDatumValidationProblem"
                 }
               }
             }
@@ -91,17 +91,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelRequest"
+                "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelRequest"
+                "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelRequest"
+                "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelRequest"
               }
             }
           }
@@ -112,7 +112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelResponse"
+                  "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelResponse"
                 }
               }
             }
@@ -122,7 +122,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumValidationProblem"
+                  "$ref": "#/components/schemas/EarthVerticalDatumValidationProblem"
                 }
               }
             }
@@ -143,7 +143,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumModelInfo"
+                  "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
                 }
               }
             }
@@ -156,7 +156,7 @@
         "tags": [
           "EarthVerticalDatumUsageStatistics"
         ],
-        "summary": "Returns in-memory usage counters for this service replica. This operation is intentionally not exposed as an MCP tool.",
+        "summary": "Returns cumulative usage counters retained across service restarts. This operation is intentionally not exposed as an MCP tool.",
         "operationId": "GetEarthVerticalDatumUsageStatistics",
         "responses": {
           "200": {
@@ -164,7 +164,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.UsageStatisticsEarthVerticalDatum"
+                  "$ref": "#/components/schemas/UsageStatisticsEarthVerticalDatum"
                 }
               }
             }
@@ -175,7 +175,7 @@
   },
   "components": {
     "schemas": {
-      "OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumModelInfo": {
+      "EarthVerticalDatumModelInfo": {
         "type": "object",
         "properties": {
           "Name": {
@@ -245,10 +245,9 @@
             "nullable": true
           }
         },
-        "additionalProperties": false,
         "description": "Identity, accuracy, and provenance of the geoid model used for conversion."
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumPosition": {
+      "EarthVerticalDatumPosition": {
         "type": "object",
         "properties": {
           "Latitude": {
@@ -271,14 +270,13 @@
             "format": "double"
           }
         },
-        "additionalProperties": false,
         "description": "A WGS84 horizontal position and a mean-sea-level depth expressed using OSDC SI conventions."
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumSample": {
+      "EarthVerticalDatumSample": {
         "type": "object",
         "properties": {
           "Position": {
-            "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumPosition"
+            "$ref": "#/components/schemas/EarthVerticalDatumPosition"
           },
           "Wgs84EllipsoidalDepth": {
             "type": "number",
@@ -291,10 +289,9 @@
             "format": "double"
           }
         },
-        "additionalProperties": false,
         "description": "An input position and its corresponding WGS84 ellipsoidal-depth conversion."
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumValidationError": {
+      "EarthVerticalDatumValidationError": {
         "type": "object",
         "properties": {
           "PositionIndex": {
@@ -314,10 +311,9 @@
             "type": "string",
             "nullable": true
           }
-        },
-        "additionalProperties": false
+        }
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumValidationProblem": {
+      "EarthVerticalDatumValidationProblem": {
         "type": "object",
         "properties": {
           "Error": {
@@ -331,15 +327,14 @@
           "Errors": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumValidationError"
+              "$ref": "#/components/schemas/EarthVerticalDatumValidationError"
             },
             "nullable": true
           }
         },
-        "additionalProperties": false,
         "description": "Details returned when a conversion request is rejected atomically."
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.MeanSeaLevelToWgs84Request": {
+      "MeanSeaLevelToWgs84Request": {
         "required": [
           "Positions"
         ],
@@ -349,32 +344,30 @@
             "minItems": 1,
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumPosition"
+              "$ref": "#/components/schemas/EarthVerticalDatumPosition"
             },
             "description": "Positions and mean-sea-level depths to convert. The entire request is rejected when any item is invalid."
           }
         },
-        "additionalProperties": false,
         "description": "A stateless synchronous request to convert mean-sea-level depths to WGS84 ellipsoidal depths."
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.MeanSeaLevelToWgs84Response": {
+      "MeanSeaLevelToWgs84Response": {
         "type": "object",
         "properties": {
           "Model": {
-            "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumModelInfo"
+            "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
           },
           "Samples": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumSample"
+              "$ref": "#/components/schemas/EarthVerticalDatumSample"
             },
             "nullable": true
           }
         },
-        "additionalProperties": false,
         "description": "EGM84-30 conversion results in the same order as the request positions."
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.UsageStatisticsEarthVerticalDatum": {
+      "UsageStatisticsEarthVerticalDatum": {
         "type": "object",
         "properties": {
           "StartedAt": {
@@ -417,10 +410,9 @@
             "format": "int64",
             "readOnly": true
           }
-        },
-        "additionalProperties": false
+        }
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelPosition": {
+      "Wgs84ToMeanSeaLevelPosition": {
         "type": "object",
         "properties": {
           "Latitude": {
@@ -443,10 +435,9 @@
             "format": "double"
           }
         },
-        "additionalProperties": false,
         "description": "A WGS84 horizontal position and ellipsoidal depth expressed using OSDC SI conventions."
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelRequest": {
+      "Wgs84ToMeanSeaLevelRequest": {
         "required": [
           "Positions"
         ],
@@ -456,36 +447,34 @@
             "minItems": 1,
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelPosition"
+              "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelPosition"
             },
             "description": "Positions and WGS84 ellipsoidal depths to convert. Any invalid item rejects the entire request."
           }
         },
-        "additionalProperties": false,
         "description": "A stateless synchronous request to convert WGS84 ellipsoidal depths to mean-sea-level depths."
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelResponse": {
+      "Wgs84ToMeanSeaLevelResponse": {
         "type": "object",
         "properties": {
           "Model": {
-            "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.EarthVerticalDatumModelInfo"
+            "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
           },
           "Samples": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelSample"
+              "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelSample"
             },
             "nullable": true
           }
         },
-        "additionalProperties": false,
         "description": "EGM84-30 inverse-conversion results in the same order as the request positions."
       },
-      "OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelSample": {
+      "Wgs84ToMeanSeaLevelSample": {
         "type": "object",
         "properties": {
           "Position": {
-            "$ref": "#/components/schemas/OSDC.Drilling.EarthVerticalDatum.Model.Wgs84ToMeanSeaLevelPosition"
+            "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelPosition"
           },
           "MeanSeaLevelDepth": {
             "type": "number",
@@ -498,7 +487,6 @@
             "format": "double"
           }
         },
-        "additionalProperties": false,
         "description": "An input WGS84 position and its corresponding EGM84 mean-sea-level depth."
       }
     }

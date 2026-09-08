@@ -25,7 +25,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Client 
+    public partial class Client
     {
         #pragma warning disable 8618
         private string _baseUrl;
@@ -3147,7 +3147,7 @@ namespace OSDC.Drilling.Cluster.ModelShared
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// Returns in-memory usage counters for this service replica. This operation is intentionally not exposed as an MCP tool.
+        /// Returns cumulative usage counters retained across service restarts. This operation is intentionally not exposed as an MCP tool.
         /// </summary>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
