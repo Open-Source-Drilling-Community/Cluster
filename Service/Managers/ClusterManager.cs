@@ -40,7 +40,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             get
             {
                 int count = 0;
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     var command = connection.CreateCommand();
@@ -68,7 +68,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
 
         public bool Clear()
         {
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 bool success = false;
@@ -100,11 +100,12 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         public bool Contains(Guid guid)
         {
             int count = 0;
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT COUNT(*) FROM ClusterTable WHERE ID = '{guid}'";
+                command.CommandText = "SELECT COUNT(*) FROM ClusterTable WHERE ID = $id";
+                command.Parameters.AddWithValue("$id", guid);
                 try
                 {
                     using SqliteDataReader reader = command.ExecuteReader();
@@ -132,7 +133,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         public List<Guid>? GetAllClusterId()
         {
             List<Guid> ids = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -167,7 +168,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         public List<MetaInfo?>? GetAllClusterMetaInfo()
         {
             List<MetaInfo?> metaInfos = new();
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -205,12 +206,13 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         {
             if (!guid.Equals(Guid.Empty))
             {
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     Model.Cluster? cluster;
                     var command = connection.CreateCommand();
-                    command.CommandText = $"SELECT Cluster FROM ClusterTable WHERE ID = '{guid}'";
+                    command.CommandText = "SELECT Cluster FROM ClusterTable WHERE ID = $id";
+                    command.Parameters.AddWithValue("$id", guid);
                     try
                     {
                         using var reader = command.ExecuteReader();
@@ -254,7 +256,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         public List<Model.Cluster?>? GetAllCluster()
         {
             List<Model.Cluster?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -290,7 +292,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         public List<Model.ClusterLight>? GetAllClusterLight()
         {
             List<Model.ClusterLight> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -347,11 +349,12 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         public List<Model.Cluster?>? GetAllClusterByFieldId(Guid fieldId)
         {
             List<Model.Cluster?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT Cluster FROM ClusterTable WHERE FieldID = '{fieldId}'";
+                command.CommandText = "SELECT Cluster FROM ClusterTable WHERE FieldID = $fieldId";
+                command.Parameters.AddWithValue("$fieldId", fieldId);
                 try
                 {
                     using var reader = command.ExecuteReader();
@@ -382,11 +385,12 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         public List<Model.Cluster?>? GetAllClusterByRigId(Guid guid)
         {
             List<Model.Cluster?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT Cluster FROM ClusterTable WHERE RigID = '{guid}'";
+                command.CommandText = "SELECT Cluster FROM ClusterTable WHERE RigID = $rigId";
+                command.Parameters.AddWithValue("$rigId", guid);
                 try
                 {
                     using var reader = command.ExecuteReader();
@@ -417,11 +421,12 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         public List<Model.Cluster?>? GetAllSingleWellCluster(bool IsSingleWell)
         {
             List<Model.Cluster?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT Cluster FROM ClusterTable WHERE IsSingleWell = {IsSingleWell}";
+                command.CommandText = "SELECT Cluster FROM ClusterTable WHERE IsSingleWell = $isSingleWell";
+                command.Parameters.AddWithValue("$isSingleWell", IsSingleWell ? 1 : 0);
                 try
                 {
                     using var reader = command.ExecuteReader();
@@ -452,11 +457,12 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         public List<Model.Cluster?>? GetAllFixedPlatformCluster(bool fixedBool)
         {
             List<Model.Cluster?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT Cluster FROM ClusterTable WHERE IsFixedPlatform = {fixedBool}";
+                command.CommandText = "SELECT Cluster FROM ClusterTable WHERE IsFixedPlatform = $isFixedPlatform";
+                command.Parameters.AddWithValue("$isFixedPlatform", fixedBool ? 1 : 0);
                 try
                 {
                     using var reader = command.ExecuteReader();
@@ -577,7 +583,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
         {
             if (!guid.Equals(Guid.Empty))
             {
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     using var transaction = connection.BeginTransaction();
