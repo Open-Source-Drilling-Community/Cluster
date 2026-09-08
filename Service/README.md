@@ -26,6 +26,7 @@ The Service project is an ASP.NET Core Web API that exposes REST endpoints to cr
    - Base API path: `https://localhost:5001/Cluster/api`
 3. Configure (optional):
    - `Service/appsettings.*.json` configures `FieldHostURL` and `RigHostURL` for live backup/restore reference validation, and supports `WellHostURL`.
+   - Kubernetes deployments set these three routes from the service chart's `serviceUrls` values. The production defaults use the OSDC service names `osdcfieldservice`, `osdcrigservice`, and `osdcwellservice`.
    - Logging and detailed errors configured per environment.
    - Optional external service configuration is loaded from `home/Cluster.Service.json`, or from the path specified by `CLUSTER_EXTERNAL_CONFIG`.
    - In Docker, the image reads optional external configuration from `/home/Cluster.Service.json`.

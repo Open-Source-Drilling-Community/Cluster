@@ -11,6 +11,10 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "stable"
 imagePullSecrets: []
+serviceUrls:
+  WellHostURL: "http://osdcwellservice/"
+  FieldHostURL: "http://osdcfieldservice/"
+  RigHostURL: "http://osdcrigservice/"
 nameOverride: "osdcdrillingclusterservice"
 fullnameOverride: "osdcclusterservice"
 serviceAccount:
