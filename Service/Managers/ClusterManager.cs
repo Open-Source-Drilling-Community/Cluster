@@ -105,7 +105,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             {
                 var command = connection.CreateCommand();
                 command.CommandText = "SELECT COUNT(*) FROM ClusterTable WHERE ID = $id";
-                command.Parameters.AddWithValue("$id", guid);
+                command.Parameters.AddWithValue("$id", guid.ToString());
                 try
                 {
                     using SqliteDataReader reader = command.ExecuteReader();
@@ -212,7 +212,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
                     Model.Cluster? cluster;
                     var command = connection.CreateCommand();
                     command.CommandText = "SELECT Cluster FROM ClusterTable WHERE ID = $id";
-                    command.Parameters.AddWithValue("$id", guid);
+                    command.Parameters.AddWithValue("$id", guid.ToString());
                     try
                     {
                         using var reader = command.ExecuteReader();
@@ -354,7 +354,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             {
                 var command = connection.CreateCommand();
                 command.CommandText = "SELECT Cluster FROM ClusterTable WHERE FieldID = $fieldId";
-                command.Parameters.AddWithValue("$fieldId", fieldId);
+                command.Parameters.AddWithValue("$fieldId", fieldId.ToString());
                 try
                 {
                     using var reader = command.ExecuteReader();
@@ -390,7 +390,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             {
                 var command = connection.CreateCommand();
                 command.CommandText = "SELECT Cluster FROM ClusterTable WHERE RigID = $rigId";
-                command.Parameters.AddWithValue("$rigId", guid);
+                command.Parameters.AddWithValue("$rigId", guid.ToString());
                 try
                 {
                     using var reader = command.ExecuteReader();
