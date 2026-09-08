@@ -105,12 +105,16 @@
             {
                 <MudAlert Severity="Severity.Info" Dense="true">Select a cluster to display its survey runs.</MudAlert>
             }
-            else if (surveyRunList.Count == 0)
+            else if (surveyRunList.Count == 0 && plotTraces.Count == 0)
             {
-                <MudAlert Severity="Severity.Info" Dense="true">No survey runs were found for the selected cluster.</MudAlert>
+                <MudAlert Severity="Severity.Info" Dense="true">No survey runs, cluster slots, or delineation lines were found for the selected cluster.</MudAlert>
             }
             else
             {
+                @if (surveyRunList.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Info" Dense="true">No survey runs were found; displaying the available cluster slots and delineation lines.</MudAlert>
+                }
                 <MudGrid>
                     <MudItem xs="12" xl="6">
                         <MudPaper Class="pa-4" Elevation="2">
@@ -190,6 +194,7 @@
     private List<ClusterModelShared.RigReadResponse>? rigList;
     private List<ClusterModelShared.SurveyRunLight> surveyRunLightList = [];
     private List<ClusterModelShared.SurveyRun> surveyRunList = [];
+    private ClusterModelShared.Cluster? selectedClusterDetails;
     private List<ClusterModelShared.FieldDelineationLine> selectedFieldDelineationLines = [];
     private Guid? selectedFieldId;
     private Guid? selectedClusterId;
@@ -202,6 +207,7 @@
     private bool isCalculatingEllipses;
     private double ellipseConfidenceFactor = 0.95;
     private bool cameraIsAboveScene = true;
+    private double zeroMeanSeaLevelDepthWgs84;
     private List<PlotTrace> plotTraces = [];
     private Dictionary<Guid, List<ClusterModelShared.SurveyStationEllipseResult>> ellipseResultsBySurveyRun = [];
 
@@ -349,6 +355,7 @@
         }
         else
         {
+            selectedClusterDetails = null;
             surveyRunLightList.Clear();
             surveyRunList.Clear();
             selectedFieldDelineationLines.Clear();
@@ -370,12 +377,24 @@
 
     private async Task ApplySelectedClusterReferenceValuesAsync(Guid? clusterId)
     {
-        ClusterModelShared.ClusterLight? selectedCluster = clusterList?.FirstOrDefault(cluster => cluster.MetaInfo?.ID == clusterId);
-        DataUtils.ApplyClusterReferenceValues(selectedCluster, rigList);
-        await ApplySelectedFieldReferenceValuesAsync(selectedCluster?.FieldID ?? selectedFieldId);
-        await CartographicPositionReferenceUtils.ApplyAsync(Api, selectedCluster, logger);
-        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference =
-            await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, selectedCluster);
+        ClusterModelShared.ClusterLight? selectedClusterLight = clusterList?.FirstOrDefault(cluster => cluster.MetaInfo?.ID == clusterId);
+        selectedClusterDetails = clusterId is Guid selectedId
+            ? await Api.ClientCluster.GetClusterByIdAsync(selectedId)
+            : null;
+        if (selectedClusterDetails != null)
+        {
+            DataUtils.ApplyClusterReferenceValues(selectedClusterDetails, rigList);
+        }
+        else
+        {
+            DataUtils.ApplyClusterReferenceValues(selectedClusterLight, rigList);
+        }
+        await ApplySelectedFieldReferenceValuesAsync(selectedClusterDetails?.FieldID ?? selectedClusterLight?.FieldID ?? selectedFieldId);
+        await CartographicPositionReferenceUtils.ApplyAsync(Api, selectedClusterLight, logger);
+        double? meanSeaLevelDepthWgs84 =
+            await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, selectedClusterDetails);
+        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = meanSeaLevelDepthWgs84;
+        zeroMeanSeaLevelDepthWgs84 = meanSeaLevelDepthWgs84 ?? 0.0;
     }
 
     private async Task ApplySelectedFieldReferenceValuesAsync(Guid? fieldId)
@@ -553,8 +572,36 @@
         }
 
         AddEllipseTracesForLoadedSurveyRuns(nextPlotTraces);
+        AppendClusterSlotTrace(nextPlotTraces);
         AppendDelineationTraces(nextPlotTraces);
         plotTraces = nextPlotTraces;
+    }
+
+    private void AppendClusterSlotTrace(List<PlotTrace> traces)
+    {
+        if (selectedClusterDetails is not { IsSingleWell: false } cluster)
+        {
+            return;
+        }
+
+        List<object> northValues = [];
+        List<object> eastValues = [];
+        List<object> tvdValues = [];
+        double depth = ClusterVisualizationOverlayUtils.ResolveSlotDepthWgs84(cluster, zeroMeanSeaLevelDepthWgs84);
+        foreach (ClusterModelShared.Slot slot in cluster.Slots?.Values ?? [])
+        {
+            if (ClusterVisualizationOverlayUtils.TryGetSlotNorthEast(slot, out double north, out double east))
+            {
+                AppendPointValues(north, east, depth, northValues, eastValues, tvdValues);
+            }
+        }
+
+        if (northValues.Count > 0)
+        {
+            string clusterName = string.IsNullOrWhiteSpace(cluster.Name) ? "Cluster" : cluster.Name;
+            traces.Add(new PlotTrace($"{clusterName} slots", 2, Colors[4], true,
+                northValues, eastValues, tvdValues));
+        }
     }
 
     private async Task OnCameraIsAboveSceneChanged(bool value)
@@ -642,7 +689,7 @@
         }
 
         return northValues.Count >= 2 && northValues.Count == eastValues.Count
-            ? new PlotTrace(name, 1, color, showLegend, northValues, eastValues, tvdValues, true, true, false, lineDash)
+            ? new PlotTrace(name, 1, color, showLegend, northValues, eastValues, tvdValues, true, true, true, lineDash)
             : null;
     }
 

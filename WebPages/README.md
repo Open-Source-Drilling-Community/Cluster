@@ -57,6 +57,8 @@ The web pages include dedicated administration pages for:
 
 - Field and cluster selectors list every applicable item when empty and filter names by case-insensitive substring as the user types.
 - The 3D view shows survey/trajectory traces and selected uncertainty ellipses.
+- Both views show the selected real cluster's slots as one legend-toggleable marker trace, including when no survey runs or trajectories exist.
+- In 3D, slots use the cluster reference depth when defined, otherwise ground/mud-line depth, otherwise 0 MSL converted to the internal WGS84 depth datum.
 - The `Field` position reference uses the persisted reference point of the selected owning Field; if that datum cannot be resolved, the active selection falls back to WGS84.
 - The `Cartographic` position reference resolves the selected Cluster reference point through its owning Field's configured projection; conversion failure falls back to WGS84 without blocking the display.
 - The depth selector offers the shared `Rotary table`/`RTE` choice backed by `Rig.DrillFloorElevation` only for a selected fixed-platform Cluster with a valid Rig link. Rig-service failure leaves the plots usable and only disables that conversion value.
@@ -64,7 +66,7 @@ The web pages include dedicated administration pages for:
 - If the selected field defines delineation lines, the pages overlay the original delineation lines and calculated boundary lines.
 - Boundary lines are drawn dashed in the horizontal projection.
 - In the 3D view, delineation lines are displayed on the north/east plane at the top or bottom of the survey/trajectory bounding box, depending on camera angle.
-- The 3D bounding box is based only on survey/trajectory data and uncertainty traces that contribute to bounds; delineation lines do not enlarge the plot bounds.
+- The 3D bounding box includes cluster slots and delineation lines so every available overlay is visible in the initial view.
 
 ## Dependencies
 

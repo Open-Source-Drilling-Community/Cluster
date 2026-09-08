@@ -6,10 +6,7 @@ namespace OSDC.Drilling.Cluster.WebPages;
 public static class MslDepthReferenceUtils
 {
     public static Task<double?> ResolveMeanSeaLevelDepthReferenceAsync(IClusterAPIUtils api, ModelShared.Cluster? cluster) =>
-        CalculateMeanSeaLevelDepthReferenceAsync(
-            api,
-            cluster?.ReferencePoint?.Latitude,
-            cluster?.ReferencePoint?.Longitude);
+        ResolveMeanSeaLevelDepthReferenceFromFullClusterAsync(api, cluster);
 
     public static Task<double?> ResolveMeanSeaLevelDepthReferenceAsync(IClusterAPIUtils api, ModelShared.ClusterLight? cluster) =>
         CalculateMeanSeaLevelDepthReferenceAsync(
@@ -42,5 +39,29 @@ public static class MslDepthReferenceUtils
         MeanSeaLevelToWgs84Response response =
             await api.ClientEarthVerticalDatum.ConvertMeanSeaLevelToWgs84Async(request);
         return response.Samples?.FirstOrDefault()?.Wgs84EllipsoidalDepth;
+    }
+
+    private static Task<double?> ResolveMeanSeaLevelDepthReferenceFromFullClusterAsync(
+        IClusterAPIUtils api,
+        ModelShared.Cluster? cluster)
+    {
+        if (cluster?.ReferencePoint?.Latitude is double latitude &&
+            cluster.ReferencePoint.Longitude is double longitude)
+        {
+            return CalculateMeanSeaLevelDepthReferenceAsync(api, latitude, longitude);
+        }
+
+        List<(double Latitude, double Longitude)> positions = (cluster?.Slots?.Values ?? [])
+            .Where(slot => slot.Latitude?.GaussianValue?.Mean != null && slot.Longitude?.GaussianValue?.Mean != null)
+            .Select(slot => (
+                slot.Latitude!.GaussianValue!.Mean!.Value,
+                slot.Longitude!.GaussianValue!.Mean!.Value))
+            .ToList();
+        return positions.Count == 0
+            ? Task.FromResult<double?>(null)
+            : CalculateMeanSeaLevelDepthReferenceAsync(
+                api,
+                positions.Average(position => position.Latitude),
+                positions.Average(position => position.Longitude));
     }
 }

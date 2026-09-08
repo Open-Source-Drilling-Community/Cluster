@@ -46,7 +46,7 @@ the stable `Trajectory/api/` base path.
 - Contextual Rig page: `/Cluster/webapp/Rig` hosts the `OSDC.Drilling.Rig.WebPages` catalog and editor against the configured Rig service.
 - Detail page: edit cluster metadata, field association, reference coordinates, identities, features, environment depths, slots, and slot features.
 - Admin pages: manage cluster identities, cluster feature categories/options, and slot feature categories/options.
-- Backup and restore: `/Cluster/webapp/ClusterBackupRestore` exports multiple clusters with their referenced local definitions and reconnects Field/Rig references during atomic restore.
+- Import/Export: the collapsed navigation group exposes **Backup / Restore** at `/Cluster/webapp/ClusterBackupRestore`; it exports multiple clusters with their referenced local definitions and reconnects Field/Rig references during atomic restore.
 - Usage statistics: `/Cluster/webapp/StatisticsCluster` displays persistent request history in a sortable method, endpoint, and functional-area table.
 - Display pages: show cluster trajectories and survey runs in 3D and horizontal projection.
 - Field delineation overlays: cluster trajectory and survey-run displays load delineation lines from the selected field and draw original lines plus calculated boundaries. Boundaries are dashed in the horizontal projection. In 3D, delineation lines are placed on the north/east plane at the top or bottom of the survey/trajectory bounding box without changing the plot bounds.
