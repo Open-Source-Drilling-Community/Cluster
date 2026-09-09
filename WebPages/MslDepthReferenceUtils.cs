@@ -38,8 +38,12 @@ public static class MslDepthReferenceUtils
         };
         MeanSeaLevelToWgs84Response response =
             await api.ClientEarthVerticalDatum.ConvertMeanSeaLevelToWgs84Async(request);
-        return response.Samples?.FirstOrDefault()?.Wgs84EllipsoidalDepth;
+        return ToMeanSeaLevelDepthReference(
+            response.Samples?.FirstOrDefault()?.Wgs84EllipsoidalDepth);
     }
+
+    public static double? ToMeanSeaLevelDepthReference(double? meanSeaLevelWgs84Depth) =>
+        -meanSeaLevelWgs84Depth;
 
     private static Task<double?> ResolveMeanSeaLevelDepthReferenceFromFullClusterAsync(
         IClusterAPIUtils api,

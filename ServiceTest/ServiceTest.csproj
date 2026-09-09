@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ModelSharedOut\ModelSharedOut.csproj" />
     <ProjectReference Include="..\Service\Service.csproj" />
+    <ProjectReference Include="..\WebPages\WebPages.csproj" Aliases="ClusterWebPages" />
   </ItemGroup>
 
 </Project>

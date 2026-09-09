@@ -394,10 +394,10 @@
         }
         await ApplySelectedFieldReferenceValuesAsync(selectedClusterDetails?.FieldID ?? selectedClusterLight?.FieldID ?? selectedFieldId);
         await CartographicPositionReferenceUtils.ApplyAsync(Api, selectedClusterLight, logger);
-        double? meanSeaLevelDepthWgs84 =
+        double? meanSeaLevelDepthReference =
             await MslDepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, selectedClusterDetails);
-        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = meanSeaLevelDepthWgs84;
-        zeroMeanSeaLevelDepthWgs84 = meanSeaLevelDepthWgs84 ?? 0.0;
+        DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference = meanSeaLevelDepthReference;
+        zeroMeanSeaLevelDepthWgs84 = -meanSeaLevelDepthReference ?? 0.0;
     }
 
     private async Task ApplySelectedFieldReferenceValuesAsync(Guid? fieldId)

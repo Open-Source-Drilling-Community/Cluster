@@ -1383,7 +1383,7 @@
 
     private void UpdateDepthPlot()
     {
-        double? meanSeaLevelDepthWGS84 = DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference;
+        double? meanSeaLevelDepthWGS84 = -DataUtils.UnitAndReferenceParameters.MeanSeaLevelDepthReferenceSource.MeanSeaLevelDepthReference;
         if (referenceDepthWGS84 != null || groundMudLineDepthWGS84 != null || topWaterDepthWGS84 != null || meanSeaLevelDepthWGS84 != null)
         {
             //each list below is designed to contain N curves: in this case, we only plot 1 curve, corresponding to 1 trajectory
