@@ -13,6 +13,7 @@ using OSDC.Drilling.Cluster.Service;
 using OSDC.Drilling.Cluster.Model;
 using System.Threading;
 using OSDC.DotnetLibraries.General.DataManagement;
+using System.Text.Json;
 
 namespace ServiceTest.Controllers
 {
@@ -224,6 +225,36 @@ namespace ServiceTest.Controllers
             Assert.That(_controller.PutClusterById(id, original, cluster), Is.TypeOf<OkObjectResult>());
             cluster.Description = "stale update";
             Assert.That(_controller.PutClusterById(id, original, cluster), Is.TypeOf<ConflictObjectResult>());
+        }
+
+        [Test]
+        public void LegacyClusterWithoutModificationDate_IsBackfilledIdempotentlyAndCanBeUpdated()
+        {
+            var id = Guid.NewGuid();
+            var cluster = MakeCluster(id);
+            Assert.That(_controller!.PostCluster(cluster), Is.TypeOf<OkObjectResult>());
+
+            cluster.LastModificationDate = null;
+            using (SqliteConnection connection = _sqlConnectionManager!.GetConnection()!)
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "UPDATE ClusterTable SET Cluster=$cluster WHERE ID=$id";
+                command.Parameters.AddWithValue("$cluster", JsonSerializer.Serialize(cluster, JsonSettings.Options));
+                command.Parameters.AddWithValue("$id", id.ToString());
+                Assert.That(command.ExecuteNonQuery(), Is.EqualTo(1));
+            }
+
+            Assert.That(_sqlConnectionManager.BackfillMissingClusterModificationDates(), Is.EqualTo(1));
+            var migrated = ((OkObjectResult)_controller.GetClusterById(id).Result!).Value as OSDC.Drilling.Cluster.Model.Cluster;
+            Assert.That(migrated?.LastModificationDate, Is.Not.Null);
+            DateTimeOffset migrationToken = migrated!.LastModificationDate!.Value;
+
+            Assert.That(_sqlConnectionManager.BackfillMissingClusterModificationDates(), Is.Zero);
+            var unchanged = ((OkObjectResult)_controller.GetClusterById(id).Result!).Value as OSDC.Drilling.Cluster.Model.Cluster;
+            Assert.That(unchanged?.LastModificationDate?.UtcTicks, Is.EqualTo(migrationToken.UtcTicks));
+
+            unchanged!.Description = "updated after migration";
+            Assert.That(_controller.PutClusterById(id, migrationToken, unchanged), Is.TypeOf<OkObjectResult>());
         }
 
         [Test]

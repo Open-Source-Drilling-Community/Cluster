@@ -6,6 +6,8 @@ using System.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Sqlite;
+using System.Text.Json;
+using OSDC.Drilling.Cluster.Model;
 
 namespace OSDC.Drilling.Cluster.Service.Managers
 {
@@ -85,6 +87,7 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             if (Initialize())
             {
                 ManageDataBase();
+                BackfillMissingClusterModificationDates();
             }
             else
             {
@@ -259,6 +262,79 @@ namespace OSDC.Drilling.Cluster.Service.Managers
             else
             {
                 _logger.LogError("Problem opening a new connection while managing database");
+            }
+        }
+
+        internal int BackfillMissingClusterModificationDates()
+        {
+            using SqliteConnection? connection = GetConnection();
+            if (connection == null)
+            {
+                throw new InvalidOperationException("Unable to open the Cluster database for the modification timestamp migration.");
+            }
+
+            using SqliteTransaction transaction = connection.BeginTransaction();
+            try
+            {
+                List<(string Id, string Document)> documents = [];
+                using (SqliteCommand read = connection.CreateCommand())
+                {
+                    read.Transaction = transaction;
+                    read.CommandText = "SELECT ID, Cluster FROM ClusterTable";
+                    using SqliteDataReader reader = read.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        if (reader.IsDBNull(0) || reader.IsDBNull(1))
+                        {
+                            throw new InvalidDataException("ClusterTable contains a row without an ID or Cluster document.");
+                        }
+
+                        documents.Add((reader.GetString(0), reader.GetString(1)));
+                    }
+                }
+
+                int changed = 0;
+                DateTimeOffset migrationTimestamp = DateTimeOffset.UtcNow;
+                foreach ((string id, string document) in documents)
+                {
+                    Model.Cluster cluster = JsonSerializer.Deserialize<Model.Cluster>(document, JsonSettings.Options)
+                        ?? throw new InvalidDataException($"ClusterTable row {id} contains an invalid Cluster document.");
+                    if (!Guid.TryParse(id, out Guid rowId) || cluster.MetaInfo?.ID != rowId)
+                    {
+                        throw new InvalidDataException($"ClusterTable row {id} does not match the Cluster document ID.");
+                    }
+
+                    if (cluster.LastModificationDate != null)
+                    {
+                        continue;
+                    }
+
+                    cluster.LastModificationDate = migrationTimestamp;
+                    using SqliteCommand update = connection.CreateCommand();
+                    update.Transaction = transaction;
+                    update.CommandText = "UPDATE ClusterTable SET Cluster=$cluster WHERE ID=$id";
+                    update.Parameters.AddWithValue("$cluster", JsonSerializer.Serialize(cluster, JsonSettings.Options));
+                    update.Parameters.AddWithValue("$id", id);
+                    if (update.ExecuteNonQuery() != 1)
+                    {
+                        throw new InvalidDataException($"ClusterTable row {id} could not be updated during the modification timestamp migration.");
+                    }
+
+                    changed++;
+                }
+
+                transaction.Commit();
+                _logger.LogInformation(
+                    "Cluster modification timestamp migration examined {ExaminedCount} records and backfilled {ChangedCount} records",
+                    documents.Count,
+                    changed);
+                return changed;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                _logger.LogCritical(ex, "Cluster modification timestamp migration failed; no records were changed");
+                throw new InvalidOperationException("Cluster modification timestamp migration failed.", ex);
             }
         }
 

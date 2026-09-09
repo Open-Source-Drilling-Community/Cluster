@@ -967,8 +967,21 @@
                 }
 
                 Cluster cluster = BuildEditedCluster(DateTimeOffset.UtcNow);
+                if (CurrentCluster.LastModificationDate == null)
+                {
+                    Cluster serverCluster = await Api.ClientCluster.GetClusterByIdAsync(CurrentCluster.MetaInfo.ID);
+                    if (serverCluster.LastModificationDate == null)
+                    {
+                        logger.LogWarning("Cluster {ClusterId} has no server modification timestamp", CurrentCluster.MetaInfo.ID);
+                        Snackbar.Add("This legacy Cluster has no server modification timestamp. Restart the Cluster service to apply its data migration, then reload this page.", Severity.Warning);
+                        return;
+                    }
+
+                    CurrentCluster.LastModificationDate = serverCluster.LastModificationDate;
+                }
+
                 await Api.ClientCluster.PutClusterByIdAsync(CurrentCluster.MetaInfo.ID,
-                    CurrentCluster.LastModificationDate ?? throw new InvalidOperationException("The Cluster has no server modification timestamp."), cluster);
+                    CurrentCluster.LastModificationDate.Value, cluster);
                 CurrentCluster = await Api.ClientCluster.GetClusterByIdAsync(CurrentCluster.MetaInfo.ID);
                 ApplyClusterToEditor(CurrentCluster);
                 await RefreshReferenceSourcesAsync();

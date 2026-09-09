@@ -135,6 +135,7 @@ Note: Updates are full replacements. Send every value that must remain stored, a
 - Database: SQLite at `home/Cluster.db` (relative to solution root).
 - Optional external service configuration and the generated MCP hub instance id can also live under the shared `home` folder.
 - On startup, the service validates the DB schema; if mismatches are found, it creates a timestamped backup and rebuilds tables.
+- After schema validation, an idempotent transaction assigns a server modification timestamp to legacy Cluster documents that do not yet have one. The service fails startup without committing any part of this migration if a stored Cluster document or row identity is invalid.
 - Main tables:
   - `ClusterTable`
   - `ClusterIdentityTable`
