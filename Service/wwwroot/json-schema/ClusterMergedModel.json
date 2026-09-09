@@ -15804,16 +15804,6 @@
             ],
             "nullable": true
           },
-          "DrillFloorElevation": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "deprecated": true
-          },
-          "IsFixedPlatform": {
-            "type": "boolean",
-            "deprecated": true
-          },
           "ClusterID": {
             "type": "string",
             "format": "uuid",
@@ -16391,9 +16381,6 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
-          },
-          "IsFixedPlatform": {
-            "type": "boolean"
           },
           "ClusterID": {
             "type": "string",
@@ -17184,16 +17171,6 @@
               }
             ],
             "nullable": true
-          },
-          "DrillFloorElevation": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "deprecated": true
-          },
-          "IsFixedPlatform": {
-            "type": "boolean",
-            "deprecated": true
           },
           "ClusterID": {
             "type": "string",
