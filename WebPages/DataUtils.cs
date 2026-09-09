@@ -136,9 +136,10 @@ public static class DataUtils
             return;
         }
 
-        if (rigs.FirstOrDefault(rig => rig?.MetaInfo?.ID == selectedRigId)?.DrillFloorElevation is double drillFloorElevation)
+        if (rigs.FirstOrDefault(rig => rig?.MetaInfo?.ID == selectedRigId)?
+            .FixedPlatformProperties?.DrillFloorDepth?.GaussianValue?.Mean is double drillFloorDepth)
         {
-            UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = -drillFloorElevation;
+            UnitAndReferenceParameters.RotaryTableDepthReferenceSource.RotaryTableDepthReference = -drillFloorDepth;
         }
         else
         {

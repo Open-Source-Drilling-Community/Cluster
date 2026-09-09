@@ -853,7 +853,7 @@
         {
             var rigs = await Api.ClientRig.GetAllRigLightAsync();
             // Only fixed platform rigs are relevant when selecting a fixed platform cluster
-            _rigs = rigs?.Where(r => r.IsFixedPlatform).OrderBy(r => r.Name).ToList() ?? new List<RigLight>();
+            _rigs = rigs?.Where(r => r.RigType == RigType.PlatformRig).OrderBy(r => r.Name).ToList() ?? new List<RigLight>();
         }
         catch (Exception ex)
         {

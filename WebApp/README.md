@@ -51,7 +51,7 @@ the stable `Trajectory/api/` base path.
 - Display pages: show cluster trajectories and survey runs in 3D and horizontal projection.
 - Field delineation overlays: cluster trajectory and survey-run displays load delineation lines from the selected field and draw original lines plus calculated boundaries. Boundaries are dashed in the horizontal projection. In 3D, delineation lines are placed on the north/east plane at the top or bottom of the survey/trajectory bounding box without changing the plot bounds.
 - Field position datum: trajectory and survey-run plots can be expressed relative to the selected owning Field's persisted reference point.
-- Fixed-platform depth datum: when the selected Cluster links a Rig that defines `DrillFloorElevation`, trajectory and survey-run plots can use the shared `Rotary table`/`RTE` depth reference. Mobile-cluster Rig links are not treated as a stable Cluster-level datum.
+- Fixed-platform depth datum: when the selected Cluster links a `PlatformRig` that defines `FixedPlatformProperties.DrillFloorDepth`, trajectory and survey-run plots can use its Gaussian mean as the shared `Rotary table`/`RTE` depth reference. Mobile-cluster Rig links are not treated as a stable Cluster-level datum.
 - Cartographic position datum: trajectory and survey-run plots obtain the selected Cluster's projected Northing/Easting offset from the owning Field's stateless coordinate-conversion endpoint; an unavailable conversion falls back to WGS84.
 - Calculators menu:
   - `Cartographic Conversion` opens the Field cartographic conversion page at `/Cluster/webapp/FieldCartographicConverter`.

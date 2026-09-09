@@ -61,7 +61,7 @@ The web pages include dedicated administration pages for:
 - In 3D, slots use the cluster reference depth when defined, otherwise ground/mud-line depth, otherwise 0 MSL converted to the internal WGS84 depth datum.
 - The `Field` position reference uses the persisted reference point of the selected owning Field; if that datum cannot be resolved, the active selection falls back to WGS84.
 - The `Cartographic` position reference resolves the selected Cluster reference point through its owning Field's configured projection; conversion failure falls back to WGS84 without blocking the display.
-- The depth selector offers the shared `Rotary table`/`RTE` choice backed by `Rig.DrillFloorElevation` only for a selected fixed-platform Cluster with a valid Rig link. Rig-service failure leaves the plots usable and only disables that conversion value.
+- The depth selector offers the shared `Rotary table`/`RTE` choice backed by `Rig.FixedPlatformProperties.DrillFloorDepth.GaussianValue.Mean` only for a selected fixed-platform Cluster with a valid platform-Rig link. The standard uncertainty defaults to 0.5 m when absent. Rig-service failure leaves the plots usable and only disables that conversion value.
 - The horizontal projection shows the same data on the north/east plane.
 - If the selected field defines delineation lines, the pages overlay the original delineation lines and calculated boundary lines.
 - Boundary lines are drawn dashed in the horizontal projection.
