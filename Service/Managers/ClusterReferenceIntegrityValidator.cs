@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.General.ResourceClassification;
 using Microsoft.Data.Sqlite;
 using OSDC.Drilling.Cluster.Model;
 using System;
@@ -22,8 +23,8 @@ internal static class ClusterReferenceIntegrityValidator
         for (int index = 0; index < (cluster.ClusterIdentityAssignments?.Count ?? 0); index++)
         {
             Guid? id = cluster.ClusterIdentityAssignments![index].IdentityID;
-            if (id is Guid value && (value == Guid.Empty || !identities.Contains(value)))
-                errors.Add(Error($"ClusterIdentityAssignments[{index}].IdentityID", "cluster_identity_not_found", $"No local Cluster identity has UUID {value}."));
+            if (!ClassificationValidation.IsValidOptionalReference(id, identities))
+                errors.Add(Error($"ClusterIdentityAssignments[{index}].IdentityID", "cluster_identity_not_found", $"No local Cluster identity has UUID {id}."));
         }
         for (int index = 0; index < (cluster.ClusterFeatureAssignments?.Count ?? 0); index++)
         {
@@ -69,21 +70,9 @@ internal static class ClusterReferenceIntegrityValidator
     private static void ValidateCategory(Guid? categoryId, Guid? optionId, IReadOnlyDictionary<Guid, HashSet<Guid>> optionsByCategory,
         string path, List<ClusterMutationError> errors)
     {
-        if (categoryId == null && optionId == null) return;
-        if (categoryId is not Guid category || category == Guid.Empty)
-        {
-            errors.Add(Error($"{path}.FeatureCategoryID", "category_id_required", "A category UUID is required when an option is selected."));
-            return;
-        }
-        if (!optionsByCategory.TryGetValue(category, out HashSet<Guid>? options))
-        {
-            errors.Add(Error($"{path}.FeatureCategoryID", "category_not_found", $"No local category has UUID {category}."));
-            return;
-        }
-        if (optionId is not Guid option || option == Guid.Empty)
-            errors.Add(Error($"{path}.FeatureOptionID", "option_id_required", "An option UUID is required when a category is selected."));
-        else if (!options.Contains(option))
-            errors.Add(Error($"{path}.FeatureOptionID", "option_not_in_category", $"Option UUID {option} does not belong to category UUID {category}."));
+        ClassificationIssue? issue = ClassificationValidation.ValidateCategoryReference(
+            categoryId, optionId, optionsByCategory, path, "FeatureCategoryID", "FeatureOptionID");
+        if (issue != null) errors.Add(Error(issue.Property, issue.Code, issue.Message));
     }
 
     private static ClusterMutationError? FindReferences(SqliteConnection connection, SqliteTransaction transaction,

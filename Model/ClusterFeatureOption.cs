@@ -1,25 +1,8 @@
-using OSDC.DotnetLibraries.General.DataManagement;
-using System;
+using OSDC.DotnetLibraries.General.ResourceClassification;
 
-namespace OSDC.Drilling.Cluster.Model
+namespace OSDC.Drilling.Cluster.Model;
+
+/// <summary>ClusterFeatureOption contract using the shared resource classification implementation.</summary>
+public class ClusterFeatureOption : FeatureOption
 {
-    public class ClusterFeatureOption : IFeatureOption
-    {
-        /// <summary>
-        /// stable identifier for the option inside its category
-        /// </summary>
-        public Guid ID { get; set; }
-
-        /// <summary>
-        /// user-defined name of the option
-        /// </summary>
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// default constructor required for JSON serialization
-        /// </summary>
-        public ClusterFeatureOption() : base()
-        {
-        }
-    }
 }

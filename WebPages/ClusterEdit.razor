@@ -1770,11 +1770,8 @@
 
     private static bool IntervalsOverlap(ClusterFeatureAssignment first, ClusterFeatureAssignment second)
     {
-        DateTimeOffset firstStart = first.FromDate ?? DateTimeOffset.MinValue;
-        DateTimeOffset firstEnd = first.ToDate ?? DateTimeOffset.MaxValue;
-        DateTimeOffset secondStart = second.FromDate ?? DateTimeOffset.MinValue;
-        DateTimeOffset secondEnd = second.ToDate ?? DateTimeOffset.MaxValue;
-        return firstStart <= secondEnd && secondStart <= firstEnd;
+        return OSDC.DotnetLibraries.General.ResourceClassification.ClassificationValidation.IntervalsOverlap(
+            first.FromDate, first.ToDate, second.FromDate, second.ToDate);
     }
 
     private string GetSlotDisplayName(SlotTemplate slot)
@@ -2042,11 +2039,8 @@
 
     private static bool SlotFeatureIntervalsOverlap(SlotFeatureAssignment first, SlotFeatureAssignment second)
     {
-        DateTimeOffset firstStart = first.FromDate ?? DateTimeOffset.MinValue;
-        DateTimeOffset firstEnd = first.ToDate ?? DateTimeOffset.MaxValue;
-        DateTimeOffset secondStart = second.FromDate ?? DateTimeOffset.MinValue;
-        DateTimeOffset secondEnd = second.ToDate ?? DateTimeOffset.MaxValue;
-        return firstStart <= secondEnd && secondStart <= firstEnd;
+        return OSDC.DotnetLibraries.General.ResourceClassification.ClassificationValidation.IntervalsOverlap(
+            first.FromDate, first.ToDate, second.FromDate, second.ToDate);
     }
 
     private Variant GetIdentityButtonVariant(ClusterIdentity identity)

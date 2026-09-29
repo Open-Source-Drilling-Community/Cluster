@@ -1,30 +1,8 @@
-using OSDC.DotnetLibraries.General.DataManagement;
-using System;
+using OSDC.DotnetLibraries.General.ResourceClassification;
 
-namespace OSDC.Drilling.Cluster.Model
+namespace OSDC.Drilling.Cluster.Model;
+
+/// <summary>ClusterIdentityAssignment contract using the shared resource classification implementation.</summary>
+public class ClusterIdentityAssignment : IdentityAssignment
 {
-    public class ClusterIdentityAssignment : IIdentityAssignment
-    {
-        /// <summary>
-        /// unique ID of the assignment
-        /// </summary>
-        public Guid ID { get; set; }
-
-        /// <summary>
-        /// reference to the selected ClusterIdentity
-        /// </summary>
-        public Guid? IdentityID { get; set; }
-
-        /// <summary>
-        /// cluster-specific identity value
-        /// </summary>
-        public string? Value { get; set; }
-
-        /// <summary>
-        /// default constructor required for JSON serialization
-        /// </summary>
-        public ClusterIdentityAssignment() : base()
-        {
-        }
-    }
 }

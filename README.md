@@ -109,3 +109,24 @@ The Docker image reads optional service configuration from `/home/Cluster.Servic
 ## Current WebApp dependencies
 
 The Cluster WebApp consumes `OSDC.Drilling.Field.WebPages` 2.0.0, `OSDC.Drilling.Rig.WebPages` 1.1.0, `OSDC.Drilling.EarthCartographicProjection.WebPages` 1.1.0, `OSDC.Drilling.EarthGeodesy.WebPages` 1.1.0, `OSDC.Drilling.EarthVerticalDatum.WebPages` 1.1.0, `OSDC.Drilling.EarthGravity.WebPages` 1.0.1, and `OSDC.Drilling.EarthMagneticField.WebPages` 1.0.1. Field and Rig pages are hosted directly from their reusable Razor assemblies; Earth contextual and calculator pages use local route wrappers so all routes remain under `/Cluster/webapp`.
+
+## Shared resource classification (0.1.0)
+
+The model and WebPages projects now reference
+`OSDC.DotnetLibraries.General.ResourceClassification` 0.1.0. DataManagement
+2.2.0 continues to own the existing interfaces. Service-specific classification
+classes inherit the common implementation while retaining their public names,
+JSON properties, nullable references and concrete option lists. Catalogue data,
+default UUIDs, database tables, transactions and resource relationships remain
+owned by this service.
+
+Reference-integrity validation uses the shared helpers, preserving existing
+error codes and unlinked drafts. Editor validity-overlap checks use the common
+inclusive-interval rule. This extraction does not add stricter server validation
+for IDs or periods; the package also exposes those helpers for a subsequent
+audited migration. Persisted records are not rewritten.
+
+Publish ResourceClassification 0.1.0 before clean CI/Docker builds. For local
+pre-publication checks, supply the packed package directory as an explicit
+NuGet restore source alongside nuget.org; there are no conditional references.
+Model classification contract tests verify serialization and typed options.
