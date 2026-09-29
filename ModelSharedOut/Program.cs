@@ -155,7 +155,8 @@ class Program
 
                         // Reading locally stored dependencies
                         IEnumerable<string> files = Directory.EnumerateFiles(jsonInputsDirectory, "*.json");
-                        foreach (string file in files)
+                        // Dependency snapshots may repeat shared types. The service-owned schema is authoritative.
+                        foreach (string file in files.OrderBy(file => Path.GetFileName(file) == "ClusterFullName.json" ? 1 : 0).ThenBy(file => file, StringComparer.Ordinal))
                         {
                             PrettyPrint(file, "Processing Open Api doc into API client...");
                             var stream = File.OpenRead(file);
@@ -208,7 +209,7 @@ class Program
                         var code = generator.GenerateFile();
                         using (StreamWriter writer = new StreamWriter(modelSharedDir + Path.DirectorySeparatorChar + CSHARP_MODEL))
                         {
-                            writer.WriteLine(code);
+                            writer.WriteLine(string.Join(Environment.NewLine, code.Split('\n').Select(line => line.TrimEnd())));
                         }
                         error = false;
                         PrettyPrint(PRETTY_STRING, "C# client and base classes have been generated successfully!");

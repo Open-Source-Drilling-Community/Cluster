@@ -1,3 +1,4 @@
+using Model = OSDC.Drilling.Cluster.Model;
 using System;
 using System.Text.Json.Nodes;
 
@@ -5,6 +6,18 @@ namespace OSDC.Drilling.Cluster.Service.Mcp.Tools;
 
 internal static class McpToolArgumentHelpers
 {
+    // All domain schemas are annotated from the same model bindings as REST.
+    private static JsonObject CreateClusterObjectSchema() => Model.ProviderSemantics.Annotate(CreateClusterObjectSchemaRaw(), typeof(Model.Cluster));
+    private static JsonObject CreateClusterLightObjectSchema() => Model.ProviderSemantics.Annotate(CreateClusterLightObjectSchemaRaw(), typeof(Model.ClusterLight));
+    private static JsonObject CreateClusterIdentityObjectSchema() => Model.ProviderSemantics.Annotate(CreateClusterIdentityObjectSchemaRaw(), typeof(Model.ClusterIdentity));
+    private static JsonObject CreateFeatureCategoryObjectSchema(string target) => Model.ProviderSemantics.Annotate(CreateFeatureCategoryObjectSchemaRaw(target), target == "cluster" ? typeof(Model.ClusterFeatureCategory) : typeof(Model.SlotFeatureCategory));
+    private static JsonObject CreateMetaInfoSchema(string resource) => Model.ProviderSemantics.Annotate(CreateMetaInfoSchemaRaw(resource), typeof(OSDC.DotnetLibraries.General.DataManagement.MetaInfo));
+    private static JsonObject CreateIdentityAssignmentSchema() => Model.ProviderSemantics.Annotate(CreateIdentityAssignmentSchemaRaw(), typeof(Model.ClusterIdentityAssignment));
+    private static JsonObject CreateFeatureAssignmentSchema(string target) => Model.ProviderSemantics.Annotate(CreateFeatureAssignmentSchemaRaw(target), target == "cluster" ? typeof(Model.ClusterFeatureAssignment) : typeof(Model.SlotFeatureAssignment));
+    private static JsonObject CreateSlotSchema() => Model.ProviderSemantics.Annotate(CreateSlotSchemaRaw(), typeof(Model.Slot));
+    private static JsonObject CreateReferencePointSchema() => Model.ProviderSemantics.Annotate(CreateReferencePointSchemaRaw(), typeof(OSDC.DotnetLibraries.General.Math.Point3DGlobalCoordinates));
+    private static JsonObject CreateBatchDocumentSchema(int minimumClusters) => Model.ProviderSemantics.Annotate(CreateBatchDocumentSchemaRaw(minimumClusters), typeof(Model.ClusterBatchExportDocument));
+
     public static JsonObject CreateEmptySchema() => new()
     {
         ["type"] = "object",
@@ -117,7 +130,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     });
 
-    private static JsonObject CreateBatchDocumentSchema(int minimumClusters) => new()
+    private static JsonObject CreateBatchDocumentSchemaRaw(int minimumClusters) => new()
     {
         ["type"] = "object",
         ["properties"] = new JsonObject
@@ -251,7 +264,7 @@ internal static class McpToolArgumentHelpers
         };
     }
 
-    private static JsonObject CreateClusterObjectSchema() => new()
+    private static JsonObject CreateClusterObjectSchemaRaw() => new()
     {
         ["type"] = "object",
         ["description"] = "Complete Cluster resource representing a drilling site, platform, or single-well location. MetaInfo.ID must be a caller-generated, non-empty UUID.",
@@ -282,7 +295,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateClusterLightObjectSchema() => new()
+    private static JsonObject CreateClusterLightObjectSchemaRaw() => new()
     {
         ["type"] = "object",
         ["description"] = "Lightweight Cluster resource for discovery and selection without nested identities, feature assignments, or slots.",
@@ -305,7 +318,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateClusterIdentityObjectSchema() => new()
+    private static JsonObject CreateClusterIdentityObjectSchemaRaw() => new()
     {
         ["type"] = "object",
         ["description"] = "Definition of a symbolic identity type that clusters can populate through ClusterIdentityAssignments. MetaInfo.ID must be a caller-generated, non-empty UUID.",
@@ -320,7 +333,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateFeatureCategoryObjectSchema(string target) => new()
+    private static JsonObject CreateFeatureCategoryObjectSchemaRaw(string target) => new()
     {
         ["type"] = "object",
         ["description"] = $"Definition of a feature category and its allowed options for assignment to a {target}. MetaInfo.ID must be a caller-generated, non-empty UUID.",
@@ -338,7 +351,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateMetaInfoSchema(string resource) => new()
+    private static JsonObject CreateMetaInfoSchemaRaw(string resource) => new()
     {
         ["type"] = "object",
         ["description"] = $"Identity and optional HTTP location metadata for the {resource}.",
@@ -353,7 +366,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateIdentityAssignmentSchema() => new()
+    private static JsonObject CreateIdentityAssignmentSchemaRaw() => new()
     {
         ["type"] = "object",
         ["description"] = "A cluster-specific value for a defined ClusterIdentity.",
@@ -367,7 +380,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateFeatureAssignmentSchema(string target) => new()
+    private static JsonObject CreateFeatureAssignmentSchemaRaw(string target) => new()
     {
         ["type"] = "object",
         ["description"] = $"Selection of one feature option for the {target}, optionally constrained to a validity interval.",
@@ -396,7 +409,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateSlotSchema() => new()
+    private static JsonObject CreateSlotSchemaRaw() => new()
     {
         ["type"] = "object",
         ["description"] = "A well slot belonging to the cluster. The ID should match the UUID used as its key in the parent Slots object.",
@@ -415,7 +428,7 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateReferencePointSchema() => new()
+    private static JsonObject CreateReferencePointSchemaRaw() => new()
     {
         ["type"] = new JsonArray { "object", "null" },
         ["description"] = "Optional global cluster reference point using SI values and WGS84 references. Latitude and Longitude are radians; linear coordinates and TVD are meters.",

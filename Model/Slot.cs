@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using DWIS.Vocabulary.Schemas;
 using OSDC.DotnetLibraries.Drilling.DrillingProperties;
 using OSDC.DotnetLibraries.General.DataManagement;
@@ -11,31 +12,37 @@ namespace OSDC.Drilling.Cluster.Model
     /// <summary>
     /// a base class other classes may derive from
     /// </summary>
+    [Semantic(Concepts.WellSlot)]
     public class Slot
     {
         /// <summary>
         /// an ID that uniquely identifies the slot
         /// </summary>
+        [Semantic(Concepts.ResourceIdentifier)]
         public Guid ID { get; set; }
 
         /// <summary>
         /// name of the data
         /// </summary>
+        [Semantic(Concepts.ResourceName)]
         public string? Name { get; set; }
 
         /// <summary>
         /// a description of the data
         /// </summary>
+        [Semantic(Concepts.ResourceDescription)]
         public string? Description { get; set; }
 
         /// <summary>
         /// the date when the data was created
         /// </summary>
+        [Semantic(Concepts.Instant, Role = Concepts.CreationTime, Reference = Concepts.Utc)]
         public DateTimeOffset? CreationDate { get; set; }
 
         /// <summary>
         /// the date when the data was last modified
         /// </summary>
+        [Semantic(Concepts.Instant, Role = Concepts.LastModificationTime, Reference = Concepts.Utc)]
         public DateTimeOffset? LastModificationDate { get; set; }
 
         /// <summary>
@@ -59,6 +66,8 @@ namespace OSDC.Drilling.Cluster.Model
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyStandardDeviation, "sigma_relative_north_position_cluster#01")]
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyMean, "relative_north_position_cluster#01")]
         [DefaultStandardDeviation(1.6e-9)] // rad (1 cm at equator)
+        [Semantic(Concepts.GaussianUncertainValue)]
+        [GaussianQuantity(Concepts.Latitude, Concepts.AngularStandardUncertainty)]
         public GaussianDrillingProperty? Latitude { get; set; } = null;
 
         /// <summary>
@@ -71,7 +80,7 @@ namespace OSDC.Drilling.Cluster.Model
         [SemanticFact("relative_east_position_cluster#01", Nouns.Enum.PhysicalData)]
         [SemanticFact("relative_east_position_cluster#01", Nouns.Enum.ContinuousDataType)]
         [SemanticFact("relative_east_position_cluster#01", Verbs.Enum.HasDynamicValue, "relative_east_position_cluster")]
-        [SemanticFact("relative_east_position_cluster#01", Verbs.Enum.IsOfMeasurableQuantity, BasePhysicalQuantity.QuantityEnum.LengthStandard)]
+        [SemanticFact("relative_east_position_cluster#01", Verbs.Enum.IsOfMeasurableQuantity, BasePhysicalQuantity.QuantityEnum.PlaneAngleGeodesic)]
         [SemanticFact("MovingAverage", Nouns.Enum.MovingAverage)]
         [SemanticFact("relative_east_position_cluster#01", Verbs.Enum.IsTransformationOutput, "MovingAverage")]
         [SemanticFact("sigma_relative_east_position_cluster", Nouns.Enum.DrillingSignal)]
@@ -82,6 +91,8 @@ namespace OSDC.Drilling.Cluster.Model
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyStandardDeviation, "sigma_relative_east_position_cluster#01")]
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyMean, "relative_east_position_cluster#01")]
         [DefaultStandardDeviation(1.6e-9)] // rad (1 cm at equator)
+        [Semantic(Concepts.GaussianUncertainValue)]
+        [GaussianQuantity(Concepts.Longitude, Concepts.AngularStandardUncertainty)]
         public GaussianDrillingProperty? Longitude { get; set; } = null;
 
         /// <summary>

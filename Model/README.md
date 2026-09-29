@@ -139,3 +139,11 @@ Publish ResourceClassification 0.1.0 before clean CI/Docker builds. For local
 pre-publication checks, supply the packed package directory as an explicit
 NuGet restore source alongside nuget.org; there are no conditional references.
 Model classification contract tests verify serialization and typed options.
+
+## Semantic bindings (catalogue 0.7.0)
+
+`Semantic` attributes bind local models to the curated catalogue. `ProviderSemantics` supplies explicit bindings for inherited classification members and shared `MetaInfo`/`Point3DGlobalCoordinates` properties; shared DTOs remain package-owned. Resource UUIDs are distinct from symbolic identity values and external authority codes. Timestamps distinguish creation, modification and validity roles.
+
+`Point3DGlobalCoordinates.X/RiemannianNorth` and `Y/RiemannianEast` are WGS84 Riemannian arc coordinates (`PositionDrilling`, metres), not projected easting/northing. `Z/TVD` is ellipsoidal depth (`DepthDrilling`, metres, positive downward from WGS84); latitude/longitude use `PlaneAngleGeodesic`, radians. A reference point carries the `ReferenceLocation` role.
+
+Gaussian wrappers carry the `GaussianUncertainValue` representation concept, not one global physical quantity. A property-specific `GaussianQuantity` binding maps relative JSON Pointers under `GaussianValue`: `/Mean`, `/StandardDeviation`, `/MinValue`, `/MaxValue`. Slot means use latitude/longitude (`PlaneAngleGeodesic`, radians); depth means use ground/mud-line or water-surface depth (`DepthDrilling`, metres). Angular standard uncertainty uses `PlaneAngleGeodesic`; linear standard uncertainty uses `LengthStandard`. Means and domain bounds reference WGS84; standard deviations have no coordinate origin. Bounds are provider domain-limit metadata, not confidence intervals or Gaussian truncation instructions.

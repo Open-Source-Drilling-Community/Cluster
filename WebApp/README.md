@@ -103,3 +103,7 @@ The published image is `digiwells/osdcdrillingclusterwebappclient:stable`. The H
 ## Shared-page package versions
 
 The exact shared-page versions are declared in `WebApp.csproj`. Keep package references, dependency injection registrations, route wrappers, configuration keys, and generated dependency schemas synchronized when an upstream service contract changes.
+
+## Semantic contract release
+
+Build this host with the regenerated shared model from the SemanticCatalogue 0.7.0 integration. Coordinate and unit conventions are described on Home and in the Model README. The catalogue dependency is an unconditional published NuGet reference through Model; no local-library fallback is required. Existing routes and stored JSON are unchanged.
