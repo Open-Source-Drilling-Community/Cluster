@@ -76,6 +76,8 @@ ModelSharedOut is a .NET 8 console tool that builds a distributed shared model f
 ## Integration Notes
 
 - OpenAPI is the source of truth for generated DTOs and clients.
+
+`ClientJsonSerializerSettings.cs` is a maintained partial-client extension, not generated output. It registers `JsonStringEnumConverter` because NSwag does not attach an item converter to arrays of string enums such as `StationKeepingSystem.Modes`. Keep it linked into WebPages when regenerating `ClusterMergedModel.cs`.
 - When a dependency changes, refresh the corresponding schema JSON in `json-schemas/` and re-run the generator.
 - Namespace consistency: the generator uses `OSDC.Drilling.Cluster.ModelShared` to avoid name collisions across services.
 - If field delineation lines or trajectory/survey DTOs change upstream, regenerate this project before updating Cluster display code.

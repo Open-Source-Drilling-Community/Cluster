@@ -36,7 +36,7 @@
 
 	<!-- Include generated DTO source files directly from ModelSharedOut -->
 	<ItemGroup>
-		<Compile Include="..\ModelSharedOut\ClusterMergedModel.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Compile Include="..\ModelSharedOut\ClusterMergedModel.cs;..\ModelSharedOut\ClientJsonSerializerSettings.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 </Project>
