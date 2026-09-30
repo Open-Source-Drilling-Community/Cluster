@@ -158,8 +158,8 @@ public sealed class McpToolRegistrationTests
         {
             Assert.That(referencePoint["description"]?.GetValue<string>(), Does.Contain("WGS84"));
             Assert.That(referencePoint["description"]?.GetValue<string>(), Does.Contain("SI"));
-            Assert.That(Property(cluster, "GroundMudLineDepth")["description"]?.GetValue<string>(), Does.Contain("meters (SI)"));
-            Assert.That(Property(cluster, "GroundMudLineDepth")["description"]?.GetValue<string>(), Does.Contain("WGS84 vertical datum"));
+            Assert.That(Property(cluster, "GroundMudLineDepth")["description"]?.GetValue<string>(), Does.Contain("SI metres (m)"));
+            Assert.That(Property(cluster, "GroundMudLineDepth")["description"]?.GetValue<string>(), Does.Contain("WGS84 ellipsoid"));
         });
 
         JsonObject slots = Property(cluster, "Slots");

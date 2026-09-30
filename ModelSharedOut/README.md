@@ -90,3 +90,9 @@ ModelSharedOut is a .NET 8 console tool that builds a distributed shared model f
   - The generator already replaces `3.0.4` with `3.0.3`; confirm the output file is being copied to `Service/wwwroot/json-schema`.
 - Build fails on missing schema files:
   - Re-run `dotnet build Service -c Debug` to refresh `ClusterFullName.json`.
+
+## Preserving semantic metadata
+
+Refresh `ClusterFullName.json` from the built Service OpenAPI output before running this generator. Refresh the sibling FieldModel.json input from that service's authoritative schema when its contract changes. The generator merges dependency snapshots first and `ClusterFullName.json` last so older copies of shared types cannot overwrite this service's annotations.
+
+Run the existing `ModelSharedOut` program and confirm the overwrite prompt. Commit both generated `ClusterMergedModel.cs` and `Service/wwwroot/json-schema/ClusterMergedModel.json` with their schema inputs. `x-osdc-semantic` and contextual `x-osdc-semantic-bindings` remain in the merged JSON contract; generated C# carries the accompanying property documentation. Do not hand-edit generated model code. Build the full solution and run contract tests after regeneration.

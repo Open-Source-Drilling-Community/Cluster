@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using System;
 using System.Collections.Generic;
 
@@ -50,7 +51,9 @@ public sealed class ClusterBatchExternalReferences
 
 public sealed class ClusterBatchExternalReference
 {
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid SourceID { get; set; }
+    [Semantic(Concepts.ResourceName)]
     public string Name { get; set; } = string.Empty;
 }
 
@@ -106,8 +109,11 @@ public sealed class ClusterBatchRestoreResponse
 public sealed class ClusterBatchCatalogMapping
 {
     public string Catalog { get; set; } = string.Empty;
+    [Semantic(Concepts.ResourceName)]
     public string Name { get; set; } = string.Empty;
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid SourceID { get; set; }
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid LocalID { get; set; }
     public string Resolution { get; set; } = string.Empty;
 }
@@ -115,8 +121,11 @@ public sealed class ClusterBatchCatalogMapping
 public sealed class ClusterBatchExternalReferenceMapping
 {
     public string Resource { get; set; } = string.Empty;
+    [Semantic(Concepts.ResourceName)]
     public string Name { get; set; } = string.Empty;
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid SourceID { get; set; }
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid LocalID { get; set; }
     public string Resolution { get; set; } = string.Empty;
 }

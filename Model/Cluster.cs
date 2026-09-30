@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using DWIS.API.DTO;
 using DWIS.Vocabulary.Schemas;
 using OSDC.DotnetLibraries.Drilling.DrillingProperties;
@@ -10,49 +11,59 @@ using System.Collections.Generic;
 
 namespace OSDC.Drilling.Cluster.Model
 {
+    [Semantic(Concepts.WellCluster)]
     public class Cluster
     {
         /// <summary>
         /// a MetaInfo for the Cluster
         /// </summary>
+        [Semantic(Concepts.ResourceMetadata)]
         public MetaInfo? MetaInfo { get; set; }
 
         /// <summary>
         /// name of the data
         /// </summary>
+        [Semantic(Concepts.ResourceName)]
         public string? Name { get; set; }
 
         /// <summary>
         /// a description of the data
         /// </summary>
+        [Semantic(Concepts.ResourceDescription)]
         public string? Description { get; set; }
 
         /// <summary>
         /// the date when the data was created
         /// </summary>
+        [Semantic(Concepts.Instant, Role = Concepts.CreationTime, Reference = Concepts.Utc)]
         public DateTimeOffset? CreationDate { get; set; }
 
         /// <summary>
         /// the date when the data was last modified
         /// </summary>
+        [Semantic(Concepts.Instant, Role = Concepts.LastModificationTime, Reference = Concepts.Utc)]
         public DateTimeOffset? LastModificationDate { get; set; }
 
         /// <summary>
         ///  the ID of the field into which this cluster belongs to
         /// </summary>
+        [Semantic(Concepts.ResourceIdentifier)]
         public Guid? FieldID { get; set; }
 
         /// <summary>
         /// if true, the cluster is not a true cluster, but a single well
         /// </summary>
+        [Semantic(Concepts.SingleWellClusterFlag)]
         public bool IsSingleWell { get; set; } = false;
         /// <summary>
         /// the ID of the rig associated with the cluster, if any
         /// </summary>
+        [Semantic(Concepts.ResourceIdentifier)]
         public Guid? RigID { get; set; } = null;
         /// <summary>
         /// true if the cluster is associated with a fixed platform, false if it is a floating or moveable rig
         /// </summary>
+        [Semantic(Concepts.FixedPlatformFlag)]
         public bool IsFixedPlatform { get; set; } = false;
 
         /// <summary>
@@ -68,6 +79,7 @@ namespace OSDC.Drilling.Cluster.Model
         /// <summary>
         /// optional reference point for the cluster in SI and WGS84 references
         /// </summary>
+        [Semantic(Concepts.Position, Role = Concepts.ReferenceLocation, Reference = Concepts.Wgs84)]
         public Point3DGlobalCoordinates? ReferencePoint { get; set; } = null;
 
         /// <summary>
@@ -91,6 +103,8 @@ namespace OSDC.Drilling.Cluster.Model
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyStandardDeviation, "sigma_ground_mud_line_depth_cluster#01")]
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyMean, "ground_mud_line_depth_cluster#01")]
         [DefaultStandardDeviation(0.01)] // m (1 cm)
+        [Semantic(Concepts.GaussianUncertainValue)]
+        [GaussianQuantity(Concepts.GroundMudLineDepth, Concepts.LinearStandardUncertainty)]
         public GaussianDrillingProperty? GroundMudLineDepth { get; set; } = null;
 
         /// <summary>
@@ -114,6 +128,8 @@ namespace OSDC.Drilling.Cluster.Model
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyStandardDeviation, "sigma_top_water_depth_cluster#01")]
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyMean, "top_water_depth_cluster#01")]
         [DefaultStandardDeviation(0.01)] // m (1 cm)
+        [Semantic(Concepts.GaussianUncertainValue)]
+        [GaussianQuantity(Concepts.WaterSurfaceDepth, Concepts.LinearStandardUncertainty)]
         public GaussianDrillingProperty? TopWaterDepth { get; set; } = null;
 
         /// <summary>
