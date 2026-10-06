@@ -106,4 +106,4 @@ The exact shared-page versions are declared in `WebApp.csproj`. Keep package ref
 
 ## Semantic contract release
 
-Build this host with the regenerated shared model from the SemanticCatalogue 0.7.0 integration. Coordinate and unit conventions are described on Home and in the Model README. The catalogue dependency is an unconditional published NuGet reference through Model; no local-library fallback is required. Existing routes and stored JSON are unchanged.
+Build this host with the Model that consumes SemanticCatalogue 0.15.0. Coordinate and unit conventions are described on Home and in the Model README. The catalogue dependency is an unconditional published NuGet reference through Model; no local-library fallback is required. Existing routes and stored JSON are unchanged.

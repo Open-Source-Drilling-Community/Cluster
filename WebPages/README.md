@@ -55,6 +55,8 @@ The web pages include dedicated administration pages for:
 
 `ClusterSurveyRuns` and `ClusterTrajectories` display all survey runs or trajectories associated with the selected field and cluster.
 
+Their uncertainty overlays call the Trajectory service's resource-specific ellipse routes, which rebuild authoritative SurveyRun ancestry before calculating graphical ellipses rather than trusting stale or partial covariance submitted by the page.
+
 - Field and cluster selectors list every applicable item when empty and filter names by case-insensitive substring as the user types.
 - The 3D view shows survey/trajectory traces and selected uncertainty ellipses.
 - Both views show the selected real cluster's slots as one legend-toggleable marker trace, including when no survey runs or trajectories exist.
@@ -135,4 +137,4 @@ Model classification contract tests verify serialization and typed options.
 
 ## Semantic contract conventions
 
-The regenerated shared models follow SemanticCatalogue 0.7.0 descriptions. UI unit selectors remain presentation conversions: wire and stored angular values are radians and linear values are metres. WGS84 ellipsoidal depth is positive downward; display depth references must convert back before saving. Riemannian north/east coordinates are distinct from projected easting/northing. See the Model README for scalar quantity and uncertainty bindings.
+The owning Model builds against SemanticCatalogue 0.15.0. UI unit selectors remain presentation conversions: wire and stored angular values are radians and linear values are metres. WGS84 ellipsoidal depth is positive downward; display depth references must convert back before saving. Riemannian north/east coordinates are distinct from projected easting/northing. See the Model README for scalar quantity and uncertainty bindings.
