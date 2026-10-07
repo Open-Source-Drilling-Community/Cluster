@@ -137,4 +137,4 @@ Model classification contract tests verify serialization and typed options.
 
 ## Semantic contract conventions
 
-The owning Model builds against SemanticCatalogue 0.15.0. UI unit selectors remain presentation conversions: wire and stored angular values are radians and linear values are metres. WGS84 ellipsoidal depth is positive downward; display depth references must convert back before saving. Riemannian north/east coordinates are distinct from projected easting/northing. See the Model README for scalar quantity and uncertainty bindings.
+The owning Model builds against SemanticCatalogue 0.16.0. UI unit selectors remain presentation conversions: wire and stored angular values are radians and linear values are metres. WGS84 ellipsoidal depth is positive downward; display depth references must convert back before saving. Riemannian north/east coordinates are distinct from projected easting/northing. See the Model README for scalar quantity and uncertainty bindings.
