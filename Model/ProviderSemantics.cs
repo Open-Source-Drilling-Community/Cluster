@@ -63,6 +63,12 @@ public static class ProviderSemantics
 
     public static JsonObject? ForProperty(PropertyInfo property)
     {
+        if(property.DeclaringType==typeof(Cluster)) {
+            string? resource=property.Name switch {
+            "FieldID" => Concepts.Field,
+            "RigID" => Concepts.Rig,                _=>null};
+            if(resource is not null){var id=Metadata(Concepts.ResourceIdentifier);id["resourceType"]=resource;return id;}
+        }
         if (SemanticMetadata.For(property) is JsonObject direct) return direct;
         Type type = property.DeclaringType!;
         if (typeof(Point3DGlobalCoordinates).IsAssignableFrom(type))

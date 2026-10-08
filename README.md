@@ -136,3 +136,5 @@ Model classification contract tests verify serialization and typed options.
 The model, REST/OpenAPI and MCP contracts use `OSDC.DotnetLibraries.Drilling.SemanticCatalogue` **0.16.0**. Bindings cover well clusters, slots, positions, uncertain depths/angles, identities and features. Schema annotations identify concepts, roles, references, physical quantities and canonical SI units. Resource classification implementations remain owned by `ResourceClassification` 0.1.0.
 
 These annotations preserve existing JSON property names, routes and persisted values. See [model binding details](Model/README.md) and [contract generation](ModelSharedOut/README.md). Build the Service and WebApp images from this revision to publish the updated contracts.
+
+Cluster resource UUID links to Field/Rig and the read-by-ID parameter are explicitly typed in the REST and MCP semantic contracts. Ground/mud-line depth remains a canonical WGS84 Gaussian quantity, including declared expected-value and uncertainty roles.

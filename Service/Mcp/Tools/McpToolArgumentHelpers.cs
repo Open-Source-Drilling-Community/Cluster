@@ -24,9 +24,9 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    public static JsonObject CreateGuidSchema(string key, string description)
+    public static JsonObject CreateGuidSchema(string key, string description, string? resourceType = null)
     {
-        return new JsonObject
+        var schema = new JsonObject
         {
             ["type"] = "object",
             ["properties"] = new JsonObject
@@ -44,6 +44,8 @@ internal static class McpToolArgumentHelpers
             },
             ["additionalProperties"] = false
         };
+        if(resourceType is not null){var identity=Model.ProviderSemantics.Metadata(OSDC.DotnetLibraries.Drilling.SemanticCatalogue.Concepts.ResourceIdentifier);identity["resourceType"]=resourceType;schema["properties"]![key]!["x-osdc-semantic"]=identity;}
+        return schema;
     }
 
     public static JsonObject CreateClusterSchema(bool includeId = false) =>
