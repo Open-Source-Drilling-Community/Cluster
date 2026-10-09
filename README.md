@@ -133,7 +133,7 @@ Model classification contract tests verify serialization and typed options.
 
 ## Curated semantic vocabulary
 
-The model, REST/OpenAPI and MCP contracts use `OSDC.DotnetLibraries.Drilling.SemanticCatalogue` **0.16.0**. Bindings cover well clusters, slots, positions, uncertain depths/angles, identities and features. Schema annotations identify concepts, roles, references, physical quantities and canonical SI units. Resource classification implementations remain owned by `ResourceClassification` 0.1.0.
+The model, REST/OpenAPI and MCP contracts use `OSDC.DotnetLibraries.Drilling.SemanticCatalogue` **0.18.0**. Bindings cover well clusters, slots, positions, uncertain depths/angles, identities and features. MCP input roots also declare generic collection, retrieval, creation, replacement and deletion operation roles so clients can compose resource workflows from discovery metadata. Schema annotations identify concepts, roles, references, physical quantities and canonical SI units. Resource classification implementations remain owned by `ResourceClassification` 0.1.0.
 
 These annotations preserve existing JSON property names, routes and persisted values. See [model binding details](Model/README.md) and [contract generation](ModelSharedOut/README.md). Build the Service and WebApp images from this revision to publish the updated contracts.
 
