@@ -12,10 +12,11 @@ public sealed class RigDependencyContractTests
 
         Assert.That(clientMethods, Does.Contain("PostRigAsync"));
         Assert.That(clientMethods, Does.Contain("PutRigByIdAsync"));
-        Assert.That(clientMethods, Does.Contain("GetAllRigLightAsync"));
+        Assert.That(clientMethods, Does.Contain("DiscoverRigAsync"));
         Assert.That(clientMethods, Does.Contain("BatchExportRigsAsync"));
         Assert.That(clientMethods, Does.Contain("BatchRestoreRigsAsync"));
-        Assert.That(clientMethods, Does.Contain("GetAllRigFeatureCategoryAsync"));
+        Assert.That(clientMethods, Does.Contain("DiscoverRigFeatureCategoryAsync"));
+        Assert.That(clientMethods, Does.Not.Contain("GetAllRigAsync").And.Not.Contain("GetAllRigFeatureCategoryAsync"));
         Assert.That(typeof(RigReadResponse).GetProperty("Photos"), Is.Not.Null);
         Assert.That(typeof(RigBatchExportDocument).GetProperty("Rigs"), Is.Not.Null);
     }
