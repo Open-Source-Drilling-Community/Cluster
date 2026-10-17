@@ -139,10 +139,12 @@ The host embeds the following current WebPages packages. Publish these versions 
 | `OSDC.Drilling.EarthGeodesy.WebPages` | `2.0.0` |
 | `OSDC.Drilling.EarthGravity.WebPages` | `1.0.4` |
 | `OSDC.Drilling.EarthMagneticField.WebPages` | `1.0.4` |
-| `OSDC.Drilling.EarthVerticalDatum.WebPages` | `1.1.4` |
+| `OSDC.Drilling.EarthVerticalDatum.WebPages` | `1.1.6` |
 | `OSDC.Drilling.Field.WebPages` | `3.0.0` |
 | `OSDC.Drilling.Rig.WebPages` | `2.0.0` |
 
 Package releases with a new major version use the bounded light discovery contracts. Selected full-record reads and dedicated backup operations remain available.
 
 The Docker publishing workflow pushes each service and WebApp image as both `stable` and `sha-<full Git commit SHA>`, so a coordinated package upgrade can be traced to its exact source commit.
+
+Earth Vertical Datum WebPages 1.1.6 includes the Geoid Model read-only grid-resolution rendering fix.
