@@ -144,3 +144,5 @@ The host embeds the following current WebPages packages. Publish these versions 
 | `OSDC.Drilling.Rig.WebPages` | `2.0.0` |
 
 Package releases with a new major version use the bounded light discovery contracts. Selected full-record reads and dedicated backup operations remain available.
+
+The Docker publishing workflow pushes each service and WebApp image as both `stable` and `sha-<full Git commit SHA>`, so a coordinated package upgrade can be traced to its exact source commit.
