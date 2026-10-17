@@ -131,7 +131,7 @@
                 return;
             }
 
-            await ManageTracesAsync();
+            ManageTraces();
             try
             {
                 await chart.React();
@@ -140,7 +140,6 @@
             {
             }
 
-            await InvokeAsync(StateHasChanged);
             _lastPlotSignature = plotSignature;
             _forceReplot = false;
         }
@@ -150,23 +149,16 @@
         }
     }
 
-    private async Task ManageTracesAsync()
+    private void ManageTraces()
     {
+        // Build the complete frame locally; PlotAsync submits it with one React call.
+        data.Clear();
         if (_disposed || !_plotlyReady || chart == null || Parent == null || XUnit == null || YUnit == null)
         {
             return;
         }
 
         if (XValuesList == null || YValuesList == null || !XValuesList.Any() || XValuesList.Count != YValuesList.Count)
-        {
-            return;
-        }
-
-        try
-        {
-            await chart.Clear();
-        }
-        catch (NullReferenceException)
         {
             return;
         }
@@ -227,7 +219,7 @@
             {
                 marker.Color = "white";
                 marker.Size = 20;
-                await chart.AddTrace(new Scatter
+                data.Add(new Scatter
                 {
                     Name = name,
                     Mode = mode,
@@ -237,7 +229,7 @@
                     X = xValues,
                     Y = yValues
                 });
-                await chart.AddTrace(new Scatter
+                data.Add(new Scatter
                 {
                     Name = name,
                     Mode = ModeFlag.Text,
@@ -251,7 +243,7 @@
             }
             else
             {
-                await chart.AddTrace(new Scatter
+                data.Add(new Scatter
                 {
                     Name = name,
                     Mode = mode,
