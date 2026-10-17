@@ -242,9 +242,9 @@
         try
         {
             logger.LogInformation("Trying to load list of Fields and Clusters");
-            Task<ICollection<ClusterModelShared.FieldLight>> fieldTask = Api.ClientField.GetAllFieldLightAsync();
-            Task<ICollection<ClusterModelShared.ClusterLight>> clusterTask = Api.ClientCluster.GetAllClusterLightAsync();
-            Task<ICollection<ClusterModelShared.RigReadResponse>> rigTask = Api.ClientRig.GetAllRigAsync(false);
+            var fieldTask = Api.ClientField.ListFieldLightAsync();
+            var clusterTask = Api.ClientCluster.ListClusterLightAsync();
+            var rigTask = Api.ClientRig.ListRigReferencesAsync();
 
             await Task.WhenAll(fieldTask, clusterTask);
 
@@ -459,7 +459,7 @@
             selectedFieldDelineationLines = await LoadSelectedFieldDelineationLinesAsync(fieldId);
 
             logger.LogInformation("Loading trajectory light data for field {FieldId} and cluster {ClusterId}", fieldId, clusterId);
-            trajectoryLightList = (await Api.ClientTrajectory.GetAllTrajectoryLightAsync(fieldId: fieldId, clusterId: clusterId))
+            trajectoryLightList = (await Api.ClientTrajectory.ListTrajectoryLightAsync(fieldId: fieldId, clusterId: clusterId))
                 .Where(trajectory => trajectory?.MetaInfo != null && trajectory.MetaInfo.ID != Guid.Empty)
                 .Where(MatchesTrajectoryFilters)
                 .OrderBy(trajectory => trajectory.Name)

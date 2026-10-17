@@ -62,7 +62,7 @@ else
     {
         try
         {
-            identities = (List<ClusterIdentity>)await Api.ClientCluster.GetAllClusterIdentityAsync();
+            identities = (List<ClusterIdentity>)await Api.ClientCluster.ListClusterIdentityReferencesAsync();
             identities = identities
                 .Where(identity => identity?.MetaInfo?.ID != null)
                 .OrderBy(identity => identity.Name, StringComparer.OrdinalIgnoreCase)

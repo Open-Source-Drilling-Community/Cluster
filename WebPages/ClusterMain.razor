@@ -69,8 +69,8 @@ else
 
             // Starting all loading tasks asynchronously
             logger.LogInformation("Trying to load list of Cluster from client: " + Api.HostNameCluster);
-            var clusterTask = Api.ClientCluster.GetAllClusterLightAsync();
-            var fieldTask = Api.ClientField.GetAllFieldLightAsync();
+            var clusterTask = Api.ClientCluster.ListClusterLightAsync();
+            var fieldTask = Api.ClientField.ListFieldLightAsync();
 
             List<Task> loadingTaskList = new List<Task> { clusterTask, fieldTask };
 

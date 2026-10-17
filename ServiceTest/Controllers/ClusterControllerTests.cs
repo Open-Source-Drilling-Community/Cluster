@@ -158,6 +158,35 @@ namespace ServiceTest.Controllers
             Assert.That(list, Is.Not.Null);
         }
 
+        [Test]
+        public void Slot_discovery_is_bounded_and_omits_assignments_and_handles_empty_and_missing_clusters()
+        {
+            Guid parentId = Guid.NewGuid();
+            var parent = MakeCluster(parentId);
+            var firstId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+            var lastId = Guid.Parse("00000000-0000-0000-0000-000000000002");
+            parent.Slots = new()
+            {
+                [lastId] = new() { ID = lastId, Name = "Åsgard B", SlotFeatureAssignments = [] },
+                [firstId] = new() { ID = firstId, Name = "Åsgard A", SlotFeatureAssignments = [] }
+            };
+            _controller!.PostCluster(parent);
+            var page = (OSDC.Drilling.Cluster.Model.SlotDiscoveryPage)((OkObjectResult)_controller.DiscoverClusterSlots(parentId, limit: 1, name: "åSGARD").Result!).Value!;
+            Assert.Multiple(() =>
+            {
+                Assert.That(page.TotalCount, Is.EqualTo(2));
+                Assert.That(page.Items.Single().ID, Is.EqualTo(firstId));
+                Assert.That(page.NextOffset, Is.EqualTo(1));
+                Assert.That(System.Text.Json.JsonSerializer.Serialize(page), Does.Not.Contain("SlotFeatureAssignments"));
+            });
+            var last = (OSDC.Drilling.Cluster.Model.SlotDiscoveryPage)((OkObjectResult)_controller.DiscoverClusterSlots(parentId, offset: 1, limit: 1).Result!).Value!;
+            Assert.That(last.Items.Single().ID, Is.EqualTo(lastId)); Assert.That(last.NextOffset, Is.Null);
+            Guid emptyId = Guid.NewGuid(); _controller.PostCluster(MakeCluster(emptyId));
+            var empty = (OSDC.Drilling.Cluster.Model.SlotDiscoveryPage)((OkObjectResult)_controller.DiscoverClusterSlots(emptyId).Result!).Value!;
+            Assert.That(empty.TotalCount, Is.Zero); Assert.That(empty.Items, Is.Empty);
+            Assert.That(_controller.DiscoverClusterSlots(Guid.NewGuid()).Result, Is.InstanceOf<NotFoundObjectResult>());
+        }
+
         private sealed class EmptyExternalReferenceResolver : IClusterExternalReferenceResolver
         {
             public Task<List<ClusterBatchError>> PopulateExportManifestAsync(ClusterBatchExportDocument document, CancellationToken cancellationToken) => Task.FromResult(new List<ClusterBatchError>());

@@ -138,7 +138,7 @@
     {
         try
         {
-            _clusters = ((await Api.ClientCluster.GetAllClusterLightAsync()) ?? [])
+            _clusters = ((await Api.ClientCluster.ListClusterLightAsync()) ?? [])
                 .Where(value => value.MetaInfo?.ID is Guid id && id != Guid.Empty)
                 .OrderBy(value => value.Name, StringComparer.OrdinalIgnoreCase).ToList();
             _selected = []; _gridKey++;

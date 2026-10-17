@@ -55,8 +55,8 @@ public sealed class McpToolRegistrationTests
     }
 
     [TestCase("cluster_get_by_id")]
-    [TestCase("cluster_get_all")]
-    [TestCase("cluster_identity_get_all")]
+    [TestCase("cluster_discover")]
+    [TestCase("cluster_identity_discover")]
     [TestCase("cluster_feature_category_get_by_id")]
     public void Read_tools_are_read_only_idempotent_and_closed_world(string toolName)
     {
@@ -122,11 +122,11 @@ public sealed class McpToolRegistrationTests
 
     [TestCase("cluster_get_all_ids")]
     [TestCase("cluster_get_all_meta_info")]
-    [TestCase("cluster_get_all")]
-    [TestCase("cluster_get_all_light")]
-    [TestCase("cluster_identity_get_all")]
-    [TestCase("cluster_feature_category_get_all")]
-    [TestCase("slot_feature_category_get_all")]
+    [TestCase("cluster_discover")]
+    [TestCase("cluster_discover")]
+    [TestCase("cluster_identity_discover")]
+    [TestCase("cluster_feature_category_discover")]
+    [TestCase("slot_feature_category_discover")]
     public void Parameterless_tools_publish_an_explicit_empty_object_schema(string toolName)
     {
         JsonObject schema = RequireObject(_tools[toolName].InputSchema);
@@ -170,10 +170,9 @@ public sealed class McpToolRegistrationTests
     [Test]
     public void Cluster_read_outputs_distinguish_complete_and_lightweight_resources()
     {
-        JsonObject completeData = Property(RequireObject(_tools["cluster_get_all"].OutputSchema), "data");
-        JsonObject completeItem = RequireObject(completeData["items"]);
-        JsonObject lightData = Property(RequireObject(_tools["cluster_get_all_light"].OutputSchema), "data");
-        JsonObject lightItem = RequireObject(lightData["items"]);
+        JsonObject completeItem = Property(RequireObject(_tools["cluster_get_by_id"].OutputSchema), "data");
+        JsonObject lightData = Property(RequireObject(_tools["cluster_discover"].OutputSchema), "data");
+        JsonObject lightItem = RequireObject(Property(lightData, "Items")["items"]);
         Assert.Multiple(() =>
         {
             Assert.That(PropertyNames(completeItem), Does.Contain("Slots"));

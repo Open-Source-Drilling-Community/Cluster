@@ -178,7 +178,8 @@
                         @foreach (ClusterFeatureCategory category in _clusterFeatureCategories)
                         {
                             <MudExpansionPanel Text="@GetCategoryDisplayName(category)">
-                                @foreach (ClusterFeatureOption option in category.Options ?? [])
+                                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => LoadClusterFeatureCategoryOptionsAsync(category))">Load options</MudButton>
+                                    @foreach (ClusterFeatureOption option in category.Options ?? [])
                                 {
                                     <MudButton Class="me-1 mb-1" Variant="@GetOptionButtonVariant(category, option)" Color="@GetOptionButtonColor(category, option)" Size="Size.Small" Disabled="@IsOptionUnavailable(category)" OnClick="@(() => SelectFeatureOption(category, option))">
                                         @option.Name
@@ -366,7 +367,8 @@
                                 @foreach (SlotFeatureCategory category in _slotFeatureCategories)
                                 {
                                     <MudExpansionPanel Text="@GetSlotFeatureCategoryDisplayName(category)">
-                                        @foreach (SlotFeatureOption option in category.Options ?? [])
+                                        <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => LoadSlotFeatureCategoryOptionsAsync(category))">Load options</MudButton>
+                                    @foreach (SlotFeatureOption option in category.Options ?? [])
                                         {
                                             <MudButton Class="me-1 mb-1" Variant="@GetSlotFeatureOptionButtonVariant(category, option)" Color="@GetSlotFeatureOptionButtonColor(category, option)" Size="Size.Small" Disabled="@IsSlotFeatureOptionUnavailable(category)" OnClick="@(() => SelectSlotFeatureOption(category, option))">
                                                 @option.Name
@@ -436,6 +438,20 @@
     </MudExpansionPanels>
 </MudUnitAndReferenceChoiceTag>
 @code {
+    private async Task LoadClusterFeatureCategoryOptionsAsync(ClusterFeatureCategory category)
+    {
+        var full = await Api.ClientCluster.GetClusterFeatureCategoryByIdAsync(category.MetaInfo!.ID);
+        foreach (var property in typeof(ClusterFeatureCategory).GetProperties().Where(property => property.CanWrite))
+            property.SetValue(category, property.GetValue(full));
+    }
+
+    private async Task LoadSlotFeatureCategoryOptionsAsync(SlotFeatureCategory category)
+    {
+        var full = await Api.ClientCluster.GetSlotFeatureCategoryByIdAsync(category.MetaInfo!.ID);
+        foreach (var property in typeof(SlotFeatureCategory).GetProperties().Where(property => property.CanWrite))
+            property.SetValue(category, property.GetValue(full));
+    }
+
     [Parameter]
     public Cluster? CurrentCluster { get; set; }
 
@@ -851,7 +867,7 @@
     {
         try
         {
-            var rigs = await Api.ClientRig.GetAllRigLightAsync();
+            var rigs = await Api.ClientRig.ListRigLightAsync();
             // Only fixed platform rigs are relevant when selecting a fixed platform cluster
             _rigs = rigs?.Where(r => r.RigType == RigType.PlatformRig).OrderBy(r => r.Name).ToList() ?? new List<RigLight>();
         }
@@ -877,7 +893,7 @@
     {
         try
         {
-            _clusterIdentities = ((IEnumerable<ClusterIdentity>)await Api.ClientCluster.GetAllClusterIdentityAsync())
+            _clusterIdentities = ((IEnumerable<ClusterIdentity>)await Api.ClientCluster.ListClusterIdentityReferencesAsync())
                 .Where(identity => identity?.MetaInfo?.ID != null)
                 .OrderBy(identity => identity.Name, StringComparer.OrdinalIgnoreCase)
                 .ToList();
@@ -894,10 +910,12 @@
     {
         try
         {
-            _clusterFeatureCategories = ((IEnumerable<ClusterFeatureCategory>)await Api.ClientCluster.GetAllClusterFeatureCategoryAsync())
+            _clusterFeatureCategories = ((IEnumerable<ClusterFeatureCategory>)await Api.ClientCluster.ListClusterFeatureCategoryReferencesAsync())
                 .Where(category => category?.MetaInfo?.ID != null)
                 .OrderBy(category => category.Name, StringComparer.OrdinalIgnoreCase)
                 .ToList();
+            foreach (Guid id in CurrentCluster?.ClusterFeatureAssignments?.Where(value => value.FeatureCategoryID.HasValue).Select(value => value.FeatureCategoryID!.Value).Distinct() ?? [])
+                await Api.ClientCluster.LoadClusterFeatureCategoryDetailsAsync(_clusterFeatureCategories, id);
         }
         catch (Exception ex)
         {
@@ -911,10 +929,12 @@
     {
         try
         {
-            _slotFeatureCategories = ((IEnumerable<SlotFeatureCategory>)await Api.ClientCluster.GetAllSlotFeatureCategoryAsync())
+            _slotFeatureCategories = ((IEnumerable<SlotFeatureCategory>)await Api.ClientCluster.ListSlotFeatureCategoryReferencesAsync())
                 .Where(category => category?.MetaInfo?.ID != null)
                 .OrderBy(category => category.Name, StringComparer.OrdinalIgnoreCase)
                 .ToList();
+            foreach (Guid id in CurrentCluster?.Slots?.Values.SelectMany(slot => slot.SlotFeatureAssignments ?? [])?.Where(value => value.FeatureCategoryID.HasValue).Select(value => value.FeatureCategoryID!.Value).Distinct() ?? [])
+                await Api.ClientCluster.LoadSlotFeatureCategoryDetailsAsync(_slotFeatureCategories, id);
         }
         catch (Exception ex)
         {

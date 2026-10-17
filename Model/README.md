@@ -147,3 +147,21 @@ Model classification contract tests verify serialization and typed options.
 `Point3DGlobalCoordinates.X/RiemannianNorth` and `Y/RiemannianEast` are WGS84 Riemannian arc coordinates (`PositionDrilling`, metres), not projected easting/northing. `Z/TVD` is ellipsoidal depth (`DepthDrilling`, metres, positive downward from WGS84); latitude/longitude use `PlaneAngleGeodesic`, radians. A reference point carries the `ReferenceLocation` role.
 
 Gaussian wrappers carry the `GaussianUncertainValue` representation concept, not one global physical quantity. A property-specific `GaussianQuantity` binding maps relative JSON Pointers under `GaussianValue`: `/Mean`, `/StandardDeviation`, `/MinValue`, `/MaxValue`. Slot means use latitude/longitude (`PlaneAngleGeodesic`, radians); depth means use ground/mud-line or water-surface depth (`DepthDrilling`, metres). Angular standard uncertainty uses `PlaneAngleGeodesic`; linear standard uncertainty uses `LengthStandard`. Means and domain bounds reference WGS84; standard deviations have no coordinate origin. Bounds are provider domain-limit metadata, not confidence intervals or Gaussian truncation instructions.
+
+## Bounded light discovery
+
+Resource and catalog discovery returns light pages, with `offset` defaulting to 0 and `limit` defaulting to 50 (allowed range 1–200). Names and relevant resource-reference filters are evaluated on the server. Unbounded full-object `HeavyData` routes and tools, including filtered full-object lists, have been removed. Existing UUID and HTTP-metadata listings remain available; use named light pages for routine discovery.
+
+REST routes and MCP tool names (relative to the service's existing API path base):
+
+- `/Cluster/LightData` / `cluster_discover`
+- `/ClusterFeatureCategory/LightData` / `cluster_feature_category_discover`
+- `/ClusterIdentity/LightData` / `cluster_identity_discover`
+- `/SlotFeatureCategory/LightData` / `slot_feature_category_discover`
+- `/Cluster/{clusterId}/Slots/LightData` / `cluster_slots_discover`
+
+Pages contain `Items`, `Offset`, `Limit`, `TotalCount`, and `NextOffset`; `NextOffset` is null on the final page. Offset pages are individually consistent reads, not a snapshot spanning requests: concurrent inserts/deletes can change later pages. Refresh discovery when the underlying collection changes. EarthGeodesy's existing search pages instead expose `Items[].Value`, `Offset`, `Limit`, and `TotalCount`.
+
+Single-record reads, result/chunk reads, and deliberate backup/export/restore operations are preserved. Backups can still contain complete resources and should be treated as explicit bulk operations.
+
+This is a breaking REST/MCP contract change: update generated clients, UIs, and external integrations together with the service release. Removed heavy-list names are not compatibility aliases. No persisted engineering shapes, database names, or storage volumes are changed. Historical usage counters are retained; bounded discovery has a separate additive `DiscoveryRequestsPerDay` history in resource services.

@@ -5,6 +5,139 @@
     "version": "1.0"
   },
   "paths": {
+    "/Cluster/{clusterId}/Slots/LightData": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "DiscoverClusterSlots",
+        "parameters": [
+          {
+            "name": "clusterId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.SlotDiscoveryPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Cluster/LightData": {
+      "get": {
+        "tags": [
+          "Cluster"
+        ],
+        "operationId": "DiscoverCluster",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fieldId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "rigId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "isSingleWell",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "isFixedPlatform",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.ClusterDiscoveryPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Cluster": {
       "get": {
         "tags": [
@@ -211,29 +344,6 @@
         }
       }
     },
-    "/Cluster/HeavyData": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllCluster",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.Cluster"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Cluster/BatchExport": {
       "post": {
         "tags": [
@@ -402,107 +512,36 @@
         }
       }
     },
-    "/Cluster/LightData": {
+    "/ClusterFeatureCategory/LightData": {
       "get": {
         "tags": [
-          "Cluster"
+          "ClusterFeatureCategory"
         ],
-        "operationId": "GetAllClusterLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.ClusterLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Cluster/ByFieldId": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllClusterByFieldId",
+        "operationId": "DiscoverClusterFeatureCategory",
         "parameters": [
           {
-            "name": "guid",
+            "name": "offset",
             "in": "query",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "integer",
+              "format": "int32",
+              "default": 0
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.Cluster"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Cluster/ByRigId": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllClusterByRigId",
-        "parameters": [
+          },
           {
-            "name": "guid",
+            "name": "limit",
             "in": "query",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "integer",
+              "format": "int32",
+              "default": 50
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.Cluster"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Cluster/SingleWell": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllSingleWellCluster",
-        "parameters": [
+          },
           {
-            "name": "IsSingleWellNullable",
+            "name": "name",
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
@@ -512,42 +551,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.Cluster"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Cluster/FixedPlatform": {
-      "get": {
-        "tags": [
-          "Cluster"
-        ],
-        "operationId": "GetAllFixedPlatformCluster",
-        "parameters": [
-          {
-            "name": "fixedBool",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.Cluster"
-                  }
+                  "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.ClusterFeatureCategoryDiscoveryPage"
                 }
               }
             }
@@ -742,22 +746,46 @@
         }
       }
     },
-    "/ClusterFeatureCategory/HeavyData": {
+    "/ClusterIdentity/LightData": {
       "get": {
         "tags": [
-          "ClusterFeatureCategory"
+          "ClusterIdentity"
         ],
-        "operationId": "GetAllClusterFeatureCategory",
+        "operationId": "DiscoverClusterIdentity",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.ClusterFeatureCategory"
-                  }
+                  "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.ClusterIdentityDiscoveryPage"
                 }
               }
             }
@@ -952,29 +980,6 @@
         }
       }
     },
-    "/ClusterIdentity/HeavyData": {
-      "get": {
-        "tags": [
-          "ClusterIdentity"
-        ],
-        "operationId": "GetAllClusterIdentity",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.ClusterIdentity"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/ClusterUsageStatistics": {
       "get": {
         "tags": [
@@ -988,6 +993,53 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.UsageStatisticsCluster"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SlotFeatureCategory/LightData": {
+      "get": {
+        "tags": [
+          "SlotFeatureCategory"
+        ],
+        "operationId": "DiscoverSlotFeatureCategory",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.SlotFeatureCategoryDiscoveryPage"
                 }
               }
             }
@@ -1178,29 +1230,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          }
-        }
-      }
-    },
-    "/SlotFeatureCategory/HeavyData": {
-      "get": {
-        "tags": [
-          "SlotFeatureCategory"
-        ],
-        "operationId": "GetAllSlotFeatureCategory",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.SlotFeatureCategory"
-                  }
-                }
-              }
-            }
           }
         }
       }
@@ -2377,6 +2406,36 @@
         },
         "additionalProperties": false
       },
+      "OSDC.Drilling.Cluster.Model.ClusterDiscoveryPage": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.ClusterLight"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NextOffset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OSDC.Drilling.Cluster.Model.ClusterFeatureAssignment": {
         "type": "object",
         "properties": {
@@ -2606,6 +2665,65 @@
           "constraints": [ ]
         }
       },
+      "OSDC.Drilling.Cluster.Model.ClusterFeatureCategoryDiscoveryPage": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.ClusterFeatureCategoryLight"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NextOffset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Cluster.Model.ClusterFeatureCategoryLight": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExclusive": {
+            "type": "boolean"
+          },
+          "HasValidityPeriod": {
+            "type": "boolean"
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OSDC.Drilling.Cluster.Model.ClusterFeatureOption": {
         "type": "object",
         "properties": {
@@ -2807,6 +2925,59 @@
             "The assignment UUID is distinct from the definition UUID and the identified resource UUID."
           ]
         }
+      },
+      "OSDC.Drilling.Cluster.Model.ClusterIdentityDiscoveryPage": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.ClusterIdentityLight"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NextOffset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Cluster.Model.ClusterIdentityLight": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "OSDC.Drilling.Cluster.Model.ClusterLight": {
         "type": "object",
@@ -3609,6 +3780,36 @@
           "constraints": [ ]
         }
       },
+      "OSDC.Drilling.Cluster.Model.SlotDiscoveryPage": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.SlotLight"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NextOffset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OSDC.Drilling.Cluster.Model.SlotFeatureAssignment": {
         "type": "object",
         "properties": {
@@ -3838,6 +4039,65 @@
           "constraints": [ ]
         }
       },
+      "OSDC.Drilling.Cluster.Model.SlotFeatureCategoryDiscoveryPage": {
+        "type": "object",
+        "properties": {
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.SlotFeatureCategoryLight"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NextOffset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Cluster.Model.SlotFeatureCategoryLight": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExclusive": {
+            "type": "boolean"
+          },
+          "HasValidityPeriod": {
+            "type": "boolean"
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OSDC.Drilling.Cluster.Model.SlotFeatureOption": {
         "type": "object",
         "properties": {
@@ -3884,9 +4144,57 @@
           "constraints": [ ]
         }
       },
+      "OSDC.Drilling.Cluster.Model.SlotLight": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Latitude": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+          },
+          "Longitude": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+          }
+        },
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.18.0",
+          "concept": "urn:osdc:semantic:well-slot",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "containing cluster"
+          ],
+          "constraints": [ ]
+        }
+      },
       "OSDC.Drilling.Cluster.Model.UsageStatisticsCluster": {
         "type": "object",
         "properties": {
+          "DiscoveryRequestsPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Cluster.Model.History"
+          },
           "LastSaved": {
             "type": "string",
             "format": "date-time"

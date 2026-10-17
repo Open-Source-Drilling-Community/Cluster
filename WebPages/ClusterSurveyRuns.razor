@@ -239,9 +239,9 @@
         try
         {
             logger.LogInformation("Trying to load list of Fields and Clusters");
-            Task<ICollection<ClusterModelShared.FieldLight>> fieldTask = Api.ClientField.GetAllFieldLightAsync();
-            Task<ICollection<ClusterModelShared.ClusterLight>> clusterTask = Api.ClientCluster.GetAllClusterLightAsync();
-            Task<ICollection<ClusterModelShared.RigReadResponse>> rigTask = Api.ClientRig.GetAllRigAsync(false);
+            var fieldTask = Api.ClientField.ListFieldLightAsync();
+            var clusterTask = Api.ClientCluster.ListClusterLightAsync();
+            var rigTask = Api.ClientRig.ListRigReferencesAsync();
 
             await Task.WhenAll(fieldTask, clusterTask);
 
@@ -449,7 +449,7 @@
             selectedFieldDelineationLines = await LoadSelectedFieldDelineationLinesAsync(fieldId);
 
             logger.LogInformation("Loading survey run light data for field {FieldId} and cluster {ClusterId}", fieldId, clusterId);
-            surveyRunLightList = (await Api.ClientTrajectory.GetAllSurveyRunLightAsync(fieldId: fieldId, clusterId: clusterId))
+            surveyRunLightList = (await Api.ClientTrajectory.ListSurveyRunLightAsync(fieldId: fieldId, clusterId: clusterId))
                 .Where(surveyRun => surveyRun?.MetaInfo != null && surveyRun.MetaInfo.ID != Guid.Empty)
                 .Where(MatchesSurveyRunFilters)
                 .OrderBy(surveyRun => surveyRun.Name)

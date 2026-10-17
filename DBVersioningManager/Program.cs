@@ -18,7 +18,10 @@ Client clusterClient = ClientSetup(devHostName, clusterHostBase);
 // Create clients to access databases from local/ environment
 Client clusterLocalClient = ClientSetup(localHostName, clusterHostBase);
 // Get all clusters and cartographic projection sets from the APIs
-List<Cluster> clusters = (List<Cluster>) (await clusterClient.GetAllClusterAsync()).ToList();
+// This explicit administrative copy reads full records individually after light discovery.
+List<Cluster> clusters = [];
+foreach (var summary in await clusterClient.ListClusterLightAsync())
+    clusters.Add(await clusterClient.GetClusterByIdAsync(summary.MetaInfo!.ID));
 
 // Update local database with data from dev/ database
 try{
@@ -35,9 +38,9 @@ catch (Exception ex)
 }
 // Test if the new method works...
 Guid rigID = clusters[0].RigID!.Value;
-List<Cluster> clustersByRigId = (List<Cluster>) (await clusterLocalClient.GetAllClusterByRigIdAsync(rigID)).ToList();
+List<ClusterLight> clustersByRigId = (List<ClusterLight>) (await clusterLocalClient.ListClusterLightAsync(rigId: rigID)).ToList();
 Console.WriteLine($"Number of clusters with slot ID {rigID} in local database: {clustersByRigId.Count}");
-List<Cluster> clustersFixed = (List<Cluster>) (await clusterLocalClient.GetAllFixedPlatformClusterAsync(false)).ToList();
+List<ClusterLight> clustersFixed = (List<ClusterLight>) (await clusterLocalClient.ListClusterLightAsync(isFixedPlatform: false)).ToList();
 Console.WriteLine($"Number of clusters with slot ID {rigID} in local database: {clustersFixed.Count}");
 
 

@@ -1,3 +1,4 @@
+using OSDC.Drilling.Cluster.Service;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -18,6 +19,46 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
     [ApiController]
     public class ClusterController : ControllerBase
     {
+        /// <summary>Discover one cluster's slot locations without transferring the complete cluster or slot assignments.</summary>
+        [HttpGet("{clusterId:guid}/Slots/LightData", Name = "DiscoverClusterSlots")]
+        public ActionResult<SlotDiscoveryPage> DiscoverClusterSlots(Guid clusterId, [FromQuery] int offset = 0,
+            [FromQuery] int limit = 50, [FromQuery] string? name = null)
+        {
+            UsageStatisticsCluster.Instance.IncrementDiscoveryRequestsPerDay();
+            if (clusterId == Guid.Empty || offset < 0 || limit is < 1 or > 200 || name?.Length > 200)
+                return BadRequest(new { error = "invalid_discovery_query" });
+            try
+            {
+                var items = DiscoveryRecords.ReadSlotPage(_discoveryConnections.GetConnection(), clusterId, offset, limit, name, out int total);
+                return Ok(new SlotDiscoveryPage { Items = items, Offset = offset, Limit = limit, TotalCount = total,
+                    NextOffset = offset < total && items.Count < total - offset ? offset + items.Count : null });
+            }
+            catch (KeyNotFoundException) { return NotFound(new { error = "cluster_not_found" }); }
+            catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.Text.Json.JsonException or InvalidOperationException)
+            { return StatusCode(500, new { error = "discovery_failed" }); }
+        }
+        private readonly SqlConnectionManager _discoveryConnections;
+
+        /// <summary>Discover Cluster resources as bounded light records; retrieve selected full records by ID.</summary>
+        [HttpGet("LightData", Name = "DiscoverCluster")]
+        public ActionResult<OSDC.Drilling.Cluster.Model.ClusterDiscoveryPage> DiscoverCluster([FromQuery] int offset = 0, [FromQuery] int limit = 50, [FromQuery] string? name = null, [FromQuery] System.Guid? fieldId = null, [FromQuery] System.Guid? rigId = null, [FromQuery] bool? isSingleWell = null, [FromQuery] bool? isFixedPlatform = null)
+        {
+            UsageStatisticsCluster.Instance.IncrementDiscoveryRequestsPerDay();
+            if (offset < 0 || limit < 1 || limit > 200 || name?.Length > 200 || fieldId == System.Guid.Empty || rigId == System.Guid.Empty)
+                return BadRequest(new { error = "invalid_discovery_query", message = "Offset must be non-negative, limit 1–200, name at most 200 characters, and UUID filters non-empty." });
+            try
+            {
+                var records = DiscoveryRecords.ReadPage<OSDC.Drilling.Cluster.Model.ClusterLight>(_discoveryConnections.GetConnection(), "ClusterTable", "Cluster", offset, limit, name,
+                    new System.Collections.Generic.Dictionary<string, object?> { ["FieldID"] = fieldId, ["RigID"] = rigId, ["IsSingleWell"] = isSingleWell, ["IsFixedPlatform"] = isFixedPlatform }, out int total);
+                return Ok(new OSDC.Drilling.Cluster.Model.ClusterDiscoveryPage { Items = records, Offset = offset, Limit = limit, TotalCount = total,
+                    NextOffset = offset < total && records.Count < total - offset ? offset + records.Count : null });
+            }
+            catch (System.Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.Text.Json.JsonException or System.InvalidOperationException)
+            {
+                return StatusCode(500, new { error = "discovery_failed" });
+            }
+        }
+
         private readonly ILogger<ClusterManager> _logger;
         private readonly ClusterManager _clusterManager;
         private readonly IClusterExternalReferenceResolver _externalReferenceResolver;
@@ -25,6 +66,7 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         public ClusterController(ILogger<ClusterManager> logger, SqlConnectionManager connectionManager,
             IClusterExternalReferenceResolver externalReferenceResolver)
         {
+            _discoveryConnections = connectionManager;
             _logger = logger;
             _clusterManager = ClusterManager.GetInstance(_logger, connectionManager);
             _externalReferenceResolver = externalReferenceResolver;
@@ -100,7 +142,7 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         /// Returns the list of all Cluster present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData
         /// </summary>
         /// <returns>the list of all Cluster present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData</returns>
-        [HttpGet("HeavyData", Name = "GetAllCluster")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.Cluster?>> GetAllCluster()
         {
             UsageStatisticsCluster.Instance.IncrementGetAllClusterPerDay();
@@ -218,7 +260,7 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         /// Returns the list of all ClusterLight present in the microservice database, at endpoint Cluster/api/Cluster/LightData
         /// </summary>
         /// <returns>the list of all ClusterLight present in the microservice database, at endpoint Cluster/api/Cluster/LightData</returns>
-        [HttpGet("LightData", Name = "GetAllClusterLight")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.ClusterLight>> GetAllClusterLight()
         {
             UsageStatisticsCluster.Instance.IncrementGetAllClusterLightPerDay();
@@ -237,7 +279,7 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         /// Returns the list of all Cluster with given field id present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData
         /// </summary>
         /// <returns>the list of all Cluster with given field id present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData</returns>
-        [HttpGet("ByFieldId", Name = "GetAllClusterByFieldId")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.Cluster?>> GetAllClusterByFieldId(Guid guid)
         {
             UsageStatisticsCluster.Instance.IncrementGetAllClusterByFieldIdPerDay();
@@ -255,7 +297,7 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         /// Returns the list of all Cluster with given rig id present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData
         /// </summary>
         /// <returns>the list of all Cluster with given rig id present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData</returns>
-        [HttpGet("ByRigId", Name = "GetAllClusterByRigId")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.Cluster?>> GetAllClusterByRigId(Guid guid)
         {
             UsageStatisticsCluster.Instance.IncrementGetAllClusterByRigIdPerDay();
@@ -273,7 +315,7 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         /// Returns the list of all single well Clusters present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData
         /// </summary>
         /// <returns>the list of all single well Cluster present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData</returns>
-        [HttpGet("SingleWell", Name = "GetAllSingleWellCluster")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.Cluster?>> GetAllSingleWellCluster(bool? IsSingleWellNullable)
         {
             UsageStatisticsCluster.Instance.IncrementGetAllSingleWellClusterPerDay();
@@ -292,7 +334,7 @@ namespace OSDC.Drilling.Cluster.Service.Controllers
         /// Returns the list of all fixed platform Clusters present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData
         /// </summary>
         /// <returns>the list of all fixed platform Cluster present in the microservice database, at endpoint Cluster/api/Cluster/HeavyData</returns>
-        [HttpGet("FixedPlatform", Name = "GetAllFixedPlatformCluster")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.Cluster?>> GetAllFixedPlatformCluster(bool fixedBool)
         {
             UsageStatisticsCluster.Instance.IncrementGetAllFixedPlatformClusterPerDay();
